@@ -3,6 +3,8 @@
 	import welcome from '$lib/images/svelte-welcome.webp';
 
 	import Counter from './Counter.svelte';
+
+  export let data;
 </script>
 
 <svelte:head>
@@ -27,6 +29,15 @@
 	</h2>
 
 	<Counter />
+
+	<h2>
+		Countries:
+	</h2>
+	<ul>
+	{#each data.countries as country}
+		<li>{country.name}</li>
+	{/each}
+	</ul>
 </section>
 
 <style>
