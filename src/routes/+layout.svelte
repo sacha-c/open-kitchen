@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { locales, localizeHref } from '$lib/paraglide/runtime';
-	import Header from './Header.svelte';
 	import './layout.css';
 	import { invalidate } from '$app/navigation'
 	import { onMount } from 'svelte'
@@ -19,7 +18,6 @@
 </script>
 
 <div class="app">
-	<Header />
 	<main>{@render children()}</main>
 
 	<footer>

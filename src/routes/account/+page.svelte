@@ -1,8 +1,5 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
-	import type { SubmitFunction } from '@sveltejs/kit';
-
-	// ...
+    import type { SubmitFunction } from './$types.js';
 
 	let { data, form } = $props()
 	let { claims, supabase, profile } = $derived(data)
@@ -33,31 +30,31 @@
 </script>
 
 <div class="form-widget">
-	<form
-		class="form-widget"
-		method="post"
-		action="?/update"
-		use:enhance={handleSubmit}
-		bind:this={profileForm}>
-		<input type="hidden" name="avatarUrl" value={avatarUrl} />
-		<div>
-			<label for="email">Email</label>
-			<input id="email" type="text" value={claims?.email ?? ''} disabled />
-		</div>
+	   <form
+		   class="form-widget"
+		   method="post"
+		   action="?/update"
+		   use:enhance={handleSubmit}
+		   bind:this={profileForm}>
+		   <input type="hidden" name="avatarUrl" value={avatarUrl} />
+		   <div>
+			   <label for="email">Email</label>
+			   <input id="email" type="text" value={claims?.email ?? ''} disabled />
+		   </div>
 
-		<div>
-			<label for="fullName">Full Name</label>
-			<input id="fullName" name="fullName" type="text" value={form?.fullName ?? fullName} />
-		</div>
+		   <div>
+			   <label for="fullName">Full name</label>
+			   <input id="fullName" name="fullName" type="text" value={form?.fullName ?? fullName} />
+		   </div>
 
-		<div>
-			<label for="username">Username</label>
-			<input id="username" name="username" type="text" value={form?.username ?? username} />
-		</div>
+		   <div>
+			   <label for="username">Username</label>
+			   <input id="username" name="username" type="text" value={form?.username ?? username} />
+		   </div>
 
-		<div>
-			<label for="website">Website</label>
-			<input id="website" name="website" type="url" value={form?.website ?? website} />
+		   <div>
+			   <label for="website">Website</label>
+			   <input id="website" name="website" type="url" value={form?.website ?? website} />
 		</div>
 
 		<div>
