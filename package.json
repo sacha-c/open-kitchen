@@ -1,0 +1,41 @@
+{
+	"name": "open-mambo",
+	"private": true,
+	"version": "0.0.1",
+	"type": "module",
+	"scripts": {
+		"dev": "vite dev",
+		"build": "vite build",
+		"preview": "vite preview",
+		"prepare": "svelte-kit sync || echo ''",
+		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+		"test:unit": "vitest",
+		"test": "npm run test:unit -- --run && npm run test:e2e",
+		"test:e2e": "playwright test"
+	},
+	"devDependencies": {
+		"@fontsource/fira-mono": "^5.2.7",
+		"@inlang/paraglide-js": "^2.10.0",
+		"@neoconfetti/svelte": "^2.2.2",
+		"@playwright/test": "^1.58.2",
+		"@sveltejs/adapter-vercel": "^6.3.1",
+		"@sveltejs/kit": "^2.50.2",
+		"@sveltejs/vite-plugin-svelte": "^6.2.4",
+		"@tailwindcss/forms": "^0.5.11",
+		"@tailwindcss/typography": "^0.5.19",
+		"@tailwindcss/vite": "^4.1.18",
+		"@vitest/browser-playwright": "^4.1.0",
+		"mdsvex": "^0.12.6",
+		"playwright": "^1.58.2",
+		"prettier-plugin-tailwindcss": "^0.7.2",
+		"svelte": "^5.54.0",
+		"svelte-check": "^4.4.2",
+		"tailwindcss": "^4.1.18",
+		"typescript": "^5.9.3",
+		"vite": "^7.3.1",
+		"vite-plugin-devtools-json": "^1.0.0",
+		"vitest": "^4.1.0",
+		"vitest-browser-svelte": "^2.0.2"
+	}
+}
