@@ -1,71 +1,56 @@
 <script lang="ts">
-	import welcomeFallback from '$lib/images/svelte-welcome.png';
-	import welcome from '$lib/images/svelte-welcome.webp';
+	import { enhance } from '$app/forms'
+	import type { ActionData, SubmitFunction } from './$types.js'
 
-	import Counter from './Counter.svelte';
+	interface Props {
+		form: ActionData
+	}
+	let { form }: Props = $props()
 
-  export let data;
+	let loading = $state(false)
+
+	const handleSubmit: SubmitFunction = () => {
+		loading = true
+		return async ({ update }) => {
+			update()
+			loading = false
+		}
+	}
 </script>
 
 <svelte:head>
-	<title>Home</title>
-	<meta name="description" content="Svelte demo app" />
+	<title>User Management</title>
 </svelte:head>
 
-<section>
-	<h1>
-		<span class="welcome">
-			<picture>
-				<source srcset={welcome} type="image/webp" />
-				<img src={welcomeFallback} alt="Welcome" />
-			</picture>
+<form class="row flex flex-center" method="POST" use:enhance={handleSubmit}>
+	<div class="col-6 form-widget">
+		<h1 class="header">Supabase + SvelteKit</h1>
+		<p class="description">Sign in via magic link with your email below</p>
+		{#if form?.message !== undefined}
+		<div class="success {form?.success ? '' : 'fail'}">
+			{form?.message}
+		</div>
+		{/if}
+		<div>
+			<label for="email">Email address</label>
+			<input 
+				id="email" 
+				name="email" 
+				class="inputField" 
+				type="email" 
+				placeholder="Your email" 
+				value={form?.email ?? ''} 
+			/>
+		</div>
+		{#if form?.errors?.email}
+		<span class="flex items-center text-sm error">
+			{form?.errors?.email}
 		</span>
-
-		to your new<br />SvelteKit app
-	</h1>
-
-	<h2>
-		try editing <strong>src/routes/+page.svelte</strong>
-	</h2>
-
-	<Counter />
-
-	<h2>
-		Countries:
-	</h2>
-	<ul>
-	{#each data.countries as country}
-		<li>{country.name}</li>
-	{/each}
-	</ul>
-</section>
-
-<style>
-	section {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		flex: 0.6;
-	}
-
-	h1 {
-		width: 100%;
-	}
-
-	.welcome {
-		display: block;
-		position: relative;
-		width: 100%;
-		height: 0;
-		padding: 0 0 calc(100% * 495 / 2048) 0;
-	}
-
-	.welcome img {
-		position: absolute;
-		width: 100%;
-		height: 100%;
-		top: 0;
-		display: block;
-	}
-</style>
+		{/if}
+		<div>
+			<button class="button primary block">
+				{ loading ? 'Loading' : 'Send magic link' }
+			</button>
+		</div>
+	</div>
+</form>

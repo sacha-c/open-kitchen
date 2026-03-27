@@ -2,7 +2,7 @@
 
 - **Language**: TypeScript
 - **Package Manager**: pnpm
-- **Add-ons**: vitest, playwright, tailwindcss, sveltekit-adapter, devtools-json, mdsvex, paraglide, mcp
+- **Add-ons**: vitest, playwright, tailwindcss, sveltekit-adapter, devtools-json, supabase-auth, mdsvex, paraglide, mcp
 
 ---
 
