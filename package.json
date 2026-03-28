@@ -30,6 +30,7 @@
     "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/vite": "^4.1.18",
     "@vitest/browser-playwright": "^4.1.0",
+    "daisyui": "^5.5.19",
     "mdsvex": "^0.12.6",
     "playwright": "^1.58.2",
     "prettier-plugin-tailwindcss": "^0.7.2",

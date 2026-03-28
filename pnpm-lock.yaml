@@ -51,6 +51,9 @@ importers:
       '@vitest/browser-playwright':
         specifier: ^4.1.0
         version: 4.1.2(playwright@1.58.2)(vite@7.3.1(@types/node@25.5.0)(jiti@2.6.1)(lightningcss@1.32.0))(vitest@4.1.2)
+      daisyui:
+        specifier: ^5.5.19
+        version: 5.5.19
       mdsvex:
         specifier: ^0.12.6
         version: 0.12.7(svelte@5.55.0)
@@ -1029,6 +1032,9 @@ packages:
     resolution: {integrity: sha512-/Tb/JcjK111nNScGob5MNtsntNM1aCNUDipB/TkwZFhyDrrE47SOx/18wF2bbjgc3ZzCSKW1T5nt5EbFoAz/Vg==}
     engines: {node: '>=4'}
     hasBin: true
+
+  daisyui@5.5.19:
+    resolution: {integrity: sha512-pbFAkl1VCEh/MPCeclKL61I/MqRIFFhNU7yiXoDDRapXN4/qNCoMxeCCswyxEEhqL5eiTTfwHvucFtOE71C9sA==}
 
   debug@4.4.3:
     resolution: {integrity: sha512-RGwwWnwQvkVfavKVt22FGLw+xYSdzARwm0ru6DhTVA3umU5hZc28V3kO4stgYryrTlLpuvgI9GiijltAjNbcqA==}
@@ -2399,6 +2405,8 @@ snapshots:
   cookie@1.1.1: {}
 
   cssesc@3.0.0: {}
+
+  daisyui@5.5.19: {}
 
   debug@4.4.3:
     dependencies:

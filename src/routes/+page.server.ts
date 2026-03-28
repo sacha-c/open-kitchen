@@ -25,12 +25,8 @@ export const actions: Actions = {
       errors.email = "Please enter a valid email address.";
     }
     // Password validation
-    if (password.length < 8) {
-      errors.password = "Password must be at least 8 characters.";
-    }
-    if (!/[A-Za-z]/.test(password) || !/\d/.test(password)) {
-      errors.password =
-        "Password must contain at least one letter and one number.";
+    if (password.length < 6) {
+      errors.password = "Password must be at least 6 characters.";
     }
     if (Object.keys(errors).length > 0) {
       return fail(400, { errors, email });
