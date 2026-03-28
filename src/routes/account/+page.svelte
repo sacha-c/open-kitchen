@@ -1,76 +1,94 @@
 <script lang="ts">
-    import type { SubmitFunction } from './$types.js';
-	import { enhance } from '$app/forms';
+  import { enhance } from "$app/forms";
+  import type { SubmitFunction } from "./$types.js";
 
-	let { data, form } = $props()
-	let { claims, supabase, profile } = $derived(data)
-	let profileForm: HTMLFormElement
-	let loading = $state(false)
-	let fullName: string = profile?.full_name ?? ''
-	let username: string = profile?.username ?? ''
-	let website: string = profile?.website ?? ''
-	let avatarUrl: string = profile?.avatar_url ?? ''
+  let { data, form } = $props();
+  let { claims, supabase, profile } = $derived(data);
+  let profileForm: HTMLFormElement;
+  let loading = $state(false);
+  let fullName: string = profile?.full_name ?? "";
+  let username: string = profile?.username ?? "";
+  let website: string = profile?.website ?? "";
+  let avatarUrl: string = profile?.avatar_url ?? "";
 
-	// ...
+  // ...
 
-	const handleSubmit: SubmitFunction = () => {
-		loading = true
-		return async ({ update }) => {
-			loading = false
-			update()
-		}
-	}
+  const handleSubmit: SubmitFunction = () => {
+    loading = true;
+    return async ({ update }) => {
+      loading = false;
+      update();
+    };
+  };
 
-	const handleSignOut: SubmitFunction = () => {
-		loading = true
-		return async ({ update }) => {
-			loading = false
-			update()
-		}
-	}
+  const handleSignOut: SubmitFunction = () => {
+    loading = true;
+    return async ({ update }) => {
+      loading = false;
+      update();
+    };
+  };
 </script>
 
 <div class="form-widget">
-	   <form
-		   class="form-widget"
-		   method="post"
-		   action="?/update"
-		   use:enhance={handleSubmit}
-		   bind:this={profileForm}>
-		   <input type="hidden" name="avatarUrl" value={avatarUrl} />
-		   <div>
-			   <label for="email">Email</label>
-			   <input id="email" type="text" value={claims?.email ?? ''} disabled />
-		   </div>
+  <form
+    class="form-widget"
+    method="post"
+    action="?/update"
+    use:enhance={handleSubmit}
+    bind:this={profileForm}
+  >
+    <input type="hidden" name="avatarUrl" value={avatarUrl}>
+    <div>
+      <label for="email">Email</label>
+      <input id="email" type="text" value={claims?.email ?? ''} disabled>
+    </div>
 
-		   <div>
-			   <label for="fullName">Full name</label>
-			   <input id="fullName" name="fullName" type="text" value={form?.fullName ?? fullName} />
-		   </div>
+    <div>
+      <label for="fullName">Full name</label>
+      <input
+        id="fullName"
+        name="fullName"
+        type="text"
+        value={form?.fullName ?? fullName}
+      >
+    </div>
 
-		   <div>
-			   <label for="username">Username</label>
-			   <input id="username" name="username" type="text" value={form?.username ?? username} />
-		   </div>
+    <div>
+      <label for="username">Username</label>
+      <input
+        id="username"
+        name="username"
+        type="text"
+        value={form?.username ?? username}
+      >
+    </div>
 
-		   <div>
-			   <label for="website">Website</label>
-			   <input id="website" name="website" type="url" value={form?.website ?? website} />
-		</div>
+    <div>
+      <label for="website">Website</label>
+      <input
+        id="website"
+        name="website"
+        type="url"
+        value={form?.website ?? website}
+      >
+    </div>
 
-		<div>
-			<input
-				type="submit"
-				class="button block primary"
-				value={loading ? 'Loading...' : 'Update'}
-				disabled={loading}
-			/>
-		</div>
-	</form>
+    <div>
+      <input
+        type="submit"
+        class="button block primary"
+        value={loading ? 'Loading...' : 'Update'}
+        disabled={loading}
+      >
+    </div>
+  </form>
 
-	<form method="post" action="?/signout" use:enhance={handleSignOut}>
-		<div>
-			<button class="button block" disabled={loading}>Sign Out</button>
-		</div>
-	</form>
+  <form method="post" action="?/signout" use:enhance={handleSignOut}>
+    <div>
+      <button class="button block" disabled={loading} type="submit">
+        Sign Out
+      </button>
+    </div>
+  </form>
 </div>

@@ -1,26 +1,41 @@
-import { PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public'
-import type { LayoutLoad } from './$types'
-import { createBrowserClient, createServerClient, isBrowser } from '@supabase/ssr'
+import {
+  createBrowserClient,
+  createServerClient,
+  isBrowser,
+} from "@supabase/ssr";
+import {
+  PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY,
+  PUBLIC_SUPABASE_URL,
+} from "$env/static/public";
+import type { LayoutLoad } from "./$types";
 
 export const load: LayoutLoad = async ({ fetch, data, depends }) => {
-  depends('supabase:auth')
+  depends("supabase:auth");
 
   const supabase = isBrowser()
-    ? createBrowserClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY, {
-        global: {
-          fetch,
-        },
-      })
-    : createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY, {
-        global: {
-          fetch,
-        },
-        cookies: {
-          getAll() {
-            return data.cookies
+    ? createBrowserClient(
+        PUBLIC_SUPABASE_URL,
+        PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY,
+        {
+          global: {
+            fetch,
           },
         },
-      })
+      )
+    : createServerClient(
+        PUBLIC_SUPABASE_URL,
+        PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY,
+        {
+          global: {
+            fetch,
+          },
+          cookies: {
+            getAll() {
+              return data.cookies;
+            },
+          },
+        },
+      );
 
   /**
    * `getClaims` validates the JWT signature locally (for asymmetric keys) once
@@ -29,8 +44,8 @@ export const load: LayoutLoad = async ({ fetch, data, depends }) => {
    * fetch or refresh keys, this is both faster and safer than `getSession`,
    * which does not validate the JWT.
    */
-  const { data: claimsData, error } = await supabase.auth.getClaims()
-  const claims = error ? null : claimsData?.claims
+  const { data: claimsData, error } = await supabase.auth.getClaims();
+  const claims = error ? null : claimsData?.claims;
 
-  return { supabase, claims }
-}
+  return { supabase, claims };
+};

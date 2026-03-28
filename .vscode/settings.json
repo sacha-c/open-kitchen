@@ -1,5 +1,8 @@
 {
-	"files.associations": {
-		"*.css": "tailwindcss"
-	}
+  "files.associations": {
+    "*.css": "tailwindcss"
+  },
+  "editor.codeActionsOnSave": {
+    "source.fixAll.biome": "explicit"
+  }
 }
