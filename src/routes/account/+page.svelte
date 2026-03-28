@@ -1,5 +1,6 @@
 <script lang="ts">
     import type { SubmitFunction } from './$types.js';
+	import { enhance } from '$app/forms';
 
 	let { data, form } = $props()
 	let { claims, supabase, profile } = $derived(data)
