@@ -3,12 +3,9 @@ import type { Actions, PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ url, locals: { supabase } }) => {
   const { data, error } = await supabase.auth.getClaims();
-
-  // if the user is already logged in return them to the account page
   if (!error && data?.claims) {
     redirect(303, "/account");
   }
-
   return { url: url.origin };
 };
 
@@ -19,30 +16,66 @@ export const actions: Actions = {
       locals: { supabase },
     } = event;
     const formData = await request.formData();
-    const email = formData.get("email") as string;
-    const validEmail = /^[\w-.+]+@([\w-]+\.)+[\w-]{2,8}$/.test(email);
+    const email = (formData.get("email") || "").toString().trim();
+    const password = (formData.get("password") || "").toString();
+    const errors: Record<string, string> = {};
 
-    if (!validEmail) {
-      return fail(400, {
-        errors: { email: "Please enter a valid email address" },
-        email,
-      });
+    // Email validation
+    if (!/^[\w-.+]+@([\w-]+\.)+[\w-]{2,8}$/.test(email)) {
+      errors.email = "Please enter a valid email address.";
+    }
+    // Password validation
+    if (password.length < 8) {
+      errors.password = "Password must be at least 8 characters.";
+    }
+    if (!/[A-Za-z]/.test(password) || !/\d/.test(password)) {
+      errors.password =
+        "Password must contain at least one letter and one number.";
+    }
+    if (Object.keys(errors).length > 0) {
+      return fail(400, { errors, email });
     }
 
-    const { error } = await supabase.auth.signInWithOtp({ email });
-
-    if (error) {
-      return fail(400, {
-        success: false,
-        email,
-        message: `There was an issue, Please contact support.`,
-      });
+    // Try sign in
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (!signInError) {
+      return { success: true, message: "Signed in successfully!" };
     }
 
-    return {
-      success: true,
+    // If user not found, try sign up
+    if (
+      signInError.message?.match(
+        /invalid login|user not found|invalid credentials|email or password/gi,
+      )
+    ) {
+      const { error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+      if (signUpError) {
+        return fail(400, {
+          success: false,
+          email,
+          message:
+            signUpError.message ||
+            "There was an issue creating your account. Please try again or contact support.",
+        });
+      }
+      return {
+        success: true,
+        message: "Account created and signed in successfully!",
+      };
+    }
+
+    // Other errors
+    return fail(400, {
+      success: false,
+      email,
       message:
-        "Please check your email for a magic link to log into the website.",
-    };
+        signInError.message || "There was an issue, Please contact support.",
+    });
   },
 };

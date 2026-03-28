@@ -6,10 +6,10 @@
   let { claims, supabase, profile } = $derived(data);
   let profileForm: HTMLFormElement;
   let loading = $state(false);
-  let fullName: string = profile?.full_name ?? "";
-  let username: string = profile?.username ?? "";
-  let website: string = profile?.website ?? "";
-  let avatarUrl: string = profile?.avatar_url ?? "";
+  let fullName: string = $derived.by(() => profile?.full_name ?? "");
+  let username: string = $derived.by(() => profile?.username ?? "");
+  let website: string = $derived.by(() => profile?.website ?? "");
+  let avatarUrl: string = $derived.by(() => profile?.avatar_url ?? "");
 
   // ...
 
