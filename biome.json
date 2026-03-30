@@ -7,7 +7,11 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "includes": ["**/*", "!project.inlang/settings.json"]
+    "includes": [
+      "**/*",
+      "!project.inlang/settings.json",
+      "!src/database.types.ts"
+    ]
   },
   "formatter": {
     "enabled": true,

@@ -15,7 +15,9 @@
     "test:e2e": "playwright test",
     "format": "biome check --write",
     "lint": "biome lint --error-on-warnings",
-    "lint:ci": "biome ci --error-on-warnings"
+    "lint:ci": "biome ci --error-on-warnings",
+    "supabase:start": "supabase start",
+    "supabase:gentypes": "supabase gen types typescript --local --schema public > src/database.types.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.9",
@@ -34,6 +36,7 @@
     "mdsvex": "^0.12.6",
     "playwright": "^1.58.2",
     "prettier-plugin-tailwindcss": "^0.7.2",
+    "supabase": "^2.84.4",
     "svelte": "^5.54.0",
     "svelte-check": "^4.4.2",
     "tailwindcss": "^4.1.18",
