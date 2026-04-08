@@ -1,30 +1,23 @@
 import { fail, redirect } from "@sveltejs/kit";
+import { auth } from "$lib/server/auth";
 import type { Actions, PageServerLoad } from "./$types";
 
-export const load: PageServerLoad = async ({ url, locals: { supabase } }) => {
-  const { data, error } = await supabase.auth.getClaims();
-  if (!error && data?.claims) {
-    redirect(303, "/account");
-  }
-  return { url: url.origin };
+export const load: PageServerLoad = async ({ locals }) => {
+  return {
+    user: locals.user,
+  };
 };
 
 export const actions: Actions = {
-  default: async (event) => {
-    const {
-      request,
-      locals: { supabase },
-    } = event;
+  signin: async ({ request }) => {
     const formData = await request.formData();
     const email = (formData.get("email") || "").toString().trim();
     const password = (formData.get("password") || "").toString();
     const errors: Record<string, string> = {};
 
-    // Email validation
     if (!/^[\w-.+]+@([\w-]+\.)+[\w-]{2,8}$/.test(email)) {
       errors.email = "Please enter a valid email address.";
     }
-    // Password validation
     if (password.length < 6) {
       errors.password = "Password must be at least 6 characters.";
     }
@@ -32,46 +25,24 @@ export const actions: Actions = {
       return fail(400, { errors, email });
     }
 
-    // Try sign in
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
+    const response = await auth.api.signInEmail({
+      body: { email, password },
+      asResponse: true,
     });
-    if (!signInError) {
-      return { success: true, message: "Signed in successfully!" };
-    }
-
-    // If user not found, try sign up
-    if (
-      signInError.message?.match(
-        /invalid login|user not found|invalid credentials|email or password/gi,
-      )
-    ) {
-      const { error: signUpError } = await supabase.auth.signUp({
+    if (!response.ok) {
+      return fail(400, {
         email,
-        password,
+        message: "Invalid email or password.",
       });
-      if (signUpError) {
-        return fail(400, {
-          success: false,
-          email,
-          message:
-            signUpError.message ||
-            "There was an issue creating your account. Please try again or contact support.",
-        });
-      }
-      return {
-        success: true,
-        message: "Account created and signed in successfully!",
-      };
     }
 
-    // Other errors
-    return fail(400, {
-      success: false,
-      email,
-      message:
-        signInError.message || "There was an issue, Please contact support.",
+    redirect(303, "/");
+  },
+
+  signout: async ({ request }) => {
+    await auth.api.signOut({
+      headers: request.headers,
     });
+    redirect(303, "/");
   },
 };

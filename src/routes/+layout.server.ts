@@ -1,8 +1,8 @@
-// src/routes/+layout.server.ts
 import type { LayoutServerLoad } from "./$types";
 
-export const load: LayoutServerLoad = async ({ cookies }) => {
+export const load: LayoutServerLoad = async ({ locals }) => {
   return {
-    cookies: cookies.getAll(),
+    session: locals.session,
+    user: locals.user,
   };
 };
