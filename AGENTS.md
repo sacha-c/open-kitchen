@@ -1,3 +1,9 @@
+## Workflow
+
+**Before starting any feature or issue-driven task**, read and follow the `feature-workflow` skill (`.agents/skills/feature-workflow/SKILL.md`). It defines the full process: fetch issue → check dependencies → assess codebase → implement → test → commit → PR.
+
+---
+
 ## Project Configuration
 
 - **Language**: TypeScript
