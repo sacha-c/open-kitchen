@@ -52,6 +52,14 @@ Follow these principles:
   - **Link to the issue**: include `closes #N` if the PR fully resolves the issue, or `Relates to #N` if it's partial.
 - Pipe `gh` commands through `| cat` to avoid pager issues.
 
+### 6. Verify CI is green
+
+- After pushing, **always check that CI passes** before considering the task done.
+- Use `gh pr checks <PR-number> --repo sacha-c/open-kitchen` (redirect to a file or pipe through `| cat`) to monitor CI status.
+- If any job fails, fetch the failure logs with `gh run view <run-id> --repo sacha-c/open-kitchen --job <job-id> --log-failed` and diagnose.
+- Fix failures, commit, push, and re-check. **Iterate until all CI jobs are green.**
+- Do not hand back to the user with a red pipeline — a PR is not done until CI passes.
+
 ## Quick Reference
 
 ```bash
