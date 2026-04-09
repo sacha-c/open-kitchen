@@ -46,6 +46,10 @@ jobs:
 
       - name: Typecheck
         run: pnpm check
+        env:
+          DATABASE_URL: postgres://unused
+          BETTER_AUTH_SECRET: ci-dummy-secret
+          BETTER_AUTH_URL: http://localhost:5173
 
   test:
     runs-on: ubuntu-latest
@@ -64,6 +68,9 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install chromium
 
       - name: Run unit tests
         run: pnpm test:unit --run
