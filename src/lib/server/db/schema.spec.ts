@@ -184,4 +184,3 @@ describe("recipeIngredient columns", () => {
     expect(fk?.reference().foreignColumns[0].name).toBe("id");
   });
 });
-
