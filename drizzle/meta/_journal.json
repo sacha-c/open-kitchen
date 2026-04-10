@@ -15,6 +15,13 @@
       "when": 1775714001201,
       "tag": "0001_lucky_lifeguard",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1775811231500,
+      "tag": "0002_quiet_falcon",
+      "breakpoints": true
     }
   ]
 }

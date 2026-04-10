@@ -30,7 +30,7 @@
 - Auth flow complete: sign in, sign up, sign out pages.
 - DB schema has only better-auth tables: `user`, `session`, `account`, `verification`.
 - No recipe tables, no recipe UI, no Cecotec integration yet.
-- `scripts/` folder contains **reference Python scripts** (delete later) showing Cecotec API interaction.
+- `.mambo/` folder contains **reference Python scripts** (not commited with repository) showing Cecotec API interaction.
 
 ## Cecotec API Reference
 
