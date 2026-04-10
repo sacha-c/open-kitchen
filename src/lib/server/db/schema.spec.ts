@@ -54,8 +54,8 @@ describe("cecotecCredentials columns", () => {
       f.reference().columns.some((c) => c.name === "user_id"),
     );
     expect(fk).toBeDefined();
-    expect(fk!.onDelete).toBe("cascade");
-    expect(fk!.reference().foreignColumns[0].name).toBe("id");
+    expect(fk?.onDelete).toBe("cascade");
+    expect(fk?.reference().foreignColumns[0].name).toBe("id");
   });
 });
 
@@ -99,8 +99,8 @@ describe("recipe columns", () => {
       f.reference().columns.some((c) => c.name === "user_id"),
     );
     expect(fk).toBeDefined();
-    expect(fk!.onDelete).toBe("cascade");
-    expect(fk!.reference().foreignColumns[0].name).toBe("id");
+    expect(fk?.onDelete).toBe("cascade");
+    expect(fk?.reference().foreignColumns[0].name).toBe("id");
   });
 });
 
@@ -146,8 +146,8 @@ describe("recipeStep columns", () => {
       f.reference().columns.some((c) => c.name === "recipe_id"),
     );
     expect(fk).toBeDefined();
-    expect(fk!.onDelete).toBe("cascade");
-    expect(fk!.reference().foreignColumns[0].name).toBe("id");
+    expect(fk?.onDelete).toBe("cascade");
+    expect(fk?.reference().foreignColumns[0].name).toBe("id");
   });
 });
 
@@ -180,8 +180,8 @@ describe("recipeIngredient columns", () => {
       f.reference().columns.some((c) => c.name === "recipe_id"),
     );
     expect(fk).toBeDefined();
-    expect(fk!.onDelete).toBe("cascade");
-    expect(fk!.reference().foreignColumns[0].name).toBe("id");
+    expect(fk?.onDelete).toBe("cascade");
+    expect(fk?.reference().foreignColumns[0].name).toBe("id");
   });
 });
 
