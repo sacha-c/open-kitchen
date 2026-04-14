@@ -57,11 +57,3 @@ jobs:
 
       - name: Run unit tests
         run: pnpm test:unit --run
-
-  ready-for-deployment:
-    if: github.ref == 'refs/heads/main'
-    needs: [lint, typecheck, test]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Ready
-        run: echo "Ready for deployment"
