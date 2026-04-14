@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install pnpm and dependencies
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: true
+
+      - name: Lint
+        run: pnpm lint:ci
+
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install pnpm and dependencies
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: true
+
+      - name: Compile Paraglide messages
+        run: pnpm exec paraglide-js compile --project ./project.inlang --outdir ./src/lib/paraglide
+
+      - name: Typecheck
+        run: pnpm check
+        env:
+          DATABASE_URL: postgres://unused
+          BETTER_AUTH_SECRET: ci-dummy-secret
+          BETTER_AUTH_URL: http://localhost:5173
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install pnpm and dependencies
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: true
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install chromium
+
+      - name: Run unit tests
+        run: pnpm test:unit --run
+
+  ready-for-deployment:
+    if: github.ref == 'refs/heads/main'
+    needs: [lint, typecheck, test]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ready
+        run: echo "Ready for deployment"
