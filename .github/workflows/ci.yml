@@ -72,6 +72,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
 
@@ -125,6 +128,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
 
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
