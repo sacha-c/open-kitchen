@@ -36,7 +36,11 @@ jobs:
       - name: Deploy to Vercel Preview
         id: deploy
         run: |
-          url=$(pnpm exec vercel deploy --prebuilt --meta githubCommitAuthorEmail=${{ vars.VERCEL_DEPLOY_AUTHOR_EMAIL }} --token=${{ secrets.VERCEL_TOKEN }})
+          # 1. Nuke the git folder so Vercel CLI can't snoop the commit author
+          rm -rf .git 
+          
+          # 2. Deploy
+          url=$(pnpm exec vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
           echo "url=$url" >> "$GITHUB_OUTPUT"
 
       - name: Comment Preview URL on PR
