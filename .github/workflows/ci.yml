@@ -41,6 +41,32 @@ jobs:
           BETTER_AUTH_SECRET: ci-dummy-secret
           BETTER_AUTH_URL: http://localhost:5173
 
+  check-migrations:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install pnpm and dependencies
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: true
+
+      - name: Check for missing migrations
+        run: |
+          pnpm db:generate
+          if [[ -n $(git status --porcelain) ]]; then
+            echo "❌ Missing migrations detected!"
+            echo "It looks like your schema.ts changed, but the migration files weren't generated."
+            echo "Please run 'pnpm db:generate' locally and commit the resulting files."
+            git status
+            exit 1
+          else
+            echo "✅ Migrations are up to date."
+          fi
+        env:
+          DATABASE_URL: "postgresql://dummy:dummy@localhost/dummy"
+
   test:
     runs-on: ubuntu-latest
     steps:

@@ -34,6 +34,11 @@ jobs:
       - name: Build Project Artifacts
         run: pnpm exec vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
 
+      - name: Run Database Migrations
+        run: |
+          cp .vercel/.env.production.local .env
+          pnpm db:migrate
+
       - name: Deploy to Vercel Production
         id: deploy
         run: |
