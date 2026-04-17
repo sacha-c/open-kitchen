@@ -75,7 +75,7 @@
   );
 
   function formatTime(seconds: number): string {
-    if (seconds === 0) return "0s";
+    if (seconds <= 0) return "0s";
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
     return m > 0 ? (s > 0 ? `${m}m ${s}s` : `${m}m`) : `${s}s`;
