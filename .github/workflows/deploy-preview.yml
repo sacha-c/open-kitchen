@@ -39,8 +39,6 @@ jobs:
 
       - name: Run Database Migrations
         run: pnpm db:push
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Deploy to Vercel Preview
         id: deploy
