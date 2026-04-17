@@ -38,7 +38,9 @@ jobs:
         run: pnpm exec vercel build --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Run Database Migrations
-        run: pnpm db:push
+        run: |
+          cp .vercel/.env.preview.local .env
+          pnpm db:push
 
       - name: Deploy to Vercel Preview
         id: deploy
