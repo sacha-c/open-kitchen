@@ -189,28 +189,31 @@
 
           <div class="form-control">
             <label class="label" for="language">Language</label>
-            <div class="select select-bordered w-full">
-              <select id="language" name="language" required>
-                <option
-                  value="en"
-                  selected={((form?.values?.language as string) ?? getLocale()) === "en"}
-                >
-                  English
-                </option>
-                <option
-                  value="es"
-                  selected={((form?.values?.language as string) ?? getLocale()) === "es"}
-                >
-                  Español
-                </option>
-                <option
-                  value="ca"
-                  selected={((form?.values?.language as string) ?? getLocale()) === "ca"}
-                >
-                  Català
-                </option>
-              </select>
-            </div>
+            <select
+              id="language"
+              name="language"
+              class="select select-bordered w-full"
+              required
+            >
+              <option
+                value="en"
+                selected={((form?.values?.language as string) ?? getLocale()) === "en"}
+              >
+                English
+              </option>
+              <option
+                value="es"
+                selected={((form?.values?.language as string) ?? getLocale()) === "es"}
+              >
+                Español
+              </option>
+              <option
+                value="ca"
+                selected={((form?.values?.language as string) ?? getLocale()) === "ca"}
+              >
+                Català
+              </option>
+            </select>
           </div>
         </div>
 
@@ -284,22 +287,19 @@
                 {/if}
               </div>
               <div class="form-control w-24">
-                <div
+                <select
                   class="select select-bordered select-sm w-full"
                   class:select-error={fieldError(`ingredients.${i}.unit`)}
+                  name={`ingredients[${i}].unit`}
+                  bind:value={ingredient.unit}
+                  aria-invalid={fieldError(`ingredients.${i}.unit`)
+                    ? "true"
+                    : undefined}
                 >
-                  <select
-                    name={`ingredients[${i}].unit`}
-                    bind:value={ingredient.unit}
-                    aria-invalid={fieldError(`ingredients.${i}.unit`)
-                      ? "true"
-                      : undefined}
-                  >
-                    {#each UNITS as unit (unit)}
-                      <option value={unit}>{unit}</option>
-                    {/each}
-                  </select>
-                </div>
+                  {#each UNITS as unit (unit)}
+                    <option value={unit}>{unit}</option>
+                  {/each}
+                </select>
               </div>
               <div class="flex gap-1">
                 <button
@@ -421,18 +421,17 @@
 
             <div class="form-control">
               <label class="label text-sm" for={`step-type-${i}`}> Type </label>
-              <div class="select select-bordered select-sm w-full">
-                <select
-                  id={`step-type-${i}`}
-                  name={`steps[${i}].operationType`}
-                  bind:value={step.operationType}
-                  required
-                >
-                  <option value={1}>Preparation</option>
-                  <option value={2}>Cooking</option>
-                  <option value={0}>Manual</option>
-                </select>
-              </div>
+              <select
+                id={`step-type-${i}`}
+                class="select select-bordered select-sm w-full"
+                name={`steps[${i}].operationType`}
+                bind:value={step.operationType}
+                required
+              >
+                <option value={1}>Preparation</option>
+                <option value={2}>Cooking</option>
+                <option value={0}>Manual</option>
+              </select>
             </div>
 
             {#if step.operationType === 2}
@@ -465,18 +464,17 @@
                   <label class="label text-sm" for={`step-speed-${i}`}>
                     Speed
                   </label>
-                  <div class="select select-bordered select-sm w-full">
-                    <select
-                      id={`step-speed-${i}`}
-                      name={`steps[${i}].speed`}
-                      bind:value={step.speed}
-                      required
-                    >
-                      {#each SPEED_OPTIONS as s (s)}
-                        <option value={s}>{s}</option>
-                      {/each}
-                    </select>
-                  </div>
+                  <select
+                    id={`step-speed-${i}`}
+                    class="select select-bordered select-sm w-full"
+                    name={`steps[${i}].speed`}
+                    bind:value={step.speed}
+                    required
+                  >
+                    {#each SPEED_OPTIONS as s (s)}
+                      <option value={s}>{s}</option>
+                    {/each}
+                  </select>
                 </div>
 
                 <div class="form-control">
