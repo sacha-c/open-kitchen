@@ -1,21 +1,50 @@
 import { neon } from "@neondatabase/serverless";
+import { betterAuth } from "better-auth";
+import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { drizzle } from "drizzle-orm/neon-http";
 import { reset, seed } from "drizzle-seed";
-import * as schema from "../src/lib/server/db/schema";
+import {
+  account,
+  recipe,
+  recipeIngredient,
+  recipeStep,
+  session,
+  user,
+  verification,
+} from "../src/lib/server/db/schema";
 
 if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URL is not set");
 }
+if (!process.env.BETTER_AUTH_SECRET) {
+  throw new Error("BETTER_AUTH_SECRET is not set");
+}
+
+const seedSchema = {
+  user,
+  session,
+  account,
+  verification,
+  recipe,
+  recipeStep,
+  recipeIngredient,
+};
 
 const sql = neon(process.env.DATABASE_URL);
-const db = drizzle({ client: sql, schema });
+const db = drizzle({ client: sql, schema: seedSchema });
+
+const auth = betterAuth({
+  secret: process.env.BETTER_AUTH_SECRET,
+  database: drizzleAdapter(db, { provider: "pg", schema: seedSchema }),
+  emailAndPassword: { enabled: true },
+});
 
 async function main() {
   console.log("Resetting database...");
-  await reset(db, schema);
+  await reset(db, seedSchema);
 
   console.log("Seeding database...");
-  await seed(db, schema, { count: 5, seed: 42 }).refine((funcs) => ({
+  await seed(db, seedSchema, { count: 5, seed: 42 }).refine((funcs) => ({
     user: {
       columns: {
         name: funcs.fullName(),
@@ -124,10 +153,30 @@ async function main() {
     session: { count: 0 },
     account: { count: 0 },
     verification: { count: 0 },
-    cecotecCredentials: { count: 0 },
   }));
 
+  console.log("Creating test user...");
+  const testUser = await auth.api.signUpEmail({
+    body: {
+      email: "test@open-kitchen.com",
+      password: "test1234",
+      name: "OpenKitchen Tester",
+    },
+  });
+
+  if (!testUser?.user?.id) {
+    throw new Error("Failed to create test user");
+  }
+
+  // Reassign all seeded recipes to the test user so they're visible after login
+  const { ne } = await import("drizzle-orm");
+  await db
+    .update(recipe)
+    .set({ userId: testUser.user.id })
+    .where(ne(recipe.userId, testUser.user.id));
+
   console.log("Seeding complete!");
+  console.log("Test user: test@open-kitchen.com / test1234");
 }
 
 main().catch((error) => {
