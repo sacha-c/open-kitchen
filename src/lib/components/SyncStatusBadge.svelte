@@ -16,11 +16,7 @@
   );
 
   let label = $derived(
-    status === "synced"
-      ? "Synced"
-      : status === "error"
-        ? "Error"
-        : "Pending",
+    status === "synced" ? "Synced" : status === "error" ? "Error" : "Pending",
   );
 </script>
 
@@ -33,7 +29,11 @@
   {/if}
   {#if status === "error" && syncError}
     <div class="tooltip tooltip-error" data-tip={syncError}>
-      <button class="btn btn-circle btn-ghost btn-xs" type="button" aria-label="Sync error details">
+      <button
+        class="btn btn-circle btn-ghost btn-xs"
+        type="button"
+        aria-label="Sync error details"
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"

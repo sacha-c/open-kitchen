@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { page } from "$app/state";
   import { resolve } from "$app/paths";
+  import { page } from "$app/state";
   import { locales, localizeHref } from "$lib/paraglide/runtime";
   import "./layout.css";
 

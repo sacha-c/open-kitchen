@@ -5,9 +5,7 @@
   let { data } = $props();
 </script>
 
-<svelte:head>
-  <title>My Recipes — OpenKitchen</title>
-</svelte:head>
+<svelte:head> <title>My Recipes — OpenKitchen</title> </svelte:head>
 
 <div class="mx-auto max-w-6xl px-4 py-8">
   <div class="mb-8 flex items-center justify-between">
@@ -43,9 +41,7 @@
       <a href="/recipes/new" class="btn btn-primary">Create Recipe</a>
     </div>
   {:else}
-    <div
-      class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
-    >
+    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {#each data.recipes as recipe (recipe.id)}
         <a
           href="/recipes/{recipe.id}"
@@ -57,11 +53,9 @@
                 src={recipe.imageUrl}
                 alt={recipe.name}
                 class="h-full w-full object-cover"
-              />
-            {:else}
-              <div
-                class="flex h-full w-full items-center justify-center"
               >
+            {:else}
+              <div class="flex h-full w-full items-center justify-center">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
