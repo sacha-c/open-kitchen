@@ -29,4 +29,9 @@ jobs:
         run: pnpm exec vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Deploy to Vercel Production
-        run: pnpm exec vercel deploy --prebuilt --prod --meta githubCommitAuthorEmail=${{ vars.VERCEL_DEPLOY_AUTHOR_EMAIL }} --token=${{ secrets.VERCEL_TOKEN }}
+        run: |
+          # 1. Nuke the git folder so Vercel CLI can't snoop the commit author
+          rm -rf .git 
+          
+          # 2. Deploy
+          pnpm exec vercel deploy --prebuilt --prod --meta githubCommitAuthorEmail=${{ vars.VERCEL_DEPLOY_AUTHOR_EMAIL }} --token=${{ secrets.VERCEL_TOKEN }}
