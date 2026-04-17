@@ -80,9 +80,7 @@ describe("recipeFormSchema", () => {
     });
     expect(result.success).toBe(false);
     if (!result.success) {
-      const stepsError = result.error.issues.find(
-        (i) => i.path[0] === "steps",
-      );
+      const stepsError = result.error.issues.find((i) => i.path[0] === "steps");
       expect(stepsError).toBeDefined();
     }
   });

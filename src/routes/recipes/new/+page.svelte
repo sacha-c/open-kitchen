@@ -133,9 +133,7 @@
   };
 </script>
 
-<svelte:head>
-  <title>New Recipe — OpenKitchen</title>
-</svelte:head>
+<svelte:head> <title>New Recipe — OpenKitchen</title> </svelte:head>
 
 <div class="mx-auto max-w-3xl px-4 py-8">
   <h1 class="mb-8 text-3xl font-bold">New Recipe</h1>
@@ -158,7 +156,7 @@
             value={form?.values?.name ?? ""}
             aria-invalid={fieldError("name") ? "true" : undefined}
             aria-describedby={fieldError("name") ? "name-error" : undefined}
-          />
+          >
           {#if fieldError("name")}
             <span id="name-error" class="label-text-alt text-error mt-1">
               {fieldError("name")}
@@ -181,12 +179,9 @@
               aria-describedby={fieldError("servings")
                 ? "servings-error"
                 : undefined}
-            />
+            >
             {#if fieldError("servings")}
-              <span
-                id="servings-error"
-                class="label-text-alt text-error mt-1"
-              >
+              <span id="servings-error" class="label-text-alt text-error mt-1">
                 {fieldError("servings")}
               </span>
             {/if}
@@ -200,9 +195,24 @@
               class="select select-bordered w-full"
               required
             >
-              <option value="en" selected={((form?.values?.language as string) ?? languageTag()) === "en"}>English</option>
-              <option value="es" selected={((form?.values?.language as string) ?? languageTag()) === "es"}>Español</option>
-              <option value="ca" selected={((form?.values?.language as string) ?? languageTag()) === "ca"}>Català</option>
+              <option
+                value="en"
+                selected={((form?.values?.language as string) ?? languageTag()) === "en"}
+              >
+                English
+              </option>
+              <option
+                value="es"
+                selected={((form?.values?.language as string) ?? languageTag()) === "es"}
+              >
+                Español
+              </option>
+              <option
+                value="ca"
+                selected={((form?.values?.language as string) ?? languageTag()) === "ca"}
+              >
+                Català
+              </option>
             </select>
           </div>
         </div>
@@ -252,7 +262,7 @@
                   aria-invalid={fieldError(`ingredients.${i}.name`)
                     ? "true"
                     : undefined}
-                />
+                >
                 {#if fieldError(`ingredients.${i}.name`)}
                   <span class="label-text-alt text-error mt-1">
                     {fieldError(`ingredients.${i}.name`)}
@@ -269,7 +279,7 @@
                   aria-invalid={fieldError(`ingredients.${i}.amount`)
                     ? "true"
                     : undefined}
-                />
+                >
                 {#if fieldError(`ingredients.${i}.amount`)}
                   <span class="label-text-alt text-error mt-1">
                     {fieldError(`ingredients.${i}.amount`)}
@@ -297,20 +307,26 @@
                   disabled={i === 0}
                   onclick={() => moveIngredient(i, -1)}
                   title="Move up"
-                >↑</button>
+                >
+                  ↑
+                </button>
                 <button
                   type="button"
                   class="btn btn-ghost btn-xs"
                   disabled={i === ingredients.length - 1}
                   onclick={() => moveIngredient(i, 1)}
                   title="Move down"
-                >↓</button>
+                >
+                  ↓
+                </button>
                 <button
                   type="button"
                   class="btn btn-ghost btn-xs text-error"
                   onclick={() => removeIngredient(i)}
                   title="Remove"
-                >✕</button>
+                >
+                  ✕
+                </button>
               </div>
             </div>
           </div>
@@ -336,19 +352,13 @@
       <div class="card-body">
         <div class="flex items-center justify-between">
           <h2 class="card-title text-lg">Steps</h2>
-          <button
-            type="button"
-            class="btn btn-sm btn-ghost"
-            onclick={addStep}
-          >
+          <button type="button" class="btn btn-sm btn-ghost" onclick={addStep}>
             + Add
           </button>
         </div>
 
         {#if fieldError("steps")}
-          <div class="alert alert-error text-sm">
-            {fieldError("steps")}
-          </div>
+          <div class="alert alert-error text-sm">{fieldError("steps")}</div>
         {/if}
 
         {#each steps as step, i (i)}
@@ -362,20 +372,26 @@
                   disabled={i === 0}
                   onclick={() => moveStep(i, -1)}
                   title="Move up"
-                >↑</button>
+                >
+                  ↑
+                </button>
                 <button
                   type="button"
                   class="btn btn-ghost btn-xs"
                   disabled={i === steps.length - 1}
                   onclick={() => moveStep(i, 1)}
                   title="Move down"
-                >↓</button>
+                >
+                  ↓
+                </button>
                 <button
                   type="button"
                   class="btn btn-ghost btn-xs text-error"
                   onclick={() => removeStep(i)}
                   title="Remove"
-                >✕</button>
+                >
+                  ✕
+                </button>
               </div>
             </div>
 
@@ -403,9 +419,7 @@
             </div>
 
             <div class="form-control">
-              <label class="label text-sm" for={`step-type-${i}`}>
-                Type
-              </label>
+              <label class="label text-sm" for={`step-type-${i}`}> Type </label>
               <select
                 id={`step-type-${i}`}
                 name={`steps[${i}].operationType`}
@@ -420,9 +434,7 @@
             </div>
 
             {#if step.operationType === 2}
-              <div
-                class="bg-base-300/50 grid grid-cols-2 gap-3 rounded-lg p-3"
-              >
+              <div class="bg-base-300/50 grid grid-cols-2 gap-3 rounded-lg p-3">
                 <div class="form-control">
                   <label class="label text-sm" for={`step-time-${i}`}>
                     Time (seconds)
@@ -439,7 +451,7 @@
                     aria-invalid={fieldError(`steps.${i}.time`)
                       ? "true"
                       : undefined}
-                  />
+                  >
                   {#if fieldError(`steps.${i}.time`)}
                     <span class="label-text-alt text-error mt-1">
                       {fieldError(`steps.${i}.time`)}
@@ -480,7 +492,7 @@
                     aria-invalid={fieldError(`steps.${i}.temperature`)
                       ? "true"
                       : undefined}
-                  />
+                  >
                   {#if fieldError(`steps.${i}.temperature`)}
                     <span class="label-text-alt text-error mt-1">
                       {fieldError(`steps.${i}.temperature`)}
@@ -504,7 +516,7 @@
                     aria-invalid={fieldError(`steps.${i}.power`)
                       ? "true"
                       : undefined}
-                  />
+                  >
                   {#if fieldError(`steps.${i}.power`)}
                     <span class="label-text-alt text-error mt-1">
                       {fieldError(`steps.${i}.power`)}
@@ -514,14 +526,10 @@
               </div>
             {:else}
               <!-- Hidden fields for non-cooking steps to ensure form data is sent -->
-              <input type="hidden" name={`steps[${i}].time`} value="0" />
-              <input type="hidden" name={`steps[${i}].speed`} value="0" />
-              <input
-                type="hidden"
-                name={`steps[${i}].temperature`}
-                value="0"
-              />
-              <input type="hidden" name={`steps[${i}].power`} value="0" />
+              <input type="hidden" name={`steps[${i}].time`} value="0">
+              <input type="hidden" name={`steps[${i}].speed`} value="0">
+              <input type="hidden" name={`steps[${i}].temperature`} value="0">
+              <input type="hidden" name={`steps[${i}].power`} value="0">
             {/if}
           </div>
         {/each}
@@ -529,11 +537,7 @@
         {#if steps.length === 0}
           <p class="text-base-content/40 py-4 text-center text-sm">
             No steps added.
-            <button
-              type="button"
-              class="link text-primary"
-              onclick={addStep}
-            >
+            <button type="button" class="link text-primary" onclick={addStep}>
               Add one
             </button>
           </p>

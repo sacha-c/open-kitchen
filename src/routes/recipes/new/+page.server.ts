@@ -1,15 +1,11 @@
 import { fail, redirect } from "@sveltejs/kit";
-import { db } from "$lib/server/db";
-import {
-  recipe,
-  recipeIngredient,
-  recipeStep,
-} from "$lib/server/db/schema";
 import {
   calculateCookingTime,
   parseFormDataToRecipe,
   recipeFormSchema,
 } from "$lib/recipe-validation";
+import { db } from "$lib/server/db";
+import { recipe, recipeIngredient, recipeStep } from "$lib/server/db/schema";
 import type { Actions, PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ locals }) => {

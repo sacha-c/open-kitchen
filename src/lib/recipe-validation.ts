@@ -43,9 +43,7 @@ export const recipeFormSchema = z.object({
   servings: z.string().min(1, "Servings is required"),
   language: z.enum(["en", "es", "ca"]),
   ingredients: z.array(ingredientSchema),
-  steps: z
-    .array(stepSchema)
-    .min(1, "At least one step is required"),
+  steps: z.array(stepSchema).min(1, "At least one step is required"),
 });
 
 export type RecipeFormData = z.infer<typeof recipeFormSchema>;
@@ -82,14 +80,12 @@ export function parseFormDataToRecipe(formData: FormData): unknown {
   let j = 0;
   while (formData.has(`steps[${j}].description`)) {
     steps.push({
-      description:
-        formData.get(`steps[${j}].description`)?.toString() ?? "",
+      description: formData.get(`steps[${j}].description`)?.toString() ?? "",
       operationType:
         formData.get(`steps[${j}].operationType`)?.toString() ?? "0",
       time: formData.get(`steps[${j}].time`)?.toString() ?? "0",
       speed: formData.get(`steps[${j}].speed`)?.toString() ?? "0",
-      temperature:
-        formData.get(`steps[${j}].temperature`)?.toString() ?? "0",
+      temperature: formData.get(`steps[${j}].temperature`)?.toString() ?? "0",
       power: formData.get(`steps[${j}].power`)?.toString() ?? "0",
     });
     j++;
