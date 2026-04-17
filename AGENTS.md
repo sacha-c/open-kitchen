@@ -20,7 +20,7 @@
 ## Key Commands
 
 - `pnpm dev` — dev server
-- `pnpm test:unit` — vitest
+- `pnpm test:unit --run` — vitest
 - `pnpm test:e2e` — playwright E2E
 - `pnpm lint` / `pnpm format` — biome
 - `pnpm check` — svelte & typescript
