@@ -10,6 +10,12 @@ jobs:
   deploy:
     if: github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
+    environment:
+      name: Production
+      url: ${{ steps.deploy.outputs.url }}
+    permissions:
+      contents: read
+      deployments: write
     env:
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
@@ -29,9 +35,11 @@ jobs:
         run: pnpm exec vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Deploy to Vercel Production
+        id: deploy
         run: |
           # 1. Nuke the git folder so Vercel CLI can't snoop the commit author
-          rm -rf .git 
-          
+          rm -rf .git
+
           # 2. Deploy
-          pnpm exec vercel deploy --prebuilt --prod --meta githubCommitAuthorEmail=${{ vars.VERCEL_DEPLOY_AUTHOR_EMAIL }} --token=${{ secrets.VERCEL_TOKEN }}
+          url=$(pnpm exec vercel deploy --prebuilt --prod --meta githubCommitAuthorEmail=${{ vars.VERCEL_DEPLOY_AUTHOR_EMAIL }} --token=${{ secrets.VERCEL_TOKEN }})
+          echo "url=$url" >> "$GITHUB_OUTPUT"
