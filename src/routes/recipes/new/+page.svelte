@@ -1,6 +1,7 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
   import { resolve } from "$app/paths";
+  import { formatCookingTime } from "$lib/format-cooking-time";
   import { getLocale } from "$lib/paraglide/runtime";
   import type { SubmitFunction } from "./$types.js";
 
@@ -73,13 +74,6 @@
   let cookingTime = $derived(
     steps.reduce((sum, s) => sum + (Number(s.totalTime) || 0), 0),
   );
-
-  function formatTime(seconds: number): string {
-    if (seconds <= 0) return "0s";
-    const m = Math.floor(seconds / 60);
-    const s = seconds % 60;
-    return m > 0 ? (s > 0 ? `${m}m ${s}s` : `${m}m`) : `${s}s`;
-  }
 
   function addIngredient() {
     ingredients.push({ name: "", amount: "", unit: "g" });
@@ -229,7 +223,7 @@
         </div>
 
         <div class="text-base-content/60 mt-2 text-sm">
-          Total cooking time: <strong>{formatTime(cookingTime)}</strong>
+          Total cooking time: <strong>{formatCookingTime(cookingTime)}</strong>
           (auto-calculated from steps)
         </div>
       </div>
