@@ -1,7 +1,7 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
   import { resolve } from "$app/paths";
-  import { languageTag } from "$lib/paraglide/runtime";
+  import { getLocale } from "$lib/paraglide/runtime";
   import type { SubmitFunction } from "./$types.js";
 
   interface FormResult {
@@ -197,19 +197,19 @@
             >
               <option
                 value="en"
-                selected={((form?.values?.language as string) ?? languageTag()) === "en"}
+                selected={((form?.values?.language as string) ?? getLocale()) === "en"}
               >
                 English
               </option>
               <option
                 value="es"
-                selected={((form?.values?.language as string) ?? languageTag()) === "es"}
+                selected={((form?.values?.language as string) ?? getLocale()) === "es"}
               >
                 Español
               </option>
               <option
                 value="ca"
-                selected={((form?.values?.language as string) ?? languageTag()) === "ca"}
+                selected={((form?.values?.language as string) ?? getLocale()) === "ca"}
               >
                 Català
               </option>

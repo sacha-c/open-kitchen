@@ -23,6 +23,7 @@
 - `pnpm test:unit` — vitest
 - `pnpm test:e2e` — playwright E2E
 - `pnpm lint` / `pnpm format` — biome
+- `pnpm check` — svelte & typescript
 - `pnpm db:generate` / `pnpm db:migrate` / `pnpm db:push` — drizzle migrations
 
 ## Current State

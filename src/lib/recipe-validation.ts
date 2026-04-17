@@ -50,7 +50,9 @@ export type RecipeFormData = z.infer<typeof recipeFormSchema>;
 export type IngredientFormData = z.infer<typeof ingredientSchema>;
 export type StepFormData = z.infer<typeof stepSchema>;
 
-export function calculateCookingTime(steps: StepFormData[]): number {
+export function calculateCookingTime(
+  steps: Pick<StepFormData, "time">[],
+): number {
   return steps.reduce((total, step) => total + (step.time || 0), 0);
 }
 
