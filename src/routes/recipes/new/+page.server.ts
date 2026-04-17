@@ -72,7 +72,7 @@ export const actions: Actions = {
           sortOrder: index,
           description: step.description,
           operationType: step.operationType,
-          totalTime: step.time,
+          totalTime: step.totalTime,
           speed: step.speed,
           temperature: step.temperature,
           power: step.power,

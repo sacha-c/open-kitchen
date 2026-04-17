@@ -15,7 +15,7 @@ describe("recipeFormSchema", () => {
       {
         description: "Mix everything",
         operationType: 1,
-        time: 0,
+        totalTime: 0,
         speed: "0",
         temperature: 0,
         power: 0,
@@ -100,7 +100,7 @@ describe("recipeFormSchema", () => {
         {
           description: "a".repeat(1001),
           operationType: 1,
-          time: 0,
+          totalTime: 0,
           speed: "0",
           temperature: 0,
           power: 0,
@@ -117,7 +117,7 @@ describe("recipeFormSchema", () => {
         {
           description: "Do something",
           operationType: 5,
-          time: 0,
+          totalTime: 0,
           speed: "0",
           temperature: 0,
           power: 0,
@@ -134,7 +134,7 @@ describe("recipeFormSchema", () => {
         {
           description: "Cook",
           operationType: 2,
-          time: 0,
+          totalTime: 0,
           speed: "5",
           temperature: 100,
           power: 5,
@@ -144,7 +144,7 @@ describe("recipeFormSchema", () => {
     expect(result.success).toBe(false);
     if (!result.success) {
       const timeError = result.error.issues.find((i) =>
-        i.path.includes("time"),
+        i.path.includes("totalTime"),
       );
       expect(timeError).toBeDefined();
     }
@@ -157,7 +157,7 @@ describe("recipeFormSchema", () => {
         {
           description: "Manual step",
           operationType: 0,
-          time: 0,
+          totalTime: 0,
           speed: "0",
           temperature: 0,
           power: 0,
@@ -174,7 +174,7 @@ describe("recipeFormSchema", () => {
         {
           description: "Cook forever",
           operationType: 2,
-          time: 5401,
+          totalTime: 5401,
           speed: "5",
           temperature: 100,
           power: 5,
@@ -191,7 +191,7 @@ describe("recipeFormSchema", () => {
         {
           description: "Cook",
           operationType: 2,
-          time: 60,
+          totalTime: 60,
           speed: "5",
           temperature: 201,
           power: 5,
@@ -208,7 +208,7 @@ describe("recipeFormSchema", () => {
         {
           description: "Cook",
           operationType: 2,
-          time: 60,
+          totalTime: 60,
           speed: "5",
           temperature: 100,
           power: 11,
@@ -225,7 +225,7 @@ describe("recipeFormSchema", () => {
         {
           description: "Cook",
           operationType: 2,
-          time: 60,
+          totalTime: 60,
           speed: "11",
           temperature: 100,
           power: 5,
@@ -242,7 +242,7 @@ describe("recipeFormSchema", () => {
         {
           description: "Cook",
           operationType: 2,
-          time: 60,
+          totalTime: 60,
           speed: "fast",
           temperature: 100,
           power: 5,
@@ -276,28 +276,21 @@ describe("recipeFormSchema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("coerces string numbers for step fields", () => {
+  it("rejects string numbers for integer step fields", () => {
     const result = recipeFormSchema.safeParse({
       ...validRecipe,
       steps: [
         {
           description: "Cook",
           operationType: "2",
-          time: "60",
+          totalTime: "60",
           speed: "5",
           temperature: "100",
           power: "5",
         },
       ],
     });
-    expect(result.success).toBe(true);
-    if (result.success) {
-      expect(result.data.steps[0].operationType).toBe(2);
-      expect(result.data.steps[0].time).toBe(60);
-      expect(result.data.steps[0].speed).toBe("5");
-      expect(result.data.steps[0].temperature).toBe(100);
-      expect(result.data.steps[0].power).toBe(5);
-    }
+    expect(result.success).toBe(false);
   });
 });
 
@@ -307,7 +300,7 @@ describe("calculateCookingTime", () => {
       {
         description: "a",
         operationType: 2,
-        time: 60,
+        totalTime: 60,
         speed: "5",
         temperature: 100,
         power: 5,
@@ -315,7 +308,7 @@ describe("calculateCookingTime", () => {
       {
         description: "b",
         operationType: 1,
-        time: 30,
+        totalTime: 30,
         speed: "0",
         temperature: 0,
         power: 0,
@@ -323,7 +316,7 @@ describe("calculateCookingTime", () => {
       {
         description: "c",
         operationType: 2,
-        time: 120,
+        totalTime: 120,
         speed: "3",
         temperature: 80,
         power: 3,
@@ -341,7 +334,7 @@ describe("calculateCookingTime", () => {
       {
         description: "a",
         operationType: 0,
-        time: 0,
+        totalTime: 0,
         speed: "0",
         temperature: 0,
         power: 0,
@@ -365,7 +358,7 @@ describe("parseFormDataToRecipe", () => {
     fd.set("ingredients[1].unit", "g");
     fd.set("steps[0].description", "Mix well");
     fd.set("steps[0].operationType", "1");
-    fd.set("steps[0].time", "0");
+    fd.set("steps[0].totalTime", "0");
     fd.set("steps[0].speed", "0");
     fd.set("steps[0].temperature", "0");
     fd.set("steps[0].power", "0");
@@ -382,11 +375,11 @@ describe("parseFormDataToRecipe", () => {
       steps: [
         {
           description: "Mix well",
-          operationType: "1",
-          time: "0",
+          operationType: 1,
+          totalTime: 0,
           speed: "0",
-          temperature: "0",
-          power: "0",
+          temperature: 0,
+          power: 0,
         },
       ],
     });

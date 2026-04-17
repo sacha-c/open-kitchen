@@ -23,7 +23,7 @@
   interface Step {
     description: string;
     operationType: number;
-    time: number;
+    totalTime: number;
     speed: string;
     temperature: number;
     power: number;
@@ -46,7 +46,7 @@
         {
           description: "",
           operationType: 1,
-          time: 0,
+          totalTime: 0,
           speed: "0",
           temperature: 0,
           power: 0,
@@ -59,7 +59,7 @@
           {
             description: "",
             operationType: 1,
-            time: 0,
+            totalTime: 0,
             speed: "0",
             temperature: 0,
             power: 0,
@@ -71,7 +71,7 @@
   let steps = $state<Step[]>(restoreSteps());
 
   let cookingTime = $derived(
-    steps.reduce((sum, s) => sum + (Number(s.time) || 0), 0),
+    steps.reduce((sum, s) => sum + (Number(s.totalTime) || 0), 0),
   );
 
   function formatTime(seconds: number): string {
@@ -101,7 +101,7 @@
     steps.push({
       description: "",
       operationType: 1,
-      time: 0,
+      totalTime: 0,
       speed: "0",
       temperature: 0,
       power: 0,
@@ -443,20 +443,20 @@
                   </label>
                   <input
                     id={`step-time-${i}`}
-                    name={`steps[${i}].time`}
+                    name={`steps[${i}].totalTime`}
                     type="number"
                     class="input input-bordered input-sm w-full"
                     min={1}
                     max={5400}
                     required
-                    bind:value={step.time}
-                    aria-invalid={fieldError(`steps.${i}.time`)
+                    bind:value={step.totalTime}
+                    aria-invalid={fieldError(`steps.${i}.totalTime`)
                       ? "true"
                       : undefined}
                   >
-                  {#if fieldError(`steps.${i}.time`)}
+                  {#if fieldError(`steps.${i}.totalTime`)}
                     <span class="label-text-alt text-error mt-1">
-                      {fieldError(`steps.${i}.time`)}
+                      {fieldError(`steps.${i}.totalTime`)}
                     </span>
                   {/if}
                 </div>
@@ -529,7 +529,7 @@
               </div>
             {:else}
               <!-- Hidden fields for non-cooking steps to ensure form data is sent -->
-              <input type="hidden" name={`steps[${i}].time`} value="0">
+              <input type="hidden" name={`steps[${i}].totalTime`} value="0">
               <input type="hidden" name={`steps[${i}].speed`} value="0">
               <input type="hidden" name={`steps[${i}].temperature`} value="0">
               <input type="hidden" name={`steps[${i}].power`} value="0">
