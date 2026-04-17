@@ -73,7 +73,7 @@ export const actions: Actions = {
           description: step.description,
           operationType: step.operationType,
           totalTime: step.time,
-          speed: String(step.speed),
+          speed: step.speed,
           temperature: step.temperature,
           power: step.power,
         }),

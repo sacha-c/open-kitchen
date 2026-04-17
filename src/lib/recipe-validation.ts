@@ -19,7 +19,9 @@ export const stepSchema = z
         message: "Invalid step type",
       }),
     time: z.coerce.number().int().min(0).max(5400).default(0),
-    speed: z.string().default("0"),
+    speed: z
+      .enum(["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"])
+      .default("0"),
     temperature: z.coerce.number().int().min(0).max(200).default(0),
     power: z.coerce.number().int().min(0).max(10).default(0),
   })

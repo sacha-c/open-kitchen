@@ -218,6 +218,40 @@ describe("recipeFormSchema", () => {
     expect(result.success).toBe(false);
   });
 
+  it("rejects speed > 10", () => {
+    const result = recipeFormSchema.safeParse({
+      ...validRecipe,
+      steps: [
+        {
+          description: "Cook",
+          operationType: 2,
+          time: 60,
+          speed: "11",
+          temperature: 100,
+          power: 5,
+        },
+      ],
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects non-integer speed strings", () => {
+    const result = recipeFormSchema.safeParse({
+      ...validRecipe,
+      steps: [
+        {
+          description: "Cook",
+          operationType: 2,
+          time: 60,
+          speed: "fast",
+          temperature: 100,
+          power: 5,
+        },
+      ],
+    });
+    expect(result.success).toBe(false);
+  });
+
   it("rejects ingredient with empty name", () => {
     const result = recipeFormSchema.safeParse({
       ...validRecipe,
@@ -260,6 +294,7 @@ describe("recipeFormSchema", () => {
     if (result.success) {
       expect(result.data.steps[0].operationType).toBe(2);
       expect(result.data.steps[0].time).toBe(60);
+      expect(result.data.steps[0].speed).toBe("5");
       expect(result.data.steps[0].temperature).toBe(100);
       expect(result.data.steps[0].power).toBe(5);
     }
