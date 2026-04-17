@@ -37,6 +37,11 @@ jobs:
       - name: Build Project Artifacts
         run: pnpm exec vercel build --token=${{ secrets.VERCEL_TOKEN }}
 
+      - name: Run Database Migrations
+        run: pnpm db:push
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
       - name: Deploy to Vercel Preview
         id: deploy
         run: |
