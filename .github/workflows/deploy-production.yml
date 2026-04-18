@@ -46,5 +46,5 @@ jobs:
           rm -rf .git
 
           # 2. Deploy
-          url=$(pnpm exec vercel deploy --prebuilt --prod --meta githubCommitAuthorEmail=${{ vars.VERCEL_DEPLOY_AUTHOR_EMAIL }} --token=${{ secrets.VERCEL_TOKEN }})
+          url=$(pnpm exec vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }})
           echo "url=$url" >> "$GITHUB_OUTPUT"
