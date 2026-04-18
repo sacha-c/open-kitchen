@@ -67,7 +67,7 @@ jobs:
         env:
           DATABASE_URL: "postgresql://dummy:dummy@localhost/dummy"
 
-  test:
+  test-unit:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -79,7 +79,51 @@ jobs:
           run_install: true
 
       - name: Install Playwright browsers
-        run: pnpm exec playwright install chromium
+        run: pnpm exec playwright install --with-deps chromium
 
       - name: Run unit tests
         run: pnpm test:unit --run
+
+  test-e2e:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: open-kitchen
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/open-kitchen
+      BETTER_AUTH_SECRET: ci-test-secret-that-is-at-least-32-characters
+      BETTER_AUTH_URL: http://localhost:4173
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install pnpm and dependencies
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: true
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Create .env file
+        run: |
+          echo "DATABASE_URL=$DATABASE_URL" >> .env
+          echo "BETTER_AUTH_SECRET=$BETTER_AUTH_SECRET" >> .env
+          echo "BETTER_AUTH_URL=$BETTER_AUTH_URL" >> .env
+
+      - name: Push database schema
+        run: pnpm db:push
+
+      - name: Run e2e tests
+        run: pnpm test:e2e
