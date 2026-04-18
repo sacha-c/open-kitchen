@@ -179,7 +179,9 @@ async function main() {
   console.log("Test user: test@open-kitchen.com / test1234");
 }
 
-main().catch((error) => {
-  console.error("Seeding failed:", error);
-  process.exit(1);
-});
+main()
+  .then(() => process.exit(0))
+  .catch((error) => {
+    console.error("Seeding failed:", error);
+    process.exit(1);
+  });
