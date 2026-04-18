@@ -41,12 +41,13 @@ export const actions: Actions = {
     const data = result.data;
     const cookingTime = calculateCookingTime(data.steps);
     const recipeId = crypto.randomUUID();
+    const userId = locals.user.id;
     const now = new Date();
 
-    await db.batch([
-      db.insert(recipe).values({
+    await db.transaction(async (tx) => {
+      await tx.insert(recipe).values({
         id: recipeId,
-        userId: locals.user.id,
+        userId,
         name: data.name,
         servings: data.servings,
         cookingTime,
@@ -54,31 +55,33 @@ export const actions: Actions = {
         syncStatus: "pending",
         createdAt: now,
         updatedAt: now,
-      }),
-      ...data.ingredients.map((ing, index) =>
-        db.insert(recipeIngredient).values({
-          id: crypto.randomUUID(),
-          recipeId,
-          sortOrder: index,
-          name: ing.name,
-          amount: ing.amount,
-          unit: ing.unit,
-        }),
-      ),
-      ...data.steps.map((step, index) =>
-        db.insert(recipeStep).values({
-          id: crypto.randomUUID(),
-          recipeId,
-          sortOrder: index,
-          description: step.description,
-          operationType: step.operationType,
-          totalTime: step.totalTime,
-          speed: step.speed,
-          temperature: step.temperature,
-          power: step.power,
-        }),
-      ),
-    ]);
+      });
+      await Promise.all([
+        ...data.ingredients.map((ing, index) =>
+          tx.insert(recipeIngredient).values({
+            id: crypto.randomUUID(),
+            recipeId,
+            sortOrder: index,
+            name: ing.name,
+            amount: ing.amount,
+            unit: ing.unit,
+          }),
+        ),
+        ...data.steps.map((step, index) =>
+          tx.insert(recipeStep).values({
+            id: crypto.randomUUID(),
+            recipeId,
+            sortOrder: index,
+            description: step.description,
+            operationType: step.operationType,
+            totalTime: step.totalTime,
+            speed: step.speed,
+            temperature: step.temperature,
+            power: step.power,
+          }),
+        ),
+      ]);
+    });
 
     redirect(303, `/recipes/${recipeId}`);
   },

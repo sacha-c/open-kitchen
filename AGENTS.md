@@ -25,6 +25,15 @@
 - `pnpm lint` / `pnpm format` — biome
 - `pnpm check` — svelte & typescript
 - `pnpm db:generate` / `pnpm db:migrate` / `pnpm db:push` — drizzle migrations
+- `pnpm services:start` / `pnpm services:stop` — start/stop local Docker services (Postgres, etc.)
+
+## Local Development
+
+- **Always work against the local database** when developing or working on issues. Never use the production or preview database for local development.
+- Run `pnpm services:start` to spin up the local Postgres via Docker (`docker-compose.yml`).
+- The `.env.example` `DATABASE_URL` points to the local instance: `postgresql://postgres:postgres@localhost:5432/open-kitchen`.
+- After starting services, run `pnpm db:push` to apply the schema to your local database (if relevant).
+- Run `pnpm services:stop` when done.
 
 ## Current State
 
