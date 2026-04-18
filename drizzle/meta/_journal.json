@@ -22,6 +22,13 @@
       "when": 1775811231500,
       "tag": "0002_quiet_falcon",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1776460861702,
+      "tag": "0003_pretty_masque",
+      "breakpoints": true
     }
   ]
 }

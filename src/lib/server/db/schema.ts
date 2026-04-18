@@ -1,11 +1,27 @@
 import {
   boolean,
   integer,
+  pgEnum,
   pgTable,
   text,
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
+
+export const languageEnum = pgEnum("language", ["en", "es", "ca"]);
+export const speedEnum = pgEnum("speed", [
+  "0",
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "10",
+]);
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -117,10 +133,10 @@ export const recipe = pgTable("recipe", {
   userId: text("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
-  name: text("name").notNull(),
+  name: varchar("name", { length: 200 }).notNull(),
   servings: text("servings").notNull().default("2"),
   cookingTime: integer("cooking_time").notNull(),
-  language: varchar("language", { length: 10 }).notNull().default("en"),
+  language: languageEnum().notNull().default("en"),
   imageUrl: text("image_url"),
   cecotecRecipeId: text("cecotec_recipe_id"),
   cecotecNumber: text("cecotec_number"),
@@ -146,10 +162,10 @@ export const recipeStep = pgTable("recipe_step", {
     .notNull()
     .references(() => recipe.id, { onDelete: "cascade" }),
   sortOrder: integer("sort_order").notNull(),
-  description: text("description").notNull(),
+  description: varchar("description", { length: 1000 }).notNull(),
   operationType: integer("operation_type").notNull(),
   totalTime: integer("total_time").notNull().default(0),
-  speed: varchar("speed", { length: 2 }).notNull().default("0"),
+  speed: speedEnum().notNull().default("0"),
   temperature: integer("temperature").notNull().default(0),
   power: integer("power").notNull().default(0),
   imageUrl: text("image_url"),
@@ -162,7 +178,7 @@ export const recipeIngredient = pgTable("recipe_ingredient", {
     .notNull()
     .references(() => recipe.id, { onDelete: "cascade" }),
   sortOrder: integer("sort_order").notNull(),
-  name: text("name").notNull(),
+  name: varchar("name", { length: 200 }).notNull(),
   amount: text("amount").notNull(),
   unit: text("unit").notNull(),
   cecotecIngredientId: text("cecotec_ingredient_id"),

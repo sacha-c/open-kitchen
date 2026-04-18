@@ -25,7 +25,7 @@ Follow these principles:
 
 - **Simplicity over cleverness.** Write code a junior dev can read.
 - **SOLID principles.** Single responsibility, dependency inversion, etc. — but don't create abstractions for things that are used once.
-- **Type safety.** Use TypeScript types everywhere. Parse > validate (use Zod or similar to parse inputs at system boundaries). Never use `any`.
+- **Type safety.** Use TypeScript types everywhere. Parse > validate (use Zod to parse inputs at system boundaries). Never use `any`.
 - **No overengineering.** Don't add layers, wrappers, or indirection that aren't needed yet.
 - **Uncoupled.** Keep modules independent. Pass dependencies explicitly. Avoid singletons and globals where possible.
 - **Follow existing patterns.** Match the style, naming, and structure already in the codebase.
@@ -35,7 +35,7 @@ Follow these principles:
 - **Unit tests are mandatory.** Every feature must have Vitest unit tests.
 - **Skip Playwright E2E tests** for now (unless explicitly requested).
 - Run tests with the VSCode test runner task (`UNIT TESTS`).
-- Iterate until all tests pass and there are no lint errors.
+- Iterate until all tests pass and there are no lint or typescript compilation errors.
 - Remember: `requireAssertions: true` is set in vitest config — every test must have at least one assertion.
 
 ### 5. Commit & PR
