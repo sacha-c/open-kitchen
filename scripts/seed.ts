@@ -1,8 +1,8 @@
-import { neon } from "@neondatabase/serverless";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { drizzle } from "drizzle-orm/neon-http";
+import { drizzle } from "drizzle-orm/postgres-js";
 import { reset, seed } from "drizzle-seed";
+import postgres from "postgres";
 import {
   account,
   recipe,
@@ -30,8 +30,8 @@ const seedSchema = {
   recipeIngredient,
 };
 
-const sql = neon(process.env.DATABASE_URL);
-const db = drizzle({ client: sql, schema: seedSchema });
+const client = postgres(process.env.DATABASE_URL);
+const db = drizzle({ client, schema: seedSchema });
 
 const auth = betterAuth({
   secret: process.env.BETTER_AUTH_SECRET,
