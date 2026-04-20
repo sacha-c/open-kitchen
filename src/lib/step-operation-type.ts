@@ -5,7 +5,8 @@ export const OPERATION_TYPES = {
   COOKING: 2,
 } as const;
 
-export type OperationType = (typeof OPERATION_TYPES)[keyof typeof OPERATION_TYPES];
+export type OperationType =
+  (typeof OPERATION_TYPES)[keyof typeof OPERATION_TYPES];
 
 const LABELS: Record<number, string> = {
   [OPERATION_TYPES.MANUAL]: "Manual",

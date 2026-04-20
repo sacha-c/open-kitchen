@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
-  OPERATION_TYPES,
   getStepTypeBadgeClass,
   getStepTypeLabel,
+  OPERATION_TYPES,
 } from "./step-operation-type";
 
 describe("getStepTypeLabel", () => {
@@ -29,11 +29,15 @@ describe("getStepTypeBadgeClass", () => {
   });
 
   it("returns 'badge-info' for Preparation (1)", () => {
-    expect(getStepTypeBadgeClass(OPERATION_TYPES.PREPARATION)).toBe("badge-info");
+    expect(getStepTypeBadgeClass(OPERATION_TYPES.PREPARATION)).toBe(
+      "badge-info",
+    );
   });
 
   it("returns 'badge-warning' for Cooking (2)", () => {
-    expect(getStepTypeBadgeClass(OPERATION_TYPES.COOKING)).toBe("badge-warning");
+    expect(getStepTypeBadgeClass(OPERATION_TYPES.COOKING)).toBe(
+      "badge-warning",
+    );
   });
 
   it("returns 'badge-neutral' as fallback for unknown operationType", () => {

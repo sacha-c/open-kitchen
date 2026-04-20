@@ -14,21 +14,25 @@
   let deleting = $state(false);
 </script>
 
-<svelte:head>
-  <title>{data.recipe.name} — OpenKitchen</title>
-</svelte:head>
+<svelte:head> <title>{data.recipe.name} — OpenKitchen</title> </svelte:head>
 
 <div class="mx-auto max-w-4xl px-4 py-8">
   <!-- Header -->
   <div class="mb-6 flex items-start justify-between gap-4">
     <div>
-      <a href={resolve("/recipes")} class="text-base-content/60 mb-2 inline-flex items-center gap-1 text-sm hover:underline">
+      <a
+        href={resolve("/recipes")}
+        class="text-base-content/60 mb-2 inline-flex items-center gap-1 text-sm hover:underline"
+      >
         ← My Recipes
       </a>
       <h1 class="mt-1 text-3xl font-bold">{data.recipe.name}</h1>
     </div>
     <div class="flex shrink-0 gap-2">
-      <a href={resolve(`/recipes/${data.recipe.id}/edit`)} class="btn btn-outline btn-sm">
+      <a
+        href={resolve(`/recipes/${data.recipe.id}/edit`)}
+        class="btn btn-outline btn-sm"
+      >
         Edit
       </a>
       <button
@@ -54,10 +58,12 @@
           src={data.recipe.imageUrl}
           alt={data.recipe.name}
           class="h-full w-full object-cover"
-        />
+        >
       </figure>
     {:else}
-      <div class="bg-base-200 flex h-48 items-center justify-center rounded-t-2xl">
+      <div
+        class="bg-base-200 flex h-48 items-center justify-center rounded-t-2xl"
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -85,11 +91,15 @@
         </span>
         <span class="flex items-center gap-1" title="Total cooking time">
           <span class="text-base-content/60">Time</span>
-          <span class="font-medium">{formatCookingTime(data.recipe.cookingTime)}</span>
+          <span class="font-medium"
+            >{formatCookingTime(data.recipe.cookingTime)}</span
+          >
         </span>
         <span class="flex items-center gap-1" title="Language">
           <span class="text-base-content/60">Language</span>
-          <span class="badge badge-ghost badge-sm font-medium uppercase">{data.recipe.language}</span>
+          <span class="badge badge-ghost badge-sm font-medium uppercase"
+            >{data.recipe.language}</span
+          >
         </span>
       </div>
       <div>
@@ -110,7 +120,9 @@
         <ul class="divide-base-200 divide-y">
           {#each data.ingredients as ingredient (ingredient.id)}
             <li class="flex items-center gap-2 py-2">
-              <span class="font-medium">{ingredient.amount}{ingredient.unit}</span>
+              <span class="font-medium"
+                >{ingredient.amount}{ingredient.unit}</span
+              >
               <span class="text-base-content/80">{ingredient.name}</span>
             </li>
           {/each}
@@ -127,22 +139,30 @@
         <ol class="space-y-4">
           {#each data.steps as step, index (step.id)}
             <li class="flex gap-4">
-              <div class="bg-primary text-primary-content flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold">
+              <div
+                class="bg-primary text-primary-content flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold"
+              >
                 {index + 1}
               </div>
               <div class="flex-1">
                 <div class="mb-1 flex flex-wrap items-center gap-2">
-                  <span class="badge badge-sm {getStepTypeBadgeClass(step.operationType)}">
+                  <span
+                    class="badge badge-sm {getStepTypeBadgeClass(step.operationType)}"
+                  >
                     {getStepTypeLabel(step.operationType)}
                   </span>
                 </div>
                 <p class="text-base-content/90 mb-2">{step.description}</p>
                 {#if step.operationType === 2}
-                  <div class="bg-base-200 flex flex-wrap gap-4 rounded-lg px-4 py-2 text-sm">
+                  <div
+                    class="bg-base-200 flex flex-wrap gap-4 rounded-lg px-4 py-2 text-sm"
+                  >
                     {#if step.totalTime > 0}
                       <span class="flex items-center gap-1">
                         <span class="text-base-content/60">Time</span>
-                        <span class="font-medium">{formatCookingTime(step.totalTime)}</span>
+                        <span class="font-medium"
+                          >{formatCookingTime(step.totalTime)}</span
+                        >
                       </span>
                     {/if}
                     {#if step.speed !== "0"}
@@ -180,7 +200,8 @@
     <div class="modal-box">
       <h3 class="text-lg font-bold">Delete Recipe</h3>
       <p class="py-4">
-        Are you sure you want to delete <strong>{data.recipe.name}</strong>? This action cannot be undone.
+        Are you sure you want to delete <strong>{data.recipe.name}</strong>?
+        This action cannot be undone.
       </p>
       <div class="modal-action">
         <button
