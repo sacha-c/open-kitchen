@@ -1,6 +1,6 @@
 export {
-  CecotecError,
   authenticate,
+  CecotecError,
   createRecipe,
   deleteRecipe,
   encryptPassword,

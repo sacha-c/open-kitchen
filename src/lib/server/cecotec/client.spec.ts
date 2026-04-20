@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
-  CecotecError,
   authenticate,
+  CecotecError,
   createRecipe,
   deleteRecipe,
   encryptPassword,
@@ -36,7 +36,14 @@ const minimalRecipe: CecotecRecipeInput = {
       operationType: 2,
       singleTotalTime: 120,
       cookSteps: [
-        { time: 120, power: 2, speed: "3", temperature: 80, accessoriesType: -1, reel: "" },
+        {
+          time: 120,
+          power: 2,
+          speed: "3",
+          temperature: 80,
+          accessoriesType: -1,
+          reel: "",
+        },
       ],
       accessoriesList: [],
       recipeFoodIngredients: [],
@@ -125,12 +132,16 @@ describe("authenticate", () => {
 
   it("throws CecotecError on HTTP error", async () => {
     vi.stubGlobal("fetch", mockFetch({}, 401));
-    await expect(authenticate("a@b.com", "bad")).rejects.toBeInstanceOf(CecotecError);
+    await expect(authenticate("a@b.com", "bad")).rejects.toBeInstanceOf(
+      CecotecError,
+    );
   });
 
   it("throws CecotecError when response shape is invalid", async () => {
     vi.stubGlobal("fetch", mockFetch({ msg: "Invalid credentials" }));
-    await expect(authenticate("a@b.com", "bad")).rejects.toBeInstanceOf(CecotecError);
+    await expect(authenticate("a@b.com", "bad")).rejects.toBeInstanceOf(
+      CecotecError,
+    );
   });
 
   it("encodes body as form-urlencoded", async () => {
@@ -182,7 +193,8 @@ describe("createRecipe", () => {
       .mockResolvedValueOnce({
         ok: true,
         status: 200,
-        json: () => Promise.resolve(successEnvelope({ recipeId: "r1", number: "1" })),
+        json: () =>
+          Promise.resolve(successEnvelope({ recipeId: "r1", number: "1" })),
       })
       .mockResolvedValueOnce({
         ok: true,
@@ -209,12 +221,16 @@ describe("createRecipe", () => {
       }),
     );
 
-    await expect(createRecipe("token", minimalRecipe)).rejects.toBeInstanceOf(CecotecError);
+    await expect(createRecipe("token", minimalRecipe)).rejects.toBeInstanceOf(
+      CecotecError,
+    );
   });
 
   it("throws CecotecError on HTTP error", async () => {
     vi.stubGlobal("fetch", mockFetch({}, 500));
-    await expect(createRecipe("token", minimalRecipe)).rejects.toBeInstanceOf(CecotecError);
+    await expect(createRecipe("token", minimalRecipe)).rejects.toBeInstanceOf(
+      CecotecError,
+    );
   });
 });
 
@@ -255,12 +271,16 @@ describe("listRecipes", () => {
 
   it("throws CecotecError on HTTP error", async () => {
     vi.stubGlobal("fetch", mockFetch({}, 403));
-    await expect(listRecipes("token", "uid")).rejects.toBeInstanceOf(CecotecError);
+    await expect(listRecipes("token", "uid")).rejects.toBeInstanceOf(
+      CecotecError,
+    );
   });
 
   it("throws CecotecError on API-level error", async () => {
     vi.stubGlobal("fetch", mockFetch(errorEnvelope("Not found")));
-    await expect(listRecipes("token", "uid")).rejects.toBeInstanceOf(CecotecError);
+    await expect(listRecipes("token", "uid")).rejects.toBeInstanceOf(
+      CecotecError,
+    );
   });
 });
 
@@ -278,17 +298,23 @@ describe("deleteRecipe", () => {
     const [url, init] = spy.mock.calls[0] as [string, RequestInit];
     expect(url).toContain("/deleteRecipe");
     expect(init.method).toBe("PUT");
-    expect(JSON.parse(init.body as string)).toEqual({ recipeIds: ["recipe123"] });
+    expect(JSON.parse(init.body as string)).toEqual({
+      recipeIds: ["recipe123"],
+    });
   });
 
   it("throws CecotecError on HTTP error", async () => {
     vi.stubGlobal("fetch", mockFetch({}, 500));
-    await expect(deleteRecipe("token", "r1")).rejects.toBeInstanceOf(CecotecError);
+    await expect(deleteRecipe("token", "r1")).rejects.toBeInstanceOf(
+      CecotecError,
+    );
   });
 
   it("throws CecotecError on API-level error", async () => {
     vi.stubGlobal("fetch", mockFetch(errorEnvelope("Not found")));
-    await expect(deleteRecipe("token", "r1")).rejects.toBeInstanceOf(CecotecError);
+    await expect(deleteRecipe("token", "r1")).rejects.toBeInstanceOf(
+      CecotecError,
+    );
   });
 });
 
@@ -313,7 +339,9 @@ describe("uploadImage", () => {
   });
 
   it("posts to the correct endpoint", async () => {
-    const spy = mockFetch(successEnvelope({ link: "https://cdn.example.com/x" }));
+    const spy = mockFetch(
+      successEnvelope({ link: "https://cdn.example.com/x" }),
+    );
     vi.stubGlobal("fetch", spy);
 
     await uploadImage("token", Buffer.from("data"), "f.png", "image/png");
