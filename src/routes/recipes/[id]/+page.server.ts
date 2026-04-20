@@ -1,5 +1,5 @@
 import { error, fail, redirect } from "@sveltejs/kit";
-import { asc, eq } from "drizzle-orm";
+import { and, asc, eq } from "drizzle-orm";
 import { db } from "$lib/server/db";
 import {
   cecotecCredentials,
@@ -20,9 +20,9 @@ export const load: PageServerLoad = async ({ locals, params }) => {
   const [recipeRow] = await db
     .select()
     .from(recipe)
-    .where(eq(recipe.id, recipeId));
+    .where(and(eq(recipe.id, recipeId), eq(recipe.userId, userId)));
 
-  if (!recipeRow || recipeRow.userId !== userId) {
+  if (!recipeRow) {
     error(404, "Recipe not found");
   }
 
