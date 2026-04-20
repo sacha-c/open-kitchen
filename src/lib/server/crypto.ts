@@ -7,7 +7,7 @@ import { CECOTEC_ENCRYPTION_KEY } from "$env/static/private";
  * The key must be a 64-character hex string (32 bytes).
  */
 export function encrypt(plaintext: string): string {
-  const key = Buffer.from(CECOTEC_ENCRYPTION_KEY, "hex");
+  const key = Buffer.from(CECOTEC_ENCRYPTION_KEY.trim(), "hex");
   const iv = randomBytes(12); // 96-bit IV recommended for GCM
   const cipher = createCipheriv("aes-256-gcm", key, iv);
   const encrypted = Buffer.concat([
@@ -22,7 +22,7 @@ export function encrypt(plaintext: string): string {
  * Decrypts a ciphertext produced by `encrypt`.
  */
 export function decrypt(ciphertext: string): string {
-  const key = Buffer.from(CECOTEC_ENCRYPTION_KEY, "hex");
+  const key = Buffer.from(CECOTEC_ENCRYPTION_KEY.trim(), "hex");
   const [ivHex, authTagHex, encryptedHex] = ciphertext.split(":");
   const iv = Buffer.from(ivHex, "hex");
   const authTag = Buffer.from(authTagHex, "hex");
