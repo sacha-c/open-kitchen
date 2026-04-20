@@ -29,7 +29,11 @@
 
   function handleSubmit() {
     loading = true;
-    return async ({ update }: { update: (opts?: { reset?: boolean }) => Promise<void> }) => {
+    return async ({
+      update,
+    }: {
+      update: (opts?: { reset?: boolean }) => Promise<void>;
+    }) => {
       await update({ reset: false });
       loading = false;
     };
@@ -53,7 +57,7 @@
             type="text"
             value={data.user.name}
             disabled
-          />
+          >
         </div>
         <div class="form-control">
           <label class="label" for="profile-email">Email</label>
@@ -63,7 +67,7 @@
             type="email"
             value={data.user.email}
             disabled
-          />
+          >
         </div>
       </div>
     </div>
@@ -124,7 +128,7 @@
             required
             aria-invalid={form?.errors?.email ? "true" : "false"}
             aria-describedby={form?.errors?.email ? "cecotec-email-error" : undefined}
-          />
+          >
           {#if form?.errors?.email}
             <label class="label" for="cecotec-email">
               <span id="cecotec-email-error" class="label-text-alt text-error">
@@ -147,21 +151,20 @@
             required
             aria-invalid={form?.errors?.password ? "true" : "false"}
             aria-describedby={form?.errors?.password ? "cecotec-password-error" : undefined}
-          />
+          >
           {#if form?.errors?.password}
             <label class="label" for="cecotec-password">
-              <span id="cecotec-password-error" class="label-text-alt text-error">
+              <span
+                id="cecotec-password-error"
+                class="label-text-alt text-error"
+              >
                 {form.errors.password}
               </span>
             </label>
           {/if}
         </div>
 
-        <button
-          class="btn btn-primary w-full"
-          type="submit"
-          disabled={loading}
-        >
+        <button class="btn btn-primary w-full" type="submit" disabled={loading}>
           {#if loading}
             <span class="loading loading-spinner loading-sm"></span>
           {:else}

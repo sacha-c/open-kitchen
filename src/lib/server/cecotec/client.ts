@@ -1,4 +1,4 @@
-import { constants, publicEncrypt } from "crypto";
+import { constants, publicEncrypt } from "node:crypto";
 import {
   CECOTEC_BASE_URL,
   CECOTEC_PUBLIC_KEY,

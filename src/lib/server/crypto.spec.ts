@@ -38,7 +38,7 @@ describe("encrypt / decrypt", () => {
 
   it("throws when ciphertext is tampered with", () => {
     const ct = encrypt("secret");
-    const tampered = ct.slice(0, -4) + "ffff";
+    const tampered = `${ct.slice(0, -4)}ffff`;
     expect(() => decrypt(tampered)).toThrow();
   });
 });

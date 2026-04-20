@@ -5,7 +5,9 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 // ---------------------------------------------------------------------------
 
 const mockAuthenticate = vi.fn();
-const mockEncrypt = vi.fn((_plaintext: string): string => "encrypted:password:value");
+const mockEncrypt = vi.fn(
+  (_plaintext: string): string => "encrypted:password:value",
+);
 const mockSelect = vi.fn();
 const mockInsert = vi.fn();
 const mockDelete = vi.fn();
@@ -88,11 +90,11 @@ describe("load", () => {
   it("returns user info and no credentials when not linked", async () => {
     mockSelect.mockReturnValue(buildSelectChain([]));
 
-    const result = await load({
+    const result = (await load({
       locals: makeLocals(),
       params: {},
       url: new URL("http://localhost/profile"),
-    } as never) as Record<string, unknown>;
+    } as never)) as Record<string, unknown>;
 
     expect(result.user).toMatchObject({ name: "Test User" });
     expect(result.cecotecLinked).toBe(false);
@@ -104,11 +106,11 @@ describe("load", () => {
       buildSelectChain([{ email: "cecotec@example.com" }]),
     );
 
-    const result = await load({
+    const result = (await load({
       locals: makeLocals(),
       params: {},
       url: new URL("http://localhost/profile"),
-    } as never) as Record<string, unknown>;
+    } as never)) as Record<string, unknown>;
 
     expect(result.cecotecLinked).toBe(true);
     expect(result.cecotecEmail).toBe("cecotec@example.com");
@@ -195,11 +197,9 @@ describe("actions.save", () => {
     mockEncrypt.mockReturnValue("iv:tag:enc");
 
     const insertChain = {
-      values: vi
-        .fn()
-        .mockReturnValue({
-          onConflictDoUpdate: vi.fn().mockResolvedValue(undefined),
-        }),
+      values: vi.fn().mockReturnValue({
+        onConflictDoUpdate: vi.fn().mockResolvedValue(undefined),
+      }),
     };
     mockInsert.mockReturnValue(insertChain);
 
