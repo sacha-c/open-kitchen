@@ -15,7 +15,7 @@ To recreate this project with the same configuration:
 
 ```sh
 # recreate this project
-pnpm dlx sv@0.13.0 create --template demo --types ts --add vitest="usages:unit,component" playwright tailwindcss="plugins:typography,forms" sveltekit-adapter="adapter:vercel" devtools-json mdsvex paraglide="languageTags:en, es, ca+demo:yes" mcp="ide:vscode+setup:local" --install pnpm open-mambo
+pnpm dlx sv@0.13.0 create --template demo --types ts --add vitest="usages:unit,component" playwright tailwindcss="plugins:typography,forms" sveltekit-adapter="adapter:vercel" devtools-json mdsvex paraglide="languageTags:en, es, ca+demo:yes" mcp="ide:vscode+setup:local" --install pnpm open-kitchen
 ```
 
 ## Developing
