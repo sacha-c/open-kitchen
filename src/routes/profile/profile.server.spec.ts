@@ -19,7 +19,7 @@ vi.mock("$env/static/private", () => ({
   BETTER_AUTH_URL: "http://localhost:5173",
 }));
 
-vi.mock("$lib/server/cecotec", () => ({
+vi.mock("$lib/server/cecotec/client", () => ({
   authenticate: (...args: unknown[]) => mockAuthenticate(...args),
   CecotecError: class CecotecError extends Error {
     constructor(message: string) {
@@ -163,7 +163,7 @@ describe("actions.save", () => {
   });
 
   it("returns user-friendly error on invalid Cecotec credentials", async () => {
-    const { CecotecError } = await import("$lib/server/cecotec");
+    const { CecotecError } = await import("$lib/server/cecotec/client");
     mockAuthenticate.mockRejectedValue(new CecotecError("Invalid credentials"));
 
     const result = await actions.save({
@@ -177,7 +177,7 @@ describe("actions.save", () => {
   });
 
   it("does NOT save credentials on Cecotec auth failure", async () => {
-    const { CecotecError } = await import("$lib/server/cecotec");
+    const { CecotecError } = await import("$lib/server/cecotec/client");
     mockAuthenticate.mockRejectedValue(new CecotecError("Bad creds"));
 
     await actions.save({
