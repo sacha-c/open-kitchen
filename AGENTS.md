@@ -27,6 +27,10 @@
 - `pnpm db:generate` / `pnpm db:migrate` / `pnpm db:push` — drizzle migrations
 - `pnpm services:start` / `pnpm services:stop` — start/stop local Docker services (Postgres, etc.)
 
+## Code Conventions
+
+- **No barrel re-exports**: Do not create `index.ts` files that only re-export from other modules. Import directly from the source file (e.g. `$lib/server/cecotec/client` not `$lib/server/cecotec`). Barrels obscure the dependency graph, can cause circular imports, and make mocking harder in tests.
+
 ## Local Development
 
 - **Always work against the local database** when developing or working on issues. Never use the production or preview database for local development.

@@ -1,7 +1,7 @@
 import { fail, redirect } from "@sveltejs/kit";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { authenticate, CecotecError } from "$lib/server/cecotec";
+import { authenticate, CecotecError } from "$lib/server/cecotec/client";
 import { encrypt } from "$lib/server/crypto";
 import { db } from "$lib/server/db";
 import { cecotecCredentials } from "$lib/server/db/schema";
