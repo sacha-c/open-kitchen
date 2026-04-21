@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
   pull_request:
 
 jobs:
@@ -32,7 +32,8 @@ jobs:
           run_install: true
 
       - name: Compile Paraglide messages
-        run: pnpm exec paraglide-js compile --project ./project.inlang --outdir ./src/lib/paraglide
+        run: pnpm exec paraglide-js compile --project ./project.inlang --outdir
+          ./src/lib/paraglide
 
       - name: Typecheck
         run: pnpm check
@@ -40,6 +41,7 @@ jobs:
           DATABASE_URL: postgres://unused
           BETTER_AUTH_SECRET: ci-dummy-secret
           BETTER_AUTH_URL: http://localhost:5173
+          CECOTEC_ENCRYPTION_KEY: "0000000000000000000000000000000000000000000000000000000000000000"
 
   check-migrations:
     runs-on: ubuntu-latest
@@ -93,14 +95,13 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd="pg_isready -U postgres"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
+          --health-cmd="pg_isready -U postgres" --health-interval=10s
+          --health-timeout=5s --health-retries=5
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/open-kitchen
       BETTER_AUTH_SECRET: ci-test-secret-that-is-at-least-32-characters
       BETTER_AUTH_URL: http://localhost:4173
+      CECOTEC_ENCRYPTION_KEY: "0000000000000000000000000000000000000000000000000000000000000000"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -118,6 +119,7 @@ jobs:
           echo "DATABASE_URL=$DATABASE_URL" >> .env
           echo "BETTER_AUTH_SECRET=$BETTER_AUTH_SECRET" >> .env
           echo "BETTER_AUTH_URL=$BETTER_AUTH_URL" >> .env
+          echo "CECOTEC_ENCRYPTION_KEY=$CECOTEC_ENCRYPTION_KEY" >> .env
 
       - name: Push database schema
         run: pnpm db:push

@@ -16,9 +16,7 @@
       <div class="flex-none">
         <ul class="menu menu-horizontal gap-1 px-1">
           <li><a href={resolve("/recipes")}>My Recipes</a></li>
-          <li>
-            <span class="text-base-content/60 text-sm">{data.user.name}</span>
-          </li>
+          <li><a href={resolve("/profile")}>{data.user.name}</a></li>
         </ul>
       </div>
     </nav>
