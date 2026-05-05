@@ -25,12 +25,12 @@ export const cecotecRecipeStepSchema = z.object({
   videoUrl: z.string(),
 });
 
+// Format used by the official app: recipeFoodIngredientsDetailDtos
 export const cecotecIngredientSchema = z.object({
-  ingredientId: z.string(),
-  foodIngredient: z.string(),
+  foodIngredientsId: z.string(),
   unitId: z.string(),
-  unit: z.string(),
   amount: z.string(),
+  code: z.string().default("en"),
 });
 
 export const cecotecRecipeInputSchema = z.object({

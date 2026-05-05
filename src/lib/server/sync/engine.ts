@@ -7,6 +7,7 @@ import {
   updateRecipe,
   uploadImage,
 } from "$lib/server/cecotec/client";
+import { lookupIngredientId, lookupUnitId } from "$lib/server/cecotec/catalog";
 import type {
   CecotecIngredient,
   CecotecRecipeInput,
@@ -52,6 +53,26 @@ export function transformRecipeForCecotec(
   }>,
   imageUrl?: string,
 ): CecotecRecipeInput {
+  // Resolve each ingredient to its Cecotec IDs.
+  // Use the stored cecotecIngredientId/cecotecUnitId if available, otherwise
+  // look up by name/unit in the bundled catalog.
+  const resolvedIngredients: CecotecIngredient[] = ingredients
+    .map((ing) => {
+      const foodIngredientsId =
+        ing.cecotecIngredientId ??
+        lookupIngredientId(ing.name, recipeData.language);
+      const unitId =
+        ing.cecotecUnitId ?? lookupUnitId(ing.unit);
+      if (!foodIngredientsId || !unitId) return null;
+      return {
+        foodIngredientsId,
+        unitId,
+        amount: ing.amount,
+        code: recipeData.language === "ca" ? "es" : recipeData.language,
+      };
+    })
+    .filter((x): x is CecotecIngredient => x !== null);
+
   const mappedSteps: CecotecRecipeStep[] = steps.map((step) => ({
     stepDesc: step.description,
     operationType: step.operationType,
@@ -73,14 +94,6 @@ export function transformRecipeForCecotec(
     videoUrl: "",
   }));
 
-  const mappedIngredients: CecotecIngredient[] = ingredients.map((ing) => ({
-    ingredientId: ing.cecotecIngredientId ?? "",
-    foodIngredient: ing.name,
-    unitId: ing.cecotecUnitId ?? "",
-    unit: ing.unit,
-    amount: ing.amount,
-  }));
-
   return {
     name: recipeData.name,
     servings: recipeData.servings,
@@ -88,7 +101,7 @@ export function transformRecipeForCecotec(
     language: recipeData.language,
     imageUrl,
     steps: mappedSteps,
-    ingredients: mappedIngredients,
+    ingredients: resolvedIngredients,
   };
 }
 

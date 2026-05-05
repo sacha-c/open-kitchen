@@ -210,10 +210,20 @@ describe("transformRecipeForCecotec", () => {
     expect(s.cookSteps[0].accessoriesType).toBe(-1);
   });
 
-  it("maps ingredients with cecotec IDs", () => {
+  it("maps ingredients into result.ingredients (recipeFoodIngredientsDetailDtos)", () => {
     const result = transformRecipeForCecotec(
       { name: "X", servings: "2", cookingTime: 60, language: "en" },
-      [],
+      [
+        {
+          sortOrder: 0,
+          description: "Prep",
+          operationType: 1,
+          totalTime: 0,
+          speed: "0",
+          temperature: 0,
+          power: 0,
+        },
+      ],
       [
         {
           name: "Flour",
@@ -224,29 +234,43 @@ describe("transformRecipeForCecotec", () => {
         },
       ],
     );
-    expect(result.ingredients?.[0].ingredientId).toBe("ing-id");
-    expect(result.ingredients?.[0].foodIngredient).toBe("Flour");
-    expect(result.ingredients?.[0].unitId).toBe("unit-id");
-    expect(result.ingredients?.[0].unit).toBe("g");
-    expect(result.ingredients?.[0].amount).toBe("100");
+    expect(result.ingredients).toHaveLength(1);
+    const ingredients = result.ingredients ?? [];
+    const ing = ingredients[0];
+    expect(ing.foodIngredientsId).toBe("ing-id");
+    expect(ing.unitId).toBe("unit-id");
+    expect(ing.amount).toBe("100");
+    expect(ing.code).toBe("en");
+    // Steps should NOT carry per-step ingredients
+    expect(result.steps[0].recipeFoodIngredients).toEqual([]);
   });
 
-  it("defaults null cecotec IDs to empty string", () => {
+  it("drops ingredients with null cecotec IDs that can't be catalog-resolved", () => {
     const result = transformRecipeForCecotec(
       { name: "X", servings: "2", cookingTime: 60, language: "en" },
-      [],
       [
         {
-          name: "Salt",
+          sortOrder: 0,
+          description: "Prep",
+          operationType: 1,
+          totalTime: 0,
+          speed: "0",
+          temperature: 0,
+          power: 0,
+        },
+      ],
+      [
+        {
+          name: "__unknown_ingredient_xyz__",
           amount: "1",
-          unit: "tsp",
+          unit: "__unknown_unit__",
           cecotecIngredientId: null,
           cecotecUnitId: null,
         },
       ],
     );
-    expect(result.ingredients?.[0].ingredientId).toBe("");
-    expect(result.ingredients?.[0].unitId).toBe("");
+    // Can't resolve → dropped silently
+    expect(result.ingredients).toEqual([]);
   });
 });
 

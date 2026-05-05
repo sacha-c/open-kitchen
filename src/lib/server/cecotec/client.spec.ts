@@ -382,7 +382,6 @@ describe("updateRecipe", () => {
     expect(init.method).toBe("POST");
     const body = JSON.parse(init.body as string);
     expect(body.id).toBe("rid-1");
-    expect(body.recipeId).toBe("rid-1");
     expect(body.number).toBe("num-42");
   });
 

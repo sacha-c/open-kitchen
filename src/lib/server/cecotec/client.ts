@@ -43,26 +43,23 @@ function buildRecipeBody(
   number?: string,
 ): Record<string, unknown> {
   const body: Record<string, unknown> = {
-    language: recipe.language,
+    id: recipeId ?? "",
+    languageCode: recipe.language,
     modleCode: MODEL_CODE,
     appOrDevice: 1,
     sourceType: 1,
+    isFeeder: 0,
+    challengeLevel: 0,
+    allergens: [],
+    categoryIds: [],
     defaultName: recipe.name,
     serviceSize: recipe.servings,
     cookingTime: recipe.cookingTime,
-    recipeStatus: 1,
+    recipeStatus: "1",
     recipeDeviceParameterDtos: recipe.steps,
-    ingredientsRelationVosList: recipe.ingredients ?? [],
-    recipeCategoryIds: [],
-    recipeTagIds: [],
+    recipeFoodIngredientsDetailDtos: recipe.ingredients ?? [],
+    landscapeImageUrl: recipe.imageUrl ?? "",
   };
-  if (recipe.imageUrl) {
-    body.landscapeImageUrl = recipe.imageUrl;
-  }
-  if (recipeId) {
-    body.id = recipeId;
-    body.recipeId = recipeId;
-  }
   if (number) {
     body.number = number;
   }

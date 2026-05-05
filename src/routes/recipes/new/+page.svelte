@@ -3,23 +3,24 @@
   import { resolve } from "$app/paths";
   import { formatCookingTime } from "$lib/format-cooking-time";
   import { getLocale } from "$lib/paraglide/runtime";
-  import type { SubmitFunction } from "./$types.js";
+  import type { PageData, SubmitFunction } from "./$types.js";
 
   interface FormResult {
     errors?: Record<string, string>;
     values?: Record<string, unknown>;
   }
-  let { form }: { form: FormResult | null } = $props();
+  let { form, data }: { form: FormResult | null; data: PageData } = $props();
 
   let loading = $state(false);
 
-  const UNITS = ["g", "ml", "tsp", "tbsp", "Pizca", "units"];
   const SPEED_OPTIONS = Array.from({ length: 11 }, (_, i) => String(i));
 
   interface Ingredient {
     name: string;
     amount: string;
     unit: string;
+    cecotecIngredientId: string;
+    cecotecUnitId: string;
   }
   interface Step {
     description: string;
@@ -33,11 +34,11 @@
   function restoreIngredients(): Ingredient[] {
     const vals = form?.values;
     if (!vals?.ingredients || !Array.isArray(vals.ingredients)) {
-      return [{ name: "", amount: "", unit: "g" }];
+      return [{ name: "", amount: "", unit: data.units[0]?.name ?? "g", cecotecIngredientId: "", cecotecUnitId: data.units[0]?.id ?? "" }];
     }
     return (vals.ingredients as Ingredient[]).length > 0
       ? (vals.ingredients as Ingredient[])
-      : [{ name: "", amount: "", unit: "g" }];
+      : [{ name: "", amount: "", unit: data.units[0]?.name ?? "g", cecotecIngredientId: "", cecotecUnitId: data.units[0]?.id ?? "" }];
   }
 
   function restoreSteps(): Step[] {
@@ -76,7 +77,7 @@
   );
 
   function addIngredient() {
-    ingredients.push({ name: "", amount: "", unit: "g" });
+    ingredients.push({ name: "", amount: "", unit: data.units[0]?.name ?? "g", cecotecIngredientId: "", cecotecUnitId: data.units[0]?.id ?? "" });
   }
 
   function removeIngredient(index: number) {
@@ -246,17 +247,32 @@
         {#each ingredients as ingredient, i (i)}
           <div class="bg-base-200/50 flex flex-col gap-2 rounded-lg p-3">
             <div class="flex items-start gap-2">
+              <!-- Ingredient name: searchable datalist over catalog -->
+              <datalist id={`ingredient-list-${i}`}>
+                {#each data.ingredients as opt (opt.id)}
+                  <option value={opt.name} data-id={opt.id}></option>
+                {/each}
+              </datalist>
               <div class="form-control flex-1">
                 <input
                   name={`ingredients[${i}].name`}
                   type="text"
+                  list={`ingredient-list-${i}`}
                   class="input input-bordered input-sm w-full"
-                  placeholder="Ingredient name"
+                  class:input-error={fieldError(`ingredients.${i}.name`)}
+                  placeholder="Search ingredient…"
+                  autocomplete="off"
                   bind:value={ingredient.name}
-                  aria-invalid={fieldError(`ingredients.${i}.name`)
-                    ? "true"
-                    : undefined}
+                  oninput={(e) => {
+                    const val = (e.target as HTMLInputElement).value;
+                    const match = data.ingredients.find(
+                      (o) => o.name.toLowerCase() === val.toLowerCase(),
+                    );
+                    ingredient.cecotecIngredientId = match?.id ?? '';
+                  }}
+                  aria-invalid={fieldError(`ingredients.${i}.name`) ? 'true' : undefined}
                 >
+                <input type="hidden" name={`ingredients[${i}].cecotecIngredientId`} value={ingredient.cecotecIngredientId}>
                 {#if fieldError(`ingredients.${i}.name`)}
                   <span class="label-text-alt text-error mt-1">
                     {fieldError(`ingredients.${i}.name`)}
@@ -280,20 +296,27 @@
                   </span>
                 {/if}
               </div>
+              <!-- Unit: dropdown from catalog -->
               <div class="form-control w-24">
                 <select
                   class="select select-bordered select-sm w-full"
                   class:select-error={fieldError(`ingredients.${i}.unit`)}
                   name={`ingredients[${i}].unit`}
                   bind:value={ingredient.unit}
+                  onchange={(e) => {
+                    const val = (e.target as HTMLSelectElement).value;
+                    const match = data.units.find((u) => u.name === val);
+                    ingredient.cecotecUnitId = match?.id ?? '';
+                  }}
                   aria-invalid={fieldError(`ingredients.${i}.unit`)
                     ? "true"
                     : undefined}
                 >
-                  {#each UNITS as unit (unit)}
-                    <option value={unit}>{unit}</option>
+                  {#each data.units as unit (unit.id)}
+                    <option value={unit.name}>{unit.name}</option>
                   {/each}
                 </select>
+                <input type="hidden" name={`ingredients[${i}].cecotecUnitId`} value={ingredient.cecotecUnitId}>
               </div>
               <div class="flex gap-1">
                 <button

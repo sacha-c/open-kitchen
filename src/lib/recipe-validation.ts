@@ -6,11 +6,16 @@ export const ingredientSchema = createInsertSchema(recipeIngredient, {
   name: (schema) => schema.min(1, "Ingredient name is required"),
   amount: (schema) => schema.min(1, "Amount is required"),
   unit: (schema) => schema.min(1, "Unit is required"),
-}).pick({
-  name: true,
-  amount: true,
-  unit: true,
-});
+})
+  .pick({
+    name: true,
+    amount: true,
+    unit: true,
+  })
+  .extend({
+    cecotecIngredientId: z.string().nullish(),
+    cecotecUnitId: z.string().nullish(),
+  });
 
 export const stepSchema = createInsertSchema(recipeStep, {
   description: (schema) => schema.min(1, "Step description is required"),
@@ -71,7 +76,7 @@ export function parseFormDataToRecipe(formData: FormData): unknown {
   const servings = formData.get("servings")?.toString() ?? "";
   const language = formData.get("language")?.toString() ?? "";
 
-  const ingredients: Record<string, string>[] = [];
+  const ingredients: Record<string, string | null>[] = [];
   const steps: Record<string, string | number>[] = [];
 
   // Parse ingredients: ingredients[0].name, ingredients[0].amount, etc.
@@ -81,6 +86,11 @@ export function parseFormDataToRecipe(formData: FormData): unknown {
       name: formData.get(`ingredients[${i}].name`)?.toString() ?? "",
       amount: formData.get(`ingredients[${i}].amount`)?.toString() ?? "",
       unit: formData.get(`ingredients[${i}].unit`)?.toString() ?? "",
+      cecotecIngredientId:
+        formData.get(`ingredients[${i}].cecotecIngredientId`)?.toString() ??
+        null,
+      cecotecUnitId:
+        formData.get(`ingredients[${i}].cecotecUnitId`)?.toString() ?? null,
     });
     i++;
   }
