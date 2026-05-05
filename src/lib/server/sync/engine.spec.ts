@@ -224,12 +224,11 @@ describe("transformRecipeForCecotec", () => {
         },
       ],
     );
-    const i = result.ingredients?.[0];
-    expect(i.ingredientId).toBe("ing-id");
-    expect(i.foodIngredient).toBe("Flour");
-    expect(i.unitId).toBe("unit-id");
-    expect(i.unit).toBe("g");
-    expect(i.amount).toBe("100");
+    expect(result.ingredients?.[0].ingredientId).toBe("ing-id");
+    expect(result.ingredients?.[0].foodIngredient).toBe("Flour");
+    expect(result.ingredients?.[0].unitId).toBe("unit-id");
+    expect(result.ingredients?.[0].unit).toBe("g");
+    expect(result.ingredients?.[0].amount).toBe("100");
   });
 
   it("defaults null cecotec IDs to empty string", () => {
@@ -275,7 +274,9 @@ describe("syncRecipe", () => {
     expect(mockCreateRecipe).toHaveBeenCalledOnce();
     expect(result.status).toBe("synced");
     expect(result.recipeId).toBe("recipe-1");
-    const setCall = (mockUpdate.mock.results[0].value as ReturnType<typeof makeUpdateChain>).set;
+    const setCall = (
+      mockUpdate.mock.results[0].value as ReturnType<typeof makeUpdateChain>
+    ).set;
     const setArg = (setCall as ReturnType<typeof vi.fn>).mock.calls[0][0];
     expect(setArg.syncStatus).toBe("synced");
     expect(setArg.cecotecRecipeId).toBe("new-id");
@@ -293,7 +294,12 @@ describe("syncRecipe", () => {
 
     expect(mockUpdateRecipe).toHaveBeenCalledOnce();
     expect(mockCreateRecipe).not.toHaveBeenCalled();
-    const [token, rid, num] = mockUpdateRecipe.mock.calls[0] as [string, string, string, unknown];
+    const [token, rid, num] = mockUpdateRecipe.mock.calls[0] as [
+      string,
+      string,
+      string,
+      unknown,
+    ];
     expect(token).toBe("tok123");
     expect(rid).toBe("cec-rid-1");
     expect(num).toBe("cec-num-1");
@@ -328,7 +334,9 @@ describe("syncRecipe", () => {
 
     expect(result.status).toBe("error");
     expect(result.error).toContain("No Cecotec credentials");
-    const setCall = (mockUpdate.mock.results[0].value as ReturnType<typeof makeUpdateChain>).set;
+    const setCall = (
+      mockUpdate.mock.results[0].value as ReturnType<typeof makeUpdateChain>
+    ).set;
     const setArg = (setCall as ReturnType<typeof vi.fn>).mock.calls[0][0];
     expect(setArg.syncStatus).toBe("error");
   });
@@ -361,14 +369,19 @@ describe("syncRecipe", () => {
 
     expect(result.status).toBe("error");
     expect(result.error).toBe("Create failed");
-    const setCall = (mockUpdate.mock.results[0].value as ReturnType<typeof makeUpdateChain>).set;
+    const setCall = (
+      mockUpdate.mock.results[0].value as ReturnType<typeof makeUpdateChain>
+    ).set;
     const setArg = (setCall as ReturnType<typeof vi.fn>).mock.calls[0][0];
     expect(setArg.syncStatus).toBe("error");
     expect(setArg.syncError).toBe("Create failed");
   });
 
   it("marks recipe as error on image upload failure", async () => {
-    const recipeWithImage = { ...recipeRow, imageUrl: "https://example.com/img.jpg" };
+    const recipeWithImage = {
+      ...recipeRow,
+      imageUrl: "https://example.com/img.jpg",
+    };
     mockUploadImage.mockRejectedValueOnce(new Error("Upload failed"));
 
     vi.stubGlobal(
@@ -414,7 +427,10 @@ describe("syncRecipe", () => {
 
     await syncRecipe("recipe-1");
 
-    expect(mockAuthenticate).toHaveBeenCalledWith("user@example.com", "plain-pass");
+    expect(mockAuthenticate).toHaveBeenCalledWith(
+      "user@example.com",
+      "plain-pass",
+    );
   });
 });
 
@@ -445,7 +461,9 @@ describe("syncAllPending", () => {
     // lookups happen before either first await resolves.
     mockSelect
       // syncAllPending pending-recipes query
-      .mockReturnValueOnce(chainWithAnd([{ id: "recipe-1" }, { id: "recipe-2" }]))
+      .mockReturnValueOnce(
+        chainWithAnd([{ id: "recipe-1" }, { id: "recipe-2" }]),
+      )
       // r1 recipe lookup (synchronous inside map)
       .mockReturnValueOnce(chain([recipeRow]))
       // r2 recipe lookup (synchronous inside map, right after r1)
@@ -472,7 +490,9 @@ describe("syncAllPending", () => {
     // Both recipe lookups happen synchronously via .map() before any await.
     mockSelect
       // syncAllPending pending-recipes query
-      .mockReturnValueOnce(chainWithAnd([{ id: "recipe-1" }, { id: "recipe-2" }]))
+      .mockReturnValueOnce(
+        chainWithAnd([{ id: "recipe-1" }, { id: "recipe-2" }]),
+      )
       // r1 recipe lookup
       .mockReturnValueOnce(chain([recipeRow]))
       // r2 recipe lookup

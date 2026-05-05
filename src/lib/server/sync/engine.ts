@@ -1,11 +1,4 @@
 import { and, asc, eq } from "drizzle-orm";
-import { db } from "$lib/server/db";
-import {
-  cecotecCredentials,
-  recipe,
-  recipeIngredient,
-  recipeStep,
-} from "$lib/server/db/schema";
 import {
   authenticate,
   CecotecError,
@@ -14,12 +7,19 @@ import {
   updateRecipe,
   uploadImage,
 } from "$lib/server/cecotec/client";
-import { decrypt } from "$lib/server/crypto";
 import type {
   CecotecIngredient,
   CecotecRecipeInput,
   CecotecRecipeStep,
 } from "$lib/server/cecotec/types";
+import { decrypt } from "$lib/server/crypto";
+import { db } from "$lib/server/db";
+import {
+  cecotecCredentials,
+  recipe,
+  recipeIngredient,
+  recipeStep,
+} from "$lib/server/db/schema";
 
 export interface SyncResult {
   recipeId: string;
