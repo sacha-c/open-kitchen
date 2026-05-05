@@ -54,23 +54,19 @@ function buildIngredientIndex(lang: "en" | "es"): Map<string, string> {
 }
 
 const ingredientIndexEn = buildIngredientIndex("en");
-const ingredientIndexEs = buildIngredientIndex("es");/**
+const ingredientIndexEs = buildIngredientIndex("es"); /**
  * Look up a Cecotec ingredient ID by display name and recipe language.
  * Falls back: ca → es, unknown lang → en.
  * Returns null if not found in the catalog.
  */
-export function lookupIngredientId(
-  name: string,
-  lang: string,
-): string | null {
+export function lookupIngredientId(name: string, lang: string): string | null {
   const resolvedLang = catalogLang(lang);
   const primary = resolvedLang === "en" ? ingredientIndexEn : ingredientIndexEs;
-  const fallback = resolvedLang === "en" ? ingredientIndexEs : ingredientIndexEn;
+  const fallback =
+    resolvedLang === "en" ? ingredientIndexEs : ingredientIndexEn;
 
   return (
-    primary.get(name.toLowerCase()) ??
-    fallback.get(name.toLowerCase()) ??
-    null
+    primary.get(name.toLowerCase()) ?? fallback.get(name.toLowerCase()) ?? null
   );
 }
 

@@ -1,4 +1,5 @@
 import { and, asc, eq } from "drizzle-orm";
+import { lookupIngredientId, lookupUnitId } from "$lib/server/cecotec/catalog";
 import {
   authenticate,
   CecotecError,
@@ -7,7 +8,6 @@ import {
   updateRecipe,
   uploadImage,
 } from "$lib/server/cecotec/client";
-import { lookupIngredientId, lookupUnitId } from "$lib/server/cecotec/catalog";
 import type {
   CecotecIngredient,
   CecotecRecipeInput,
@@ -61,8 +61,7 @@ export function transformRecipeForCecotec(
       const foodIngredientsId =
         ing.cecotecIngredientId ??
         lookupIngredientId(ing.name, recipeData.language);
-      const unitId =
-        ing.cecotecUnitId ?? lookupUnitId(ing.unit);
+      const unitId = ing.cecotecUnitId ?? lookupUnitId(ing.unit);
       if (!foodIngredientsId || !unitId) return null;
       return {
         foodIngredientsId,

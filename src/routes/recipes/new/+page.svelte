@@ -34,11 +34,27 @@
   function restoreIngredients(): Ingredient[] {
     const vals = form?.values;
     if (!vals?.ingredients || !Array.isArray(vals.ingredients)) {
-      return [{ name: "", amount: "", unit: data.units[0]?.name ?? "g", cecotecIngredientId: "", cecotecUnitId: data.units[0]?.id ?? "" }];
+      return [
+        {
+          name: "",
+          amount: "",
+          unit: data.units[0]?.name ?? "g",
+          cecotecIngredientId: "",
+          cecotecUnitId: data.units[0]?.id ?? "",
+        },
+      ];
     }
     return (vals.ingredients as Ingredient[]).length > 0
       ? (vals.ingredients as Ingredient[])
-      : [{ name: "", amount: "", unit: data.units[0]?.name ?? "g", cecotecIngredientId: "", cecotecUnitId: data.units[0]?.id ?? "" }];
+      : [
+          {
+            name: "",
+            amount: "",
+            unit: data.units[0]?.name ?? "g",
+            cecotecIngredientId: "",
+            cecotecUnitId: data.units[0]?.id ?? "",
+          },
+        ];
   }
 
   function restoreSteps(): Step[] {
@@ -77,7 +93,13 @@
   );
 
   function addIngredient() {
-    ingredients.push({ name: "", amount: "", unit: data.units[0]?.name ?? "g", cecotecIngredientId: "", cecotecUnitId: data.units[0]?.id ?? "" });
+    ingredients.push({
+      name: "",
+      amount: "",
+      unit: data.units[0]?.name ?? "g",
+      cecotecIngredientId: "",
+      cecotecUnitId: data.units[0]?.id ?? "",
+    });
   }
 
   function removeIngredient(index: number) {
@@ -272,7 +294,11 @@
                   }}
                   aria-invalid={fieldError(`ingredients.${i}.name`) ? 'true' : undefined}
                 >
-                <input type="hidden" name={`ingredients[${i}].cecotecIngredientId`} value={ingredient.cecotecIngredientId}>
+                <input
+                  type="hidden"
+                  name={`ingredients[${i}].cecotecIngredientId`}
+                  value={ingredient.cecotecIngredientId}
+                >
                 {#if fieldError(`ingredients.${i}.name`)}
                   <span class="label-text-alt text-error mt-1">
                     {fieldError(`ingredients.${i}.name`)}
@@ -316,7 +342,11 @@
                     <option value={unit.name}>{unit.name}</option>
                   {/each}
                 </select>
-                <input type="hidden" name={`ingredients[${i}].cecotecUnitId`} value={ingredient.cecotecUnitId}>
+                <input
+                  type="hidden"
+                  name={`ingredients[${i}].cecotecUnitId`}
+                  value={ingredient.cecotecUnitId}
+                >
               </div>
               <div class="flex gap-1">
                 <button

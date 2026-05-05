@@ -1,4 +1,5 @@
 import { fail, redirect } from "@sveltejs/kit";
+import { getLocale } from "$lib/paraglide/runtime";
 import {
   calculateCookingTime,
   parseFormDataToRecipe,
@@ -8,7 +9,6 @@ import {
   getIngredientCatalog,
   getUnitCatalog,
 } from "$lib/server/cecotec/catalog";
-import { getLocale } from "$lib/paraglide/runtime";
 import { db } from "$lib/server/db";
 import { recipe, recipeIngredient, recipeStep } from "$lib/server/db/schema";
 import type { Actions, PageServerLoad } from "./$types";
