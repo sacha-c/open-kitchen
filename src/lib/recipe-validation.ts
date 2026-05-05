@@ -87,10 +87,10 @@ export function parseFormDataToRecipe(formData: FormData): unknown {
       amount: formData.get(`ingredients[${i}].amount`)?.toString() ?? "",
       unit: formData.get(`ingredients[${i}].unit`)?.toString() ?? "",
       cecotecIngredientId:
-        formData.get(`ingredients[${i}].cecotecIngredientId`)?.toString() ??
+        formData.get(`ingredients[${i}].cecotecIngredientId`)?.toString() ||
         null,
       cecotecUnitId:
-        formData.get(`ingredients[${i}].cecotecUnitId`)?.toString() ?? null,
+        formData.get(`ingredients[${i}].cecotecUnitId`)?.toString() || null,
     });
     i++;
   }

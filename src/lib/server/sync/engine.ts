@@ -59,9 +59,9 @@ export function transformRecipeForCecotec(
   const resolvedIngredients: CecotecIngredient[] = ingredients
     .map((ing) => {
       const foodIngredientsId =
-        ing.cecotecIngredientId ??
+        ing.cecotecIngredientId ||
         lookupIngredientId(ing.name, recipeData.language);
-      const unitId = ing.cecotecUnitId ?? lookupUnitId(ing.unit);
+      const unitId = ing.cecotecUnitId || lookupUnitId(ing.unit);
       if (!foodIngredientsId || !unitId) return null;
       return {
         foodIngredientsId,

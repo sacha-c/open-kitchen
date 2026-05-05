@@ -124,7 +124,7 @@ async function main() {
             "Basil",
             "Carrot",
             "Potato",
-            "Beef",
+            "Minced beef",
             "Coconut milk",
           ],
         }),
@@ -143,10 +143,42 @@ async function main() {
           ],
         }),
         unit: funcs.valuesFromArray({
-          values: ["g", "ml", "tsp", "tbsp", "cup", "pcs"],
+          values: ["g", "ml", "tsp", "l", "kg", "un"],
         }),
-        cecotecIngredientId: funcs.default({ defaultValue: null }),
-        cecotecUnitId: funcs.default({ defaultValue: null }),
+        cecotecIngredientId: funcs.valuesFromArray({
+          values: [
+            "1473608032428208130", // Chicken breast
+            "1473607867130687490", // Onion
+            "1473607869659852802", // Garlic
+            "1473607870851035137", // Olive oil
+            "1473607860998615042", // Salt
+            "1473608897893478401", // Black pepper
+            "1473607994301984770", // Rice
+            "1473608279825035265", // Tomato
+            "1473607917542027265", // Butter
+            "1473607890086113281", // Flour
+            "1473607894062313473", // Sugar
+            "1473607878086209538", // Egg
+            "1473607895492571138", // Milk
+            "1473608367704092673", // Cream
+            "1473608145355649025", // Parmesan
+            "1473608313534656514", // Basil
+            "1473608053080961025", // Carrot
+            "1473608175537860610", // Potato
+            "1473609065833410561", // Minced beef
+            "1473609025387737090", // Coconut milk
+          ],
+        }),
+        cecotecUnitId: funcs.valuesFromArray({
+          values: [
+            "1468065253094465538", // g
+            "1468065253094465539", // ml
+            "1485486059386785793", // tsp
+            "1468065253094465540", // l
+            "1468065253094465541", // kg
+            "1485486188151918593", // un
+          ],
+        }),
       },
     },
     // Skip auth-related tables
