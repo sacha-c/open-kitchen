@@ -12,6 +12,7 @@
 
   let showDeleteModal = $state(false);
   let deleting = $state(false);
+  let syncing = $state(false);
 </script>
 
 <svelte:head> <title>{data.recipe.name} — OpenKitchen</title> </svelte:head>
@@ -43,8 +44,29 @@
         Delete
       </button>
       {#if data.hasCecotecCredentials}
-        <form method="POST" action="?/sync" use:enhance>
-          <button class="btn btn-primary btn-sm" type="submit">Sync Now</button>
+        <form
+          method="POST"
+          action="?/sync"
+          use:enhance={() => {
+            syncing = true;
+            return async ({ update }) => {
+              await update();
+              syncing = false;
+            };
+          }}
+        >
+          <button
+            class="btn btn-primary btn-sm"
+            type="submit"
+            disabled={syncing}
+          >
+            {#if syncing}
+              <span class="loading loading-spinner loading-xs"></span>
+              Syncing…
+            {:else}
+              Sync Now
+            {/if}
+          </button>
         </form>
       {/if}
     </div>
@@ -107,6 +129,7 @@
           status={data.recipe.syncStatus}
           syncedAt={data.recipe.syncedAt ? new Date(data.recipe.syncedAt) : null}
           syncError={data.recipe.syncError}
+          {syncing}
         />
       </div>
     </div>
