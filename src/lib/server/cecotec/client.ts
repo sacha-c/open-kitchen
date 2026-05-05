@@ -304,6 +304,36 @@ export async function uploadImage(
   return uploadImageResponseDataSchema.parse(envelopeData).link;
 }
 
+export async function updateRecipe(
+  token: string,
+  recipeId: string,
+  number: string,
+  recipe: CecotecRecipeInput,
+): Promise<void> {
+  const body = buildRecipeBody(recipe, recipeId, number);
+  const response = await fetch(
+    `${CECOTEC_BASE_URL}/api/blade-cook/recipe/createRecipeApp/update`,
+    {
+      method: "POST",
+      headers: authHeaders(token),
+      body: JSON.stringify(body),
+    },
+  );
+
+  if (!response.ok) {
+    throw new CecotecError(`Update recipe failed: HTTP ${response.status}`);
+  }
+
+  const raw = await response.json();
+  try {
+    parseCecotecEnvelope(raw);
+  } catch (e) {
+    throw new CecotecError(
+      e instanceof Error ? e.message : "Update recipe failed",
+    );
+  }
+}
+
 export type {
   CecotecAuthResult,
   CecotecIngredient,

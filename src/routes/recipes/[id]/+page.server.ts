@@ -7,6 +7,7 @@ import {
   recipeIngredient,
   recipeStep,
 } from "$lib/server/db/schema";
+import { syncRecipe } from "$lib/server/sync/engine";
 import type { Actions, PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ locals, params }) => {
@@ -97,5 +98,27 @@ export const actions: Actions = {
     await db.delete(recipe).where(eq(recipe.id, recipeId));
 
     redirect(303, "/recipes");
+  },
+
+  sync: async ({ locals, params }) => {
+    if (!locals.session || !locals.user) {
+      redirect(303, "/");
+    }
+
+    const userId = locals.user.id;
+    const recipeId = params.id;
+
+    const [recipeRow] = await db
+      .select({ id: recipe.id })
+      .from(recipe)
+      .where(and(eq(recipe.id, recipeId), eq(recipe.userId, userId)));
+
+    if (!recipeRow) {
+      return fail(404, { message: "Recipe not found" });
+    }
+
+    await syncRecipe(recipeId);
+
+    redirect(303, `/recipes/${recipeId}`);
   },
 };

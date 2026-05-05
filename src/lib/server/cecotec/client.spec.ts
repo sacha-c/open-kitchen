@@ -6,6 +6,7 @@ import {
   deleteRecipe,
   encryptPassword,
   listRecipes,
+  updateRecipe,
   uploadImage,
 } from "./client";
 import type { CecotecRecipeInput } from "./types";
@@ -361,6 +362,41 @@ describe("uploadImage", () => {
     vi.stubGlobal("fetch", mockFetch(errorEnvelope("File too large")));
     await expect(
       uploadImage("token", Buffer.from("data"), "f.jpg", "image/jpeg"),
+    ).rejects.toBeInstanceOf(CecotecError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// updateRecipe
+// ---------------------------------------------------------------------------
+
+describe("updateRecipe", () => {
+  it("posts to the /update endpoint with recipeId and number in body", async () => {
+    const spy = mockFetch(successEnvelope({}));
+    vi.stubGlobal("fetch", spy);
+
+    await updateRecipe("token", "rid-1", "num-42", minimalRecipe);
+
+    const [url, init] = spy.mock.calls[0] as [string, RequestInit];
+    expect(url).toContain("/update");
+    expect(init.method).toBe("POST");
+    const body = JSON.parse(init.body as string);
+    expect(body.id).toBe("rid-1");
+    expect(body.recipeId).toBe("rid-1");
+    expect(body.number).toBe("num-42");
+  });
+
+  it("throws CecotecError on HTTP error", async () => {
+    vi.stubGlobal("fetch", mockFetch({}, 500));
+    await expect(
+      updateRecipe("token", "r1", "1", minimalRecipe),
+    ).rejects.toBeInstanceOf(CecotecError);
+  });
+
+  it("throws CecotecError on API-level error", async () => {
+    vi.stubGlobal("fetch", mockFetch(errorEnvelope("Recipe not found")));
+    await expect(
+      updateRecipe("token", "r1", "1", minimalRecipe),
     ).rejects.toBeInstanceOf(CecotecError);
   });
 });
