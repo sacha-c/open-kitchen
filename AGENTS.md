@@ -55,12 +55,18 @@
   - `POST /api/blade-auth/oauth/token` — authenticate, returns `access_token`, `refresh_token`, `user_id`
   - `POST /api/blade-cook/recipe/createRecipeApp/add` — create recipe (draft)
   - `POST /api/blade-cook/recipe/createRecipeApp/update` — publish/update recipe
-  - `GET /api/blade-cook/recipe/createRecipeApp/selectPage` — list user's custom recipes
+  - `GET /api/blade-cook/recipe/createRecipeApp/selectPage` — list user's custom recipes (flat metadata only, no steps/ingredients)
+  - `GET /api/blade-cook/kitCloud/front/user/recipe/app/detail` — get full recipe detail including steps; params: `id`, `number`, `code`, `recipeType`, `selectedLanguage`, `appOrDevice`, `sourceType`; steps are in `data.multiLanguageRelations[0].recipeDeviceParameterDtos`
   - `PUT /api/blade-cook/recipe/createRecipeApp/deleteRecipe` — delete recipe by ID
   - `POST /api/blade-resource/oss/endpoint/put-file` — upload image to CDN
 - **Model code**: `"MamboTouch"`
 - **Recipe creation flow**: POST add (creates hidden draft) → POST update with `recipeStatus: 1` (publishes it).
-- **No edit endpoint confirmed** — updates may require delete + recreate on Cecotec side.
+- **Update behavior (verified in issue #9 — full-circle confirmed)**:
+  - `POST /api/blade-cook/recipe/createRecipeApp/update` on an already-published recipe fully updates it in place: `defaultName`, `serviceSize`, `cookingTime`, and all steps (`recipeDeviceParameterDtos`) are persisted and readable back via the detail endpoint.
+  - Steps are verified via `GET /api/blade-cook/kitCloud/front/user/recipe/app/detail` → `data.multiLanguageRelations[0].recipeDeviceParameterDtos`.
+  - `id` (`recipeId`) and `number` (CookbookId) remain stable across updates.
+  - `ingredientsRelationVosList` is not persisted via API alone (server requires multilanguage relation record created by the official app — known limitation).
+  - **Recommended sync strategy**: update-in-place (preserves CookbookId). Fall back to delete+recreate only on update failure.
 
 ## Recipe Data Model (Cecotec)
 
