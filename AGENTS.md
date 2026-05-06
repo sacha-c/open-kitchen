@@ -31,6 +31,18 @@
 
 - **No barrel re-exports**: Do not create `index.ts` files that only re-export from other modules. Import directly from the source file (e.g. `$lib/server/cecotec/client` not `$lib/server/cecotec`). Barrels obscure the dependency graph, can cause circular imports, and make mocking harder in tests.
 
+## Code quality
+
+You are responsible for ensuring that the code is of the utmost quality. For this you should follow a set of guidelines:
+- Code legibility: code should be easy to understand and follow. Code should be self-documented with well-chosen variable & function names, and otherwise have proper docstrings in cases of complexity.
+- Avoid duplicating code. You should avoid copy-pasting, and instead favor extracting common logic to places that can be reused, always having in mind maintainability.
+- Follow best practices of the tools and technologies we use, as well as best practices in terms of coding patterns.
+- Refactor. When modifying existing functionality, consider refactoring what is in place to work in a better and clearer way with what you are currently implementing. If you notice that a refactor is becoming too big compared to the functionality being added, you can alternatively opt for creating a github issue to address the refactor separately.
+- Bug detection. When making changes, if you notice a bug related to your changes, fix it. If you notice a bug unrelated to your current changes or if you notice that the bug requires significant changes compared to what you are currently working on, create a github issue to address the fix separately.
+- Code maintainability: the above guidelines should help make code maintainable, but keep maintainability in mind as well.
+
+In general you should follow these guidelines, however it is also important to know that they are flexible: in some cases you may need to deviate slightly to avoid overcomplicating a solution. For example in some cases it is preferrable to have a small amount of code duplication versus many layers of abstractions which would otherwise make the code more difficult to read.
+
 ## Local Development
 
 - **Always work against the local database** when developing or working on issues. Never use the production or preview database for local development.
