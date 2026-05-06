@@ -85,6 +85,16 @@ export const uploadImageResponseDataSchema = z.object({
   link: z.string(),
 });
 
+// Device linked to the user's Cecotec account.
+// modleName is the model code used in recipe payloads (e.g. "MamboTouch").
+export const cecotecDeviceSchema = z.object({
+  modleName: z.string(),
+  sn: z.string(),
+  isOnline: z.number().optional(),
+});
+
+export const devicesResponseSchema = z.array(cecotecDeviceSchema);
+
 // =============================================================================
 // Inferred TypeScript types
 // =============================================================================
@@ -94,6 +104,7 @@ export type CecotecRecipeStep = z.infer<typeof cecotecRecipeStepSchema>;
 export type CecotecIngredient = z.infer<typeof cecotecIngredientSchema>;
 export type CecotecRecipeInput = z.infer<typeof cecotecRecipeInputSchema>;
 export type CecotecRecipe = z.infer<typeof cecotecRecipeSchema>;
+export type CecotecDevice = z.infer<typeof cecotecDeviceSchema>;
 
 export interface CecotecAuthResult {
   accessToken: string;

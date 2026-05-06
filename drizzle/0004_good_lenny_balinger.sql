@@ -1,0 +1,1 @@
+ALTER TABLE "cecotec_credentials" ADD COLUMN "model_code" text;

@@ -5,6 +5,7 @@ import {
   CecotecError,
   createRecipe,
   deleteRecipe,
+  getDevices,
   updateRecipe,
   uploadImage,
 } from "$lib/server/cecotec/client";
@@ -160,6 +161,20 @@ export async function syncRecipe(recipeId: string): Promise<SyncResult> {
     const decryptedPassword = decrypt(creds.encryptedPassword);
     const { accessToken } = await authenticate(creds.email, decryptedPassword);
 
+    // Resolve device model code — fetched once from the API and cached in DB.
+    let modelCode = creds.modelCode;
+    if (!modelCode) {
+      const devices = await getDevices(accessToken);
+      const device = devices[0];
+      if (!device) {
+        throw new CecotecError("No Cecotec device linked to this account");
+      }
+      modelCode = device.modleName;
+      await db
+        .update(cecotecCredentials)
+        .set({ modelCode, updatedAt: new Date() })
+        .where(eq(cecotecCredentials.id, creds.id));
+    }
     let cecotecImageUrl: string | undefined;
     if (recipeRow.imageUrl) {
       cecotecImageUrl = await fetchAndUploadImage(
@@ -192,17 +207,18 @@ export async function syncRecipe(recipeId: string): Promise<SyncResult> {
           recipeRow.cecotecRecipeId,
           recipeRow.cecotecNumber,
           cecotecInput,
+          modelCode,
         );
         cecotecRecipeId = recipeRow.cecotecRecipeId;
         cecotecNumber = recipeRow.cecotecNumber;
       } catch {
         await deleteRecipe(accessToken, recipeRow.cecotecRecipeId);
-        const result = await createRecipe(accessToken, cecotecInput);
+        const result = await createRecipe(accessToken, cecotecInput, modelCode);
         cecotecRecipeId = result.recipeId;
         cecotecNumber = result.number;
       }
     } else {
-      const result = await createRecipe(accessToken, cecotecInput);
+      const result = await createRecipe(accessToken, cecotecInput, modelCode);
       cecotecRecipeId = result.recipeId;
       cecotecNumber = result.number;
     }

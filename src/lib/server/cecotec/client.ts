@@ -3,11 +3,11 @@ import {
   CECOTEC_BASE_URL,
   CECOTEC_PUBLIC_KEY,
   COMMON_HEADERS,
-  MODEL_CODE,
   OAUTH_BASIC_AUTH,
 } from "./constants";
 import type {
   CecotecAuthResult,
+  CecotecDevice,
   CecotecIngredient,
   CecotecRecipe,
   CecotecRecipeInput,
@@ -16,6 +16,7 @@ import type {
 import {
   authResponseSchema,
   createRecipeResponseDataSchema,
+  devicesResponseSchema,
   listRecipesResponseDataSchema,
   parseCecotecEnvelope,
   uploadImageResponseDataSchema,
@@ -39,13 +40,14 @@ function authHeaders(token: string): Record<string, string> {
 
 function buildRecipeBody(
   recipe: CecotecRecipeInput,
+  modelCode: string,
   recipeId?: string,
   number?: string,
 ): Record<string, unknown> {
   const body: Record<string, unknown> = {
     id: recipeId ?? "",
     languageCode: recipe.language,
-    modleCode: MODEL_CODE,
+    modleCode: modelCode,
     appOrDevice: 1,
     sourceType: 1,
     isFeeder: 0,
@@ -128,8 +130,9 @@ export async function authenticate(
 export async function createRecipe(
   token: string,
   recipe: CecotecRecipeInput,
+  modelCode: string,
 ): Promise<{ recipeId: string; number: string }> {
-  const body = buildRecipeBody(recipe);
+  const body = buildRecipeBody(recipe, modelCode);
 
   const addResponse = await fetch(
     `${CECOTEC_BASE_URL}/api/blade-cook/recipe/createRecipeApp/add`,
@@ -160,6 +163,7 @@ export async function createRecipe(
   // recipeStatus=1 makes it visible in the user's recipe list.
   const updateBody = buildRecipeBody(
     recipe,
+    modelCode,
     String(result.recipeId),
     String(result.number),
   );
@@ -193,12 +197,13 @@ export async function createRecipe(
 export async function listRecipes(
   token: string,
   userId: string,
+  modelCode: string,
 ): Promise<CecotecRecipe[]> {
   const params = new URLSearchParams({
     userId,
     current: "1",
     size: "50",
-    modleCode: MODEL_CODE,
+    modleCode: modelCode,
     appOrDevice: "1",
     sourceType: "1",
   });
@@ -306,8 +311,9 @@ export async function updateRecipe(
   recipeId: string,
   number: string,
   recipe: CecotecRecipeInput,
+  modelCode: string,
 ): Promise<void> {
-  const body = buildRecipeBody(recipe, recipeId, number);
+  const body = buildRecipeBody(recipe, modelCode, recipeId, number);
   const response = await fetch(
     `${CECOTEC_BASE_URL}/api/blade-cook/recipe/createRecipeApp/update`,
     {
@@ -331,8 +337,44 @@ export async function updateRecipe(
   }
 }
 
+export async function getDevices(token: string): Promise<CecotecDevice[]> {
+  const params = new URLSearchParams({
+    sourceType: "1",
+    code: "en",
+  });
+
+  // This endpoint uses Basic auth in Authorization but bearer token in blade-auth
+  const response = await fetch(
+    `${CECOTEC_BASE_URL}/api/blade-device/device/deviceBaseInfo?${params}`,
+    {
+      headers: {
+        ...COMMON_HEADERS,
+        authorization: OAUTH_BASIC_AUTH,
+        "blade-auth": `bearer ${token}`,
+      },
+    },
+  );
+
+  if (!response.ok) {
+    throw new CecotecError(`Get devices failed: HTTP ${response.status}`);
+  }
+
+  const raw = await response.json();
+  let envelopeData: unknown;
+  try {
+    envelopeData = parseCecotecEnvelope(raw);
+  } catch (e) {
+    throw new CecotecError(
+      e instanceof Error ? e.message : "Get devices failed",
+    );
+  }
+
+  return devicesResponseSchema.parse(envelopeData);
+}
+
 export type {
   CecotecAuthResult,
+  CecotecDevice,
   CecotecIngredient,
   CecotecRecipe,
   CecotecRecipeInput,

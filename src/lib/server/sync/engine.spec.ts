@@ -8,6 +8,7 @@ const mockAuthenticate = vi.fn();
 const mockCreateRecipe = vi.fn();
 const mockUpdateRecipe = vi.fn();
 const mockDeleteRecipe = vi.fn();
+const mockGetDevices = vi.fn();
 const mockUploadImage = vi.fn();
 const mockDecrypt = vi.fn((_s: string) => "decrypted-password");
 const mockSelect = vi.fn();
@@ -25,6 +26,7 @@ vi.mock("$lib/server/cecotec/client", () => ({
   createRecipe: (...args: unknown[]) => mockCreateRecipe(...args),
   updateRecipe: (...args: unknown[]) => mockUpdateRecipe(...args),
   deleteRecipe: (...args: unknown[]) => mockDeleteRecipe(...args),
+  getDevices: (...args: unknown[]) => mockGetDevices(...args),
   uploadImage: (...args: unknown[]) => mockUploadImage(...args),
   CecotecError: class CecotecError extends Error {
     constructor(message: string) {
@@ -144,6 +146,8 @@ const creds = {
   email: "user@example.com",
   encryptedPassword: "enc:pass:word",
   cecotecUserId: "cec-user-1",
+  // modelCode pre-populated so most tests skip the getDevices fetch path
+  modelCode: "MamboTouch",
   createdAt: new Date(),
   updatedAt: new Date(),
 };
@@ -283,6 +287,7 @@ describe("syncRecipe", () => {
     vi.clearAllMocks();
     mockAuthenticate.mockResolvedValue({ accessToken: "tok123" });
     mockCreateRecipe.mockResolvedValue({ recipeId: "new-id", number: "99" });
+    mockGetDevices.mockResolvedValue([{ modleName: "MamboTouch", sn: "sn-1" }]);
     mockUpdate.mockReturnValue(makeUpdateChain());
   });
 
@@ -456,6 +461,42 @@ describe("syncRecipe", () => {
       "plain-pass",
     );
   });
+
+  it("fetches and caches model code from API when not stored in credentials", async () => {
+    const credsWithoutModel = { ...creds, modelCode: null };
+    mockGetDevices.mockResolvedValueOnce([
+      { modleName: "GrillMaster", sn: "sn-gm" },
+    ]);
+
+    mockSelect
+      .mockReturnValueOnce(chain([recipeRow]))
+      .mockReturnValueOnce(chainWithOrderBy([step]))
+      .mockReturnValueOnce(chainWithOrderBy([ingredient]))
+      .mockReturnValueOnce(chain([credsWithoutModel]));
+
+    const result = await syncRecipe("recipe-1");
+
+    expect(mockGetDevices).toHaveBeenCalledWith("tok123");
+    expect(result.status).toBe("synced");
+    // Third arg to createRecipe is modelCode — should be the fetched value
+    expect(mockCreateRecipe.mock.calls[0][2]).toBe("GrillMaster");
+  });
+
+  it("errors when no device is linked to the account", async () => {
+    const credsWithoutModel = { ...creds, modelCode: null };
+    mockGetDevices.mockResolvedValueOnce([]);
+
+    mockSelect
+      .mockReturnValueOnce(chain([recipeRow]))
+      .mockReturnValueOnce(chainWithOrderBy([]))
+      .mockReturnValueOnce(chainWithOrderBy([]))
+      .mockReturnValueOnce(chain([credsWithoutModel]));
+
+    const result = await syncRecipe("recipe-1");
+
+    expect(result.status).toBe("error");
+    expect(result.error).toContain("No Cecotec device");
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -467,6 +508,7 @@ describe("syncAllPending", () => {
     vi.clearAllMocks();
     mockAuthenticate.mockResolvedValue({ accessToken: "tok123" });
     mockCreateRecipe.mockResolvedValue({ recipeId: "new-id", number: "99" });
+    mockGetDevices.mockResolvedValue([{ modleName: "MamboTouch", sn: "sn-1" }]);
     mockUpdate.mockReturnValue(makeUpdateChain());
   });
 

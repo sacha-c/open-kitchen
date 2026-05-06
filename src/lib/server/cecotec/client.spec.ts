@@ -5,6 +5,7 @@ import {
   createRecipe,
   deleteRecipe,
   encryptPassword,
+  getDevices,
   listRecipes,
   updateRecipe,
   uploadImage,
@@ -182,7 +183,7 @@ describe("createRecipe", () => {
       });
     vi.stubGlobal("fetch", spy);
 
-    const result = await createRecipe("token", minimalRecipe);
+    const result = await createRecipe("token", minimalRecipe, "MamboTouch");
     expect(spy).toHaveBeenCalledTimes(2);
     expect(result.recipeId).toBe("r1");
     expect(result.number).toBe("42");
@@ -204,7 +205,7 @@ describe("createRecipe", () => {
       });
     vi.stubGlobal("fetch", spy);
 
-    await createRecipe("token", minimalRecipe);
+    await createRecipe("token", minimalRecipe, "MamboTouch");
 
     const firstUrl = spy.mock.calls[0][0] as string;
     const secondUrl = spy.mock.calls[1][0] as string;
@@ -222,16 +223,16 @@ describe("createRecipe", () => {
       }),
     );
 
-    await expect(createRecipe("token", minimalRecipe)).rejects.toBeInstanceOf(
-      CecotecError,
-    );
+    await expect(
+      createRecipe("token", minimalRecipe, "MamboTouch"),
+    ).rejects.toBeInstanceOf(CecotecError);
   });
 
   it("throws CecotecError on HTTP error", async () => {
     vi.stubGlobal("fetch", mockFetch({}, 500));
-    await expect(createRecipe("token", minimalRecipe)).rejects.toBeInstanceOf(
-      CecotecError,
-    );
+    await expect(
+      createRecipe("token", minimalRecipe, "MamboTouch"),
+    ).rejects.toBeInstanceOf(CecotecError);
   });
 });
 
@@ -254,7 +255,7 @@ describe("listRecipes", () => {
     ];
     vi.stubGlobal("fetch", mockFetch(successEnvelope({ records })));
 
-    const result = await listRecipes("token", "user1");
+    const result = await listRecipes("token", "user1", "MamboTouch");
     expect(result).toHaveLength(1);
     expect(result[0].defaultName).toBe("Soup");
   });
@@ -263,25 +264,25 @@ describe("listRecipes", () => {
     const spy = mockFetch(successEnvelope({ records: [] }));
     vi.stubGlobal("fetch", spy);
 
-    await listRecipes("token", "uid42");
+    await listRecipes("token", "uid42", "MamboTouch");
 
     const [url] = spy.mock.calls[0] as [string, RequestInit];
     expect(url).toContain("userId=uid42");
-    // expect(url).toContain("modleCode=MamboTouch");
+    expect(url).toContain("modleCode=MamboTouch");
   });
 
   it("throws CecotecError on HTTP error", async () => {
     vi.stubGlobal("fetch", mockFetch({}, 403));
-    await expect(listRecipes("token", "uid")).rejects.toBeInstanceOf(
-      CecotecError,
-    );
+    await expect(
+      listRecipes("token", "uid", "MamboTouch"),
+    ).rejects.toBeInstanceOf(CecotecError);
   });
 
   it("throws CecotecError on API-level error", async () => {
     vi.stubGlobal("fetch", mockFetch(errorEnvelope("Not found")));
-    await expect(listRecipes("token", "uid")).rejects.toBeInstanceOf(
-      CecotecError,
-    );
+    await expect(
+      listRecipes("token", "uid", "MamboTouch"),
+    ).rejects.toBeInstanceOf(CecotecError);
   });
 });
 
@@ -375,7 +376,7 @@ describe("updateRecipe", () => {
     const spy = mockFetch(successEnvelope({}));
     vi.stubGlobal("fetch", spy);
 
-    await updateRecipe("token", "rid-1", "num-42", minimalRecipe);
+    await updateRecipe("token", "rid-1", "num-42", minimalRecipe, "MamboTouch");
 
     const [url, init] = spy.mock.calls[0] as [string, RequestInit];
     expect(url).toContain("/update");
@@ -383,19 +384,74 @@ describe("updateRecipe", () => {
     const body = JSON.parse(init.body as string);
     expect(body.id).toBe("rid-1");
     expect(body.number).toBe("num-42");
+    expect(body.modleCode).toBe("MamboTouch");
   });
 
   it("throws CecotecError on HTTP error", async () => {
     vi.stubGlobal("fetch", mockFetch({}, 500));
     await expect(
-      updateRecipe("token", "r1", "1", minimalRecipe),
+      updateRecipe("token", "r1", "1", minimalRecipe, "MamboTouch"),
     ).rejects.toBeInstanceOf(CecotecError);
   });
 
   it("throws CecotecError on API-level error", async () => {
     vi.stubGlobal("fetch", mockFetch(errorEnvelope("Recipe not found")));
     await expect(
-      updateRecipe("token", "r1", "1", minimalRecipe),
+      updateRecipe("token", "r1", "1", minimalRecipe, "MamboTouch"),
     ).rejects.toBeInstanceOf(CecotecError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// getDevices
+// ---------------------------------------------------------------------------
+
+describe("getDevices", () => {
+  it("returns the list of linked devices", async () => {
+    vi.stubGlobal(
+      "fetch",
+      mockFetch(
+        successEnvelope([
+          { modleName: "MamboTouch", sn: "sn123", isOnline: 1 },
+        ]),
+      ),
+    );
+
+    const devices = await getDevices("token");
+    expect(devices).toHaveLength(1);
+    expect(devices[0].modleName).toBe("MamboTouch");
+    expect(devices[0].sn).toBe("sn123");
+  });
+
+  it("calls the deviceBaseInfo endpoint", async () => {
+    const spy = mockFetch(successEnvelope([]));
+    vi.stubGlobal("fetch", spy);
+
+    await getDevices("tok");
+
+    const [url] = spy.mock.calls[0] as [string, RequestInit];
+    expect(url).toContain("/api/blade-device/device/deviceBaseInfo");
+  });
+
+  it("uses Basic auth in Authorization header but bearer token in blade-auth", async () => {
+    const spy = mockFetch(successEnvelope([]));
+    vi.stubGlobal("fetch", spy);
+
+    await getDevices("mytoken");
+
+    const [, init] = spy.mock.calls[0] as [string, RequestInit];
+    const headers = init.headers as Record<string, string>;
+    expect(headers["authorization"]).toContain("Basic");
+    expect(headers["blade-auth"]).toBe("bearer mytoken");
+  });
+
+  it("throws CecotecError on HTTP error", async () => {
+    vi.stubGlobal("fetch", mockFetch({}, 401));
+    await expect(getDevices("token")).rejects.toBeInstanceOf(CecotecError);
+  });
+
+  it("throws CecotecError on API-level error", async () => {
+    vi.stubGlobal("fetch", mockFetch(errorEnvelope("Unauthorized")));
+    await expect(getDevices("token")).rejects.toBeInstanceOf(CecotecError);
   });
 });
