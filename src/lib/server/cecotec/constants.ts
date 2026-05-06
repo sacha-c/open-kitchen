@@ -11,7 +11,7 @@ abZCqviBYwECcCamzwIDAQAB
 // "sword:sword_secret" base64-encoded
 export const OAUTH_BASIC_AUTH = "Basic c3dvcmQ6c3dvcmRfc2VjcmV0";
 
-export const MODEL_CODE = "MamboTouch";
+export const MODEL_CODE = "Mambo11090"; // Test this model name
 
 export const COMMON_HEADERS: Record<string, string> = {
   "cloud-kit-app-language": "en",
