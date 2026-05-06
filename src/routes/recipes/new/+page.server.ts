@@ -1,9 +1,14 @@
 import { fail, redirect } from "@sveltejs/kit";
+import { getLocale } from "$lib/paraglide/runtime";
 import {
   calculateCookingTime,
   parseFormDataToRecipe,
   recipeFormSchema,
 } from "$lib/recipe-validation";
+import {
+  getIngredientCatalog,
+  getUnitCatalog,
+} from "$lib/server/cecotec/catalog";
 import { db } from "$lib/server/db";
 import { recipe, recipeIngredient, recipeStep } from "$lib/server/db/schema";
 import type { Actions, PageServerLoad } from "./$types";
@@ -12,6 +17,19 @@ export const load: PageServerLoad = async ({ locals }) => {
   if (!locals.session) {
     redirect(303, "/");
   }
+
+  const locale = getLocale();
+  // Cecotec catalog has no Catalan translations — fall back to Spanish
+  const lang: "en" | "es" = locale === "en" ? "en" : "es";
+
+  const ingredients = getIngredientCatalog().map((e) => ({
+    id: e.id,
+    name: (e[lang] || e.en || e.es) as string,
+  }));
+
+  const units = getUnitCatalog();
+
+  return { ingredients, units };
 };
 
 export const actions: Actions = {
@@ -65,6 +83,8 @@ export const actions: Actions = {
             name: ing.name,
             amount: ing.amount,
             unit: ing.unit,
+            cecotecIngredientId: ing.cecotecIngredientId ?? null,
+            cecotecUnitId: ing.cecotecUnitId ?? null,
           }),
         ),
         ...data.steps.map((step, index) =>

@@ -118,6 +118,9 @@ export const cecotecCredentials = pgTable("cecotec_credentials", {
   email: varchar("email", { length: 255 }).notNull(),
   encryptedPassword: text("encrypted_password").notNull(),
   cecotecUserId: text("cecotec_user_id"),
+  // Cached on first sync by calling the deviceBaseInfo endpoint.
+  // Each user's machine has its own model code (e.g. "MamboTouch").
+  modelCode: text("model_code"),
   createdAt: timestamp("created_at", {
     precision: 6,
     withTimezone: true,

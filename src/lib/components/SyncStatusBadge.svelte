@@ -3,31 +3,43 @@
     status: string;
     syncedAt?: Date | null;
     syncError?: string | null;
+    syncing?: boolean;
   }
 
-  let { status, syncedAt, syncError }: Props = $props();
+  let { status, syncedAt, syncError, syncing = false }: Props = $props();
 
   let badgeClass = $derived(
-    status === "synced"
-      ? "badge-success"
-      : status === "error"
-        ? "badge-error"
-        : "badge-warning",
+    syncing
+      ? "badge-info"
+      : status === "synced"
+        ? "badge-success"
+        : status === "error"
+          ? "badge-error"
+          : "badge-warning",
   );
 
   let label = $derived(
-    status === "synced" ? "Synced" : status === "error" ? "Error" : "Pending",
+    syncing
+      ? "Syncing…"
+      : status === "synced"
+        ? "Synced"
+        : status === "error"
+          ? "Error"
+          : "Pending",
   );
 </script>
 
 <div class="inline-flex items-center gap-1">
+  {#if syncing}
+    <span class="loading loading-spinner loading-xs text-info"></span>
+  {/if}
   <span class="badge badge-sm {badgeClass}">{label}</span>
-  {#if status === "synced" && syncedAt}
+  {#if !syncing && status === "synced" && syncedAt}
     <span class="text-base-content/50 text-xs">
       {syncedAt.toLocaleDateString()}
     </span>
   {/if}
-  {#if status === "error" && syncError}
+  {#if !syncing && status === "error" && syncError}
     <div class="tooltip tooltip-error" data-tip={syncError}>
       <button
         class="btn btn-circle btn-ghost btn-xs"

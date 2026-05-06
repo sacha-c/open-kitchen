@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 // ---------------------------------------------------------------------------
 
 const mockAuthenticate = vi.fn();
+const mockGetDevices = vi.fn();
 const mockEncrypt = vi.fn(
   (_plaintext: string): string => "encrypted:password:value",
 );
@@ -21,6 +22,7 @@ vi.mock("$env/static/private", () => ({
 
 vi.mock("$lib/server/cecotec/client", () => ({
   authenticate: (...args: unknown[]) => mockAuthenticate(...args),
+  getDevices: (...args: unknown[]) => mockGetDevices(...args),
   CecotecError: class CecotecError extends Error {
     constructor(message: string) {
       super(message);
@@ -124,6 +126,8 @@ describe("load", () => {
 describe("actions.save", () => {
   beforeEach(() => {
     mockAuthenticate.mockReset();
+    mockGetDevices.mockReset();
+    mockGetDevices.mockResolvedValue([{ modleName: "MamboTouch", sn: "sn-1" }]);
     mockEncrypt.mockReset();
     mockInsert.mockReset();
     mockSelect.mockReset();
@@ -196,10 +200,9 @@ describe("actions.save", () => {
     });
     mockEncrypt.mockReturnValue("iv:tag:enc");
 
+    const onConflictDoUpdate = vi.fn().mockResolvedValue(undefined);
     const insertChain = {
-      values: vi.fn().mockReturnValue({
-        onConflictDoUpdate: vi.fn().mockResolvedValue(undefined),
-      }),
+      values: vi.fn().mockReturnValue({ onConflictDoUpdate }),
     };
     mockInsert.mockReturnValue(insertChain);
 
@@ -210,7 +213,40 @@ describe("actions.save", () => {
 
     expect(mockEncrypt).toHaveBeenCalledWith("correct");
     expect(mockInsert).toHaveBeenCalled();
+    // modelCode should be passed in the upsert values
+    const valuesArg = insertChain.values.mock.calls[0][0] as Record<
+      string,
+      unknown
+    >;
+    expect(valuesArg.modelCode).toBe("MamboTouch");
     expect(result).toMatchObject({ success: true });
+  });
+
+  it("saves null modelCode when no device is linked", async () => {
+    mockAuthenticate.mockResolvedValue({
+      accessToken: "tok",
+      refreshToken: "ref",
+      userId: "cec-uid",
+    });
+    mockGetDevices.mockResolvedValue([]);
+    mockEncrypt.mockReturnValue("iv:tag:enc");
+
+    const onConflictDoUpdate = vi.fn().mockResolvedValue(undefined);
+    const insertChain = {
+      values: vi.fn().mockReturnValue({ onConflictDoUpdate }),
+    };
+    mockInsert.mockReturnValue(insertChain);
+
+    await actions.save({
+      request: makeRequest({ email: "u@example.com", password: "correct" }),
+      locals: makeLocals(),
+    } as never);
+
+    const valuesArg = insertChain.values.mock.calls[0][0] as Record<
+      string,
+      unknown
+    >;
+    expect(valuesArg.modelCode).toBeNull();
   });
 
   it("redirects unauthenticated users", async () => {

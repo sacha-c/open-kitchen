@@ -124,7 +124,7 @@ async function main() {
             "Basil",
             "Carrot",
             "Potato",
-            "Beef",
+            "Minced beef",
             "Coconut milk",
           ],
         }),
@@ -143,8 +143,12 @@ async function main() {
           ],
         }),
         unit: funcs.valuesFromArray({
-          values: ["g", "ml", "tsp", "tbsp", "cup", "pcs"],
+          values: ["g", "ml", "tsp", "l", "kg", "un"],
         }),
+        // Leave cecotec IDs null — the sync engine will resolve them via
+        // catalog lookup by name at sync time. Storing random IDs here
+        // would misalign names and IDs since drizzle-seed picks each
+        // column independently.
         cecotecIngredientId: funcs.default({ defaultValue: null }),
         cecotecUnitId: funcs.default({ defaultValue: null }),
       },

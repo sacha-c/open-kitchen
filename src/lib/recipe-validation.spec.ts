@@ -369,8 +369,20 @@ describe("parseFormDataToRecipe", () => {
       servings: "4",
       language: "es",
       ingredients: [
-        { name: "Butter", amount: "50", unit: "g" },
-        { name: "Flour", amount: "200", unit: "g" },
+        {
+          name: "Butter",
+          amount: "50",
+          unit: "g",
+          cecotecIngredientId: null,
+          cecotecUnitId: null,
+        },
+        {
+          name: "Flour",
+          amount: "200",
+          unit: "g",
+          cecotecIngredientId: null,
+          cecotecUnitId: null,
+        },
       ],
       steps: [
         {
