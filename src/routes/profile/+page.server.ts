@@ -1,7 +1,11 @@
 import { fail, redirect } from "@sveltejs/kit";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { authenticate, CecotecError } from "$lib/server/cecotec/client";
+import {
+  authenticate,
+  CecotecError,
+  getDevices,
+} from "$lib/server/cecotec/client";
 import { encrypt } from "$lib/server/crypto";
 import { db } from "$lib/server/db";
 import { cecotecCredentials } from "$lib/server/db/schema";
@@ -61,12 +65,15 @@ export const actions: Actions = {
     }
 
     let cecotecUserId: string;
+    let modelCode: string | null = null;
     try {
       const result = await authenticate(
         parsed.data.email,
         parsed.data.password,
       );
       cecotecUserId = result.userId;
+      const devices = await getDevices(result.accessToken);
+      modelCode = devices[0]?.modleName ?? null;
     } catch (e) {
       if (e instanceof CecotecError) {
         return fail(400, {
@@ -89,6 +96,7 @@ export const actions: Actions = {
         email: parsed.data.email,
         encryptedPassword,
         cecotecUserId,
+        modelCode,
         createdAt: now,
         updatedAt: now,
       })
@@ -98,6 +106,7 @@ export const actions: Actions = {
           email: parsed.data.email,
           encryptedPassword,
           cecotecUserId,
+          modelCode,
           updatedAt: now,
         },
       });
