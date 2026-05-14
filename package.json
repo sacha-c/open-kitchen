@@ -44,7 +44,7 @@
     "mdsvex": "^0.12.6",
     "playwright": "^1.58.2",
     "prettier-plugin-tailwindcss": "^0.7.2",
-    "svelte": "^5.54.0",
+    "svelte": "^5.55.7",
     "svelte-check": "^4.4.2",
     "tailwindcss": "^4.1.18",
     "tsx": "^4.21.0",
