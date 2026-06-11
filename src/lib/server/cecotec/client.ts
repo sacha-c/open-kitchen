@@ -313,26 +313,64 @@ export async function updateRecipe(
   recipe: CecotecRecipeInput,
   modelCode: string,
 ): Promise<void> {
-  const body = buildRecipeBody(recipe, modelCode, recipeId, number);
-  const response = await fetch(
+  // 1. Force back to draft state to register the changes
+  const draftBody = buildRecipeBody(recipe, modelCode, recipeId, number);
+  draftBody.recipeId = recipeId; // Ensure this is explicitly set
+  draftBody.recipeStatus = "0"; // 0 = Draft / Unpublished
+
+  const draftPayload = JSON.stringify(draftBody);
+
+  const draftResponse = await fetch(
     `${CECOTEC_BASE_URL}/api/blade-cook/recipe/createRecipeApp/update`,
     {
       method: "POST",
       headers: authHeaders(token),
-      body: JSON.stringify(body),
+      body: draftPayload,
     },
   );
 
-  if (!response.ok) {
-    throw new CecotecError(`Update recipe failed: HTTP ${response.status}`);
+  if (!draftResponse.ok) {
+    throw new CecotecError(
+      `Update (draft phase) failed: HTTP ${draftResponse.status}`,
+    );
   }
 
-  const raw = await response.json();
+  const draftRaw = await draftResponse.json();
   try {
-    parseCecotecEnvelope(raw);
+    parseCecotecEnvelope(draftRaw);
   } catch (e) {
     throw new CecotecError(
-      e instanceof Error ? e.message : "Update recipe failed",
+      e instanceof Error ? e.message : "Update (draft phase) failed",
+    );
+  }
+
+  // 2. Publish the updated draft
+  const publishBody = buildRecipeBody(recipe, modelCode, recipeId, number);
+  publishBody.recipeId = recipeId;
+  publishBody.recipeStatus = "1"; // 1 = Published
+
+  const publishPayload = JSON.stringify(publishBody);
+  const publishResponse = await fetch(
+    `${CECOTEC_BASE_URL}/api/blade-cook/recipe/createRecipeApp/update`,
+    {
+      method: "POST",
+      headers: authHeaders(token),
+      body: publishPayload,
+    },
+  );
+
+  if (!publishResponse.ok) {
+    throw new CecotecError(
+      `Update (publish phase) failed: HTTP ${publishResponse.status}`,
+    );
+  }
+
+  const publishRaw = await publishResponse.json();
+  try {
+    parseCecotecEnvelope(publishRaw);
+  } catch (e) {
+    throw new CecotecError(
+      e instanceof Error ? e.message : "Update (publish phase) failed",
     );
   }
 }

@@ -441,7 +441,7 @@ describe("getDevices", () => {
 
     const [, init] = spy.mock.calls[0] as [string, RequestInit];
     const headers = init.headers as Record<string, string>;
-    expect(headers["authorization"]).toContain("Basic");
+    expect(headers.authorization).toContain("Basic");
     expect(headers["blade-auth"]).toBe("bearer mytoken");
   });
 
