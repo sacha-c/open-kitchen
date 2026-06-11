@@ -127,6 +127,16 @@ export async function authenticate(
   };
 }
 
+async function parseCecotecResponse(response: Response): Promise<unknown> {
+  const rawText = await response.text();
+
+  // 🚨 THE HOLY GRAIL: Find any unquoted 15+ digit number and wrap it in quotes
+  // This turns {"recipeId": 2065088550414004226} into {"recipeId": "2065088550414004226"}
+  const safeJsonText = rawText.replace(/:(\s*)(\d{15,})/g, ':$1"$2"');
+
+  return JSON.parse(safeJsonText);
+}
+
 export async function createRecipe(
   token: string,
   recipe: CecotecRecipeInput,
@@ -134,7 +144,7 @@ export async function createRecipe(
 ): Promise<{ recipeId: string; number: string }> {
   const body = buildRecipeBody(recipe, modelCode);
 
-  const addResponse = await fetch(
+  const response = await fetch(
     `${CECOTEC_BASE_URL}/api/blade-cook/recipe/createRecipeApp/add`,
     {
       method: "POST",
@@ -143,55 +153,18 @@ export async function createRecipe(
     },
   );
 
-  if (!addResponse.ok) {
-    throw new CecotecError(`Create recipe failed: HTTP ${addResponse.status}`);
+  if (!response.ok) {
+    throw new CecotecError(`Creation failed: HTTP ${response.status}`);
   }
 
-  const addRaw = await addResponse.json();
-  let envelopeData: unknown;
-  try {
-    envelopeData = parseCecotecEnvelope(addRaw);
-  } catch (e) {
-    throw new CecotecError(
-      e instanceof Error ? e.message : "Create recipe failed",
-    );
-  }
+  const cleanRawObject = await parseCecotecResponse(response);
+  const envelope = parseCecotecEnvelope(cleanRawObject);
+  const result = createRecipeResponseDataSchema.parse(envelope);
 
-  const result = createRecipeResponseDataSchema.parse(envelopeData);
-
-  // Publish: the add endpoint saves as a hidden draft; update with
-  // recipeStatus=1 makes it visible in the user's recipe list.
-  const updateBody = buildRecipeBody(
-    recipe,
-    modelCode,
-    String(result.recipeId),
-    String(result.number),
-  );
-  const updateResponse = await fetch(
-    `${CECOTEC_BASE_URL}/api/blade-cook/recipe/createRecipeApp/update`,
-    {
-      method: "POST",
-      headers: authHeaders(token),
-      body: JSON.stringify(updateBody),
-    },
-  );
-
-  if (!updateResponse.ok) {
-    throw new CecotecError(
-      `Publish recipe failed: HTTP ${updateResponse.status}`,
-    );
-  }
-
-  const updateRaw = await updateResponse.json();
-  try {
-    parseCecotecEnvelope(updateRaw);
-  } catch (e) {
-    throw new CecotecError(
-      e instanceof Error ? e.message : "Publish recipe failed",
-    );
-  }
-
-  return { recipeId: result.recipeId, number: result.number };
+  return {
+    recipeId: String(result.recipeId),
+    number: String(result.number),
+  };
 }
 
 export async function listRecipes(
@@ -314,60 +287,26 @@ export async function updateRecipe(
   modelCode: string,
 ): Promise<void> {
   // 1. Force back to draft state to register the changes
-  const draftBody = buildRecipeBody(recipe, modelCode, recipeId, number);
-  draftBody.recipeId = recipeId; // Ensure this is explicitly set
-  draftBody.recipeStatus = "0"; // 0 = Draft / Unpublished
+  const body = buildRecipeBody(recipe, modelCode, recipeId, number);
 
-  const draftPayload = JSON.stringify(draftBody);
-
-  const draftResponse = await fetch(
+  const response = await fetch(
     `${CECOTEC_BASE_URL}/api/blade-cook/recipe/createRecipeApp/update`,
     {
       method: "POST",
       headers: authHeaders(token),
-      body: draftPayload,
+      body: JSON.stringify(body),
     },
   );
 
-  if (!draftResponse.ok) {
+  if (!response.ok) {
     throw new CecotecError(
-      `Update (draft phase) failed: HTTP ${draftResponse.status}`,
+      `Update (publish phase) failed: HTTP ${response.status}`,
     );
   }
 
-  const draftRaw = await draftResponse.json();
+  const responseBodyRaw = await response.json();
   try {
-    parseCecotecEnvelope(draftRaw);
-  } catch (e) {
-    throw new CecotecError(
-      e instanceof Error ? e.message : "Update (draft phase) failed",
-    );
-  }
-
-  // 2. Publish the updated draft
-  const publishBody = buildRecipeBody(recipe, modelCode, recipeId, number);
-  publishBody.recipeId = recipeId;
-  publishBody.recipeStatus = "1"; // 1 = Published
-
-  const publishPayload = JSON.stringify(publishBody);
-  const publishResponse = await fetch(
-    `${CECOTEC_BASE_URL}/api/blade-cook/recipe/createRecipeApp/update`,
-    {
-      method: "POST",
-      headers: authHeaders(token),
-      body: publishPayload,
-    },
-  );
-
-  if (!publishResponse.ok) {
-    throw new CecotecError(
-      `Update (publish phase) failed: HTTP ${publishResponse.status}`,
-    );
-  }
-
-  const publishRaw = await publishResponse.json();
-  try {
-    parseCecotecEnvelope(publishRaw);
+    parseCecotecEnvelope(responseBodyRaw);
   } catch (e) {
     throw new CecotecError(
       e instanceof Error ? e.message : "Update (publish phase) failed",
