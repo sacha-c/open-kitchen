@@ -19,17 +19,16 @@ export const load: PageServerLoad = async ({ locals }) => {
   }
 
   const locale = getLocale();
-  // Cecotec catalog has no Catalan translations — fall back to Spanish
   const lang: "en" | "es" = locale === "en" ? "en" : "es";
 
-  const ingredients = getIngredientCatalog().map((e) => ({
+  const allIngredients = getIngredientCatalog().map((e) => ({
     id: e.id,
     name: (e[lang] || e.en || e.es) as string,
   }));
 
   const units = getUnitCatalog();
 
-  return { ingredients, units };
+  return { allIngredients, units };
 };
 
 export const actions: Actions = {

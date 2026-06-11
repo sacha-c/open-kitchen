@@ -197,8 +197,13 @@ export async function syncRecipe(recipeId: string): Promise<SyncResult> {
 
     let cecotecRecipeId: string;
     let cecotecNumber: string;
+    console.log("Syncing recipe", { recipeId, cecotecInput, modelCode });
 
     if (recipeRow.cecotecRecipeId && recipeRow.cecotecNumber) {
+      console.log("Existing Cecotec recipe detected, attempting update", {
+        cecotecRecipeId: recipeRow.cecotecRecipeId,
+        cecotecNumber: recipeRow.cecotecNumber,
+      });
       // Update-in-place (primary strategy, verified in issue #9).
       // Fall back to delete+recreate if update fails.
       try {
@@ -211,7 +216,10 @@ export async function syncRecipe(recipeId: string): Promise<SyncResult> {
         );
         cecotecRecipeId = recipeRow.cecotecRecipeId;
         cecotecNumber = recipeRow.cecotecNumber;
+        console.log("Update successful");
       } catch {
+        console.log("Update failed, falling back to delete+recreate");
+
         await deleteRecipe(accessToken, recipeRow.cecotecRecipeId);
         const result = await createRecipe(accessToken, cecotecInput, modelCode);
         cecotecRecipeId = result.recipeId;
