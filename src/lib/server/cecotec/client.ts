@@ -157,14 +157,24 @@ export async function createRecipe(
     throw new CecotecError(`Creation failed: HTTP ${response.status}`);
   }
 
-  const cleanRawObject = await parseCecotecResponse(response);
-  const envelope = parseCecotecEnvelope(cleanRawObject);
-  const result = createRecipeResponseDataSchema.parse(envelope);
+  try {
+    const cleanRawObject = await parseCecotecResponse(response);
+    const envelope = parseCecotecEnvelope(cleanRawObject);
+    const result = createRecipeResponseDataSchema.parse(envelope);
 
-  return {
-    recipeId: String(result.recipeId),
-    number: String(result.number),
-  };
+    // 💡 Return directly from inside the try block so 'result' is within scope
+    return {
+      recipeId: String(result.recipeId),
+      number: String(result.number),
+    };
+  } catch (err) {
+    if (err instanceof CecotecError) {
+      throw err;
+    }
+    throw new CecotecError(
+      err instanceof Error ? err.message : "Creation failed",
+    );
+  }
 }
 
 export async function listRecipes(

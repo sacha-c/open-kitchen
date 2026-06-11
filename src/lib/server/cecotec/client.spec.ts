@@ -167,59 +167,36 @@ describe("authenticate", () => {
 // ---------------------------------------------------------------------------
 
 describe("createRecipe", () => {
-  it("makes two POST calls (add + update)", async () => {
-    const spy = vi
-      .fn()
-      .mockResolvedValueOnce({
-        ok: true,
-        status: 200,
-        json: () =>
-          Promise.resolve(successEnvelope({ recipeId: "r1", number: "42" })),
-      })
-      .mockResolvedValueOnce({
-        ok: true,
-        status: 200,
-        json: () => Promise.resolve(successEnvelope({})),
-      });
+  it("makes one POST calls ", async () => {
+    const spy = vi.fn().mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      text: () =>
+        Promise.resolve(
+          '{"code":"200","data":{"recipeId":2065088550414004226,"number":42}}',
+        ),
+    });
+
     vi.stubGlobal("fetch", spy);
 
     const result = await createRecipe("token", minimalRecipe, "MamboTouch");
-    expect(spy).toHaveBeenCalledTimes(2);
-    expect(result.recipeId).toBe("r1");
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(result.recipeId).toBe("2065088550414004226");
     expect(result.number).toBe("42");
   });
 
-  it("first call goes to /add, second to /update", async () => {
-    const spy = vi
-      .fn()
-      .mockResolvedValueOnce({
-        ok: true,
-        status: 200,
-        json: () =>
-          Promise.resolve(successEnvelope({ recipeId: "r1", number: "1" })),
-      })
-      .mockResolvedValueOnce({
-        ok: true,
-        status: 200,
-        json: () => Promise.resolve(successEnvelope({})),
-      });
-    vi.stubGlobal("fetch", spy);
-
-    await createRecipe("token", minimalRecipe, "MamboTouch");
-
-    const firstUrl = spy.mock.calls[0][0] as string;
-    const secondUrl = spy.mock.calls[1][0] as string;
-    expect(firstUrl).toContain("/add");
-    expect(secondUrl).toContain("/update");
-  });
-
   it("throws CecotecError when add returns API error", async () => {
+    const mockErrorPayload = errorEnvelope("Recipe not allowed");
+
     vi.stubGlobal(
       "fetch",
       vi.fn().mockResolvedValue({
         ok: true,
         status: 200,
-        json: () => Promise.resolve(errorEnvelope("Recipe not allowed")),
+        // 🚨 MOCK TEXT() INSTEAD OF JSON() TO MATCH THE PRECISION-SAFE PARSER 🚨
+        text: () => Promise.resolve(JSON.stringify(mockErrorPayload)),
+        // Fallback fallback just in case other utilities check .json()
+        json: () => Promise.resolve(mockErrorPayload),
       }),
     );
 
