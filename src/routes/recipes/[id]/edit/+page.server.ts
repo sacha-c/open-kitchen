@@ -90,6 +90,8 @@ export const load: PageServerLoad = async ({ locals, params }) => {
       name: i.name,
       amount: i.amount,
       unit: i.unit,
+      cecotecIngredientId: i.cecotecIngredientId,
+      cecotecUnitId: i.cecotecUnitId,
     })),
     hasCecotecCredentials: credentials.length > 0,
     allIngredients,
