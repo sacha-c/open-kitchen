@@ -142,39 +142,60 @@ export async function createRecipe(
   recipe: CecotecRecipeInput,
   modelCode: string,
 ): Promise<{ recipeId: string; number: string }> {
-  const body = buildRecipeBody(recipe, modelCode);
-
-  const response = await fetch(
+  // Step 1: Create as a hidden draft; the /add endpoint always returns a draft
+  // regardless of the recipeStatus field in the body.
+  const addResponse = await fetch(
     `${CECOTEC_BASE_URL}/api/blade-cook/recipe/createRecipeApp/add`,
     {
       method: "POST",
       headers: authHeaders(token),
-      body: JSON.stringify(body),
+      body: JSON.stringify(buildRecipeBody(recipe, modelCode)),
     },
   );
 
-  if (!response.ok) {
-    throw new CecotecError(`Creation failed: HTTP ${response.status}`);
+  if (!addResponse.ok) {
+    throw new CecotecError(`Creation failed: HTTP ${addResponse.status}`);
   }
 
+  let recipeId: string;
+  let number: string;
   try {
-    const cleanRawObject = await parseCecotecResponse(response);
+    const cleanRawObject = await parseCecotecResponse(addResponse);
     const envelope = parseCecotecEnvelope(cleanRawObject);
     const result = createRecipeResponseDataSchema.parse(envelope);
-
-    // 💡 Return directly from inside the try block so 'result' is within scope
-    return {
-      recipeId: String(result.recipeId),
-      number: String(result.number),
-    };
+    recipeId = String(result.recipeId);
+    number = String(result.number);
   } catch (err) {
-    if (err instanceof CecotecError) {
-      throw err;
-    }
+    if (err instanceof CecotecError) throw err;
     throw new CecotecError(
       err instanceof Error ? err.message : "Creation failed",
     );
   }
+
+  // Step 2: Publish the draft by calling /update with the returned IDs.
+  const updateResponse = await fetch(
+    `${CECOTEC_BASE_URL}/api/blade-cook/recipe/createRecipeApp/update`,
+    {
+      method: "POST",
+      headers: authHeaders(token),
+      body: JSON.stringify(
+        buildRecipeBody(recipe, modelCode, recipeId, number),
+      ),
+    },
+  );
+
+  if (!updateResponse.ok) {
+    throw new CecotecError(`Publish failed: HTTP ${updateResponse.status}`);
+  }
+
+  const updateRaw = await updateResponse.json();
+  try {
+    parseCecotecEnvelope(updateRaw);
+  } catch (e) {
+    throw new CecotecError(e instanceof Error ? e.message : "Publish failed");
+  }
+
+  return { recipeId, number };
 }
 
 export async function listRecipes(

@@ -167,20 +167,36 @@ describe("authenticate", () => {
 // ---------------------------------------------------------------------------
 
 describe("createRecipe", () => {
-  it("makes one POST calls ", async () => {
-    const spy = vi.fn().mockResolvedValueOnce({
-      ok: true,
-      status: 200,
-      text: () =>
-        Promise.resolve(
-          '{"code":"200","data":{"recipeId":2065088550414004226,"number":42}}',
-        ),
-    });
+  it("makes two POST calls (add + publish update) and preserves large IDs", async () => {
+    const spy = vi
+      .fn()
+      // First call: /add — returns a large recipeId that would be corrupted by JSON.parse
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        text: () =>
+          Promise.resolve(
+            '{"code":"200","data":{"recipeId":2065088550414004226,"number":42}}',
+          ),
+      })
+      // Second call: /update (publish)
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve(successEnvelope({})),
+      });
 
     vi.stubGlobal("fetch", spy);
 
     const result = await createRecipe("token", minimalRecipe, "MamboTouch");
-    expect(spy).toHaveBeenCalledTimes(1);
+    expect(spy).toHaveBeenCalledTimes(2);
+
+    const addUrl = spy.mock.calls[0][0] as string;
+    const updateUrl = spy.mock.calls[1][0] as string;
+    expect(addUrl).toContain("/add");
+    expect(updateUrl).toContain("/update");
+
+    // The 18-digit recipeId must be preserved exactly (no floating-point rounding)
     expect(result.recipeId).toBe("2065088550414004226");
     expect(result.number).toBe("42");
   });
@@ -190,12 +206,10 @@ describe("createRecipe", () => {
 
     vi.stubGlobal(
       "fetch",
-      vi.fn().mockResolvedValue({
+      vi.fn().mockResolvedValueOnce({
         ok: true,
         status: 200,
-        // 🚨 MOCK TEXT() INSTEAD OF JSON() TO MATCH THE PRECISION-SAFE PARSER 🚨
         text: () => Promise.resolve(JSON.stringify(mockErrorPayload)),
-        // Fallback fallback just in case other utilities check .json()
         json: () => Promise.resolve(mockErrorPayload),
       }),
     );
