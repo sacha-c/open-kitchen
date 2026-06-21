@@ -2,6 +2,10 @@
   import type { SubmitFunction } from "@sveltejs/kit";
   import { enhance } from "$app/forms";
   import { formatCookingTime } from "$lib/format-cooking-time";
+  import {
+    getStepTypeBadgeClass,
+    getStepTypeLabel,
+  } from "$lib/step-operation-type";
 
   interface FormResult {
     errors?: Record<string, string>;
@@ -299,7 +303,7 @@
           class="btn btn-sm btn-ghost"
           onclick={addIngredient}
         >
-          + Add
+          + Add Ingredient
         </button>
       </div>
 
@@ -435,7 +439,7 @@
       <div class="flex items-center justify-between">
         <h2 class="card-title text-lg">Steps</h2>
         <button type="button" class="btn btn-sm btn-ghost" onclick={addStep}>
-          + Add
+          + Add Step
         </button>
       </div>
 
@@ -444,9 +448,19 @@
       {/if}
 
       {#each stepsList as step, i (i)}
-        <div class="bg-base-200/50 flex flex-col gap-3 rounded-lg p-4">
+        <div
+          class="bg-base-200/50 flex flex-col gap-3 rounded-lg p-4 border-l-4"
+          class:border-info={step.operationType === 1}
+          class:border-warning={step.operationType === 2}
+          class:border-neutral={step.operationType === 0}
+        >
           <div class="flex items-center justify-between">
-            <span class="text-sm font-semibold">Step {i + 1}</span>
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-semibold">Step {i + 1}</span>
+              <span class="badge badge-sm {getStepTypeBadgeClass(step.operationType)}">
+                {getStepTypeLabel(step.operationType)}
+              </span>
+            </div>
             <div class="flex gap-1">
               <button
                 type="button"
@@ -499,7 +513,7 @@
           </div>
 
           <div class="form-control">
-            <label class="label text-sm" for={`step-type-${i}`}> Type </label>
+            <label class="label text-sm" for={`step-type-${i}`}>Step Type</label>
             <select
               id={`step-type-${i}`}
               class="select select-bordered select-sm w-full"
