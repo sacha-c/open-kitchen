@@ -55,7 +55,7 @@ export const recipeFormSchema = createInsertSchema(recipe, {
   })
   .extend({
     ingredients: z.array(ingredientSchema),
-    steps: z.array(stepSchema).min(1, "At least one step is required"),
+    steps: z.array(stepSchema),
   });
 
 export type RecipeFormData = z.infer<typeof recipeFormSchema>;
