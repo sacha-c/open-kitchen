@@ -516,21 +516,50 @@
 
           {#if step.operationType === 2}
             <div class="bg-base-300/50 grid grid-cols-2 gap-3 rounded-lg p-3">
-              <div class="form-control">
-                <label class="label text-sm" for={`step-time-${i}`}
-                  >Time (seconds)</label
-                >
-                <input
-                  id={`step-time-${i}`}
-                  name={`steps[${i}].totalTime`}
-                  type="number"
-                  class="input input-bordered input-sm w-full"
-                  min={1}
-                  max={5400}
-                  required
-                  bind:value={step.totalTime}
-                  aria-invalid={fieldError(`steps.${i}.totalTime`) ? "true" : undefined}
-                >
+              <div class="form-control col-span-2">
+                <label class="label text-sm" for={`step-time-min-${i}`}>Duration</label>
+                <div class="flex items-center gap-2">
+                  <div class="flex items-center gap-1">
+                    <input
+                      id={`step-time-min-${i}`}
+                      type="number"
+                      class="input input-bordered input-sm w-20"
+                      class:input-error={fieldError(`steps.${i}.totalTime`)}
+                      min={0}
+                      max={90}
+                      value={Math.floor(step.totalTime / 60)}
+                      aria-label="Minutes"
+                      aria-invalid={fieldError(`steps.${i}.totalTime`) ? "true" : undefined}
+                      oninput={(e) => {
+                        const mins = Math.max(0, Math.min(90, Number((e.target as HTMLInputElement).value) || 0));
+                        step.totalTime = mins * 60 + (step.totalTime % 60);
+                      }}
+                    >
+                    <span class="text-base-content/60 text-sm">min</span>
+                  </div>
+                  <div class="flex items-center gap-1">
+                    <input
+                      id={`step-time-sec-${i}`}
+                      type="number"
+                      class="input input-bordered input-sm w-20"
+                      class:input-error={fieldError(`steps.${i}.totalTime`)}
+                      min={0}
+                      max={59}
+                      value={step.totalTime % 60}
+                      aria-label="Seconds"
+                      aria-invalid={fieldError(`steps.${i}.totalTime`) ? "true" : undefined}
+                      oninput={(e) => {
+                        const secs = Math.max(0, Math.min(59, Number((e.target as HTMLInputElement).value) || 0));
+                        step.totalTime = Math.floor(step.totalTime / 60) * 60 + secs;
+                      }}
+                    >
+                    <span class="text-base-content/60 text-sm">sec</span>
+                  </div>
+                  {#if step.totalTime > 0}
+                    <span class="text-base-content/50 text-xs">≈ {formatCookingTime(step.totalTime)}</span>
+                  {/if}
+                </div>
+                <input type="hidden" name={`steps[${i}].totalTime`} value={step.totalTime}>
                 {#if fieldError(`steps.${i}.totalTime`)}
                   <span class="label-text-alt text-error mt-1"
                     >{fieldError(`steps.${i}.totalTime`)}</span
