@@ -726,7 +726,7 @@
   </div>
   <!-- End right column -->
 
-  <div class="lg:col-span-2 flex justify-end gap-3">
+  <div class="lg:col-span-2 sticky bottom-0 z-10 flex justify-end gap-3 border-t border-base-200 bg-base-100/95 py-4 backdrop-blur-sm">
     <a href={cancelUrl} class="btn btn-ghost">Cancel</a>
     <button type="submit" class="btn btn-primary" disabled={loading}>
       {#if loading}
