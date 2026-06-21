@@ -309,14 +309,15 @@
 
       {#each ingredientsList as ingredient, i (i)}
         <div class="bg-base-200/50 flex flex-col gap-2 rounded-lg p-3">
-          <div class="flex items-start gap-2">
-            <datalist id={`ingredient-list-${i}`}>
-              {#each (catalogs.allIngredients || []) as opt (opt.id)}
-                <option value={opt.name} data-id={opt.id}></option>
-              {/each}
-            </datalist>
+          <datalist id={`ingredient-list-${i}`}>
+            {#each (catalogs.allIngredients || []) as opt (opt.id)}
+              <option value={opt.name} data-id={opt.id}></option>
+            {/each}
+          </datalist>
 
-            <div class="form-control flex-1">
+          <!-- Responsive row: name on top (mobile), inline (sm+) -->
+          <div class="flex flex-col sm:flex-row sm:items-start gap-2">
+            <div class="form-control w-full sm:flex-1">
               <input
                 name={`ingredients[${i}].name`}
                 type="text"
@@ -347,73 +348,76 @@
               {/if}
             </div>
 
-            <div class="form-control w-20">
-              <input
-                name={`ingredients[${i}].amount`}
-                type="text"
-                class="input input-bordered input-sm w-full"
-                placeholder="Amt"
-                bind:value={ingredient.amount}
-                aria-invalid={fieldError(`ingredients.${i}.amount`) ? "true" : undefined}
-              >
-              {#if fieldError(`ingredients.${i}.amount`)}
-                <span class="label-text-alt text-error mt-1"
-                  >{fieldError(`ingredients.${i}.amount`)}</span
+            <!-- Amount + unit + actions: second row on mobile, inline on sm+ -->
+            <div class="flex items-start gap-2 w-full sm:w-auto">
+              <div class="form-control w-20 shrink-0">
+                <input
+                  name={`ingredients[${i}].amount`}
+                  type="text"
+                  class="input input-bordered input-sm w-full"
+                  placeholder="Amt"
+                  bind:value={ingredient.amount}
+                  aria-invalid={fieldError(`ingredients.${i}.amount`) ? "true" : undefined}
                 >
-              {/if}
-            </div>
+                {#if fieldError(`ingredients.${i}.amount`)}
+                  <span class="label-text-alt text-error mt-1"
+                    >{fieldError(`ingredients.${i}.amount`)}</span
+                  >
+                {/if}
+              </div>
 
-            <div class="form-control w-24">
-              <select
-                class="select select-bordered select-sm w-full"
-                class:select-error={fieldError(`ingredients.${i}.unit`)}
-                name={`ingredients[${i}].unit`}
-                bind:value={ingredient.unit}
-                onchange={(e) => {
-                  const val = (e.target as HTMLSelectElement).value;
-                  const match = (catalogs.units || []).find((u) => u.name === val);
-                  ingredient.cecotecUnitId = match?.id ?? '';
-                }}
-                aria-invalid={fieldError(`ingredients.${i}.unit`) ? "true" : undefined}
-              >
-                {#each (catalogs.units || []) as unit (unit.id)}
-                  <option value={unit.name}>{unit.name}</option>
-                {/each}
-              </select>
-              <input
-                type="hidden"
-                name={`ingredients[${i}].cecotecUnitId`}
-                value={ingredient.cecotecUnitId}
-              >
-            </div>
+              <div class="form-control flex-1 sm:w-24 sm:flex-none">
+                <select
+                  class="select select-bordered select-sm w-full"
+                  class:select-error={fieldError(`ingredients.${i}.unit`)}
+                  name={`ingredients[${i}].unit`}
+                  bind:value={ingredient.unit}
+                  onchange={(e) => {
+                    const val = (e.target as HTMLSelectElement).value;
+                    const match = (catalogs.units || []).find((u) => u.name === val);
+                    ingredient.cecotecUnitId = match?.id ?? '';
+                  }}
+                  aria-invalid={fieldError(`ingredients.${i}.unit`) ? "true" : undefined}
+                >
+                  {#each (catalogs.units || []) as unit (unit.id)}
+                    <option value={unit.name}>{unit.name}</option>
+                  {/each}
+                </select>
+                <input
+                  type="hidden"
+                  name={`ingredients[${i}].cecotecUnitId`}
+                  value={ingredient.cecotecUnitId}
+                >
+              </div>
 
-            <div class="flex gap-1">
-              <button
-                type="button"
-                class="btn btn-ghost btn-xs"
-                disabled={i === 0}
-                onclick={() => moveIngredient(i, -1)}
-                title="Move up"
-              >
-                ↑
-              </button>
-              <button
-                type="button"
-                class="btn btn-ghost btn-xs"
-                disabled={i === ingredientsList.length - 1}
-                onclick={() => moveIngredient(i, 1)}
-                title="Move down"
-              >
-                ↓
-              </button>
-              <button
-                type="button"
-                class="btn btn-ghost btn-xs text-error"
-                onclick={() => removeIngredient(i)}
-                title="Remove"
-              >
-                ✕
-              </button>
+              <div class="flex gap-1 ml-auto sm:ml-0">
+                <button
+                  type="button"
+                  class="btn btn-ghost btn-xs"
+                  disabled={i === 0}
+                  onclick={() => moveIngredient(i, -1)}
+                  title="Move up"
+                >
+                  ↑
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-ghost btn-xs"
+                  disabled={i === ingredientsList.length - 1}
+                  onclick={() => moveIngredient(i, 1)}
+                  title="Move down"
+                >
+                  ↓
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-ghost btn-xs text-error"
+                  onclick={() => removeIngredient(i)}
+                  title="Remove"
+                >
+                  ✕
+                </button>
+              </div>
             </div>
           </div>
         </div>
