@@ -187,7 +187,9 @@
   };
 </script>
 
-<form method="POST" use:enhance={handleSubmit} class="flex flex-col gap-8">
+<form method="POST" use:enhance={handleSubmit} class="flex flex-col gap-8 lg:grid lg:grid-cols-2 lg:items-start">
+  <!-- Left column: Recipe Details + Ingredients -->
+  <div class="flex flex-col gap-8">
   <div class="card bg-base-100 shadow">
     <div class="card-body">
       <h2 class="card-title text-lg">Recipe Details</h2>
@@ -212,7 +214,7 @@
         {/if}
       </div>
 
-      <div class="grid grid-cols-2 gap-4">
+      <div class="grid grid-cols-3 gap-4">
         <div class="form-control">
           <label class="label" for="servings">Servings</label>
           <input
@@ -261,6 +263,13 @@
             </option>
           </select>
         </div>
+
+        <div class="form-control">
+          <span class="label">Cooking Time</span>
+          <div class="input input-bordered bg-base-200/60 flex items-center text-sm font-medium">
+            {formatCookingTime(cookingTime)}
+          </div>
+        </div>
       </div>
 
       <div class="form-control">
@@ -285,11 +294,6 @@
             </span>
           {/if}
         </div>
-      </div>
-
-      <div class="text-base-content/60 mt-2 text-sm">
-        Total cooking time: <strong>{formatCookingTime(cookingTime)}</strong>
-        (auto-calculated from steps)
       </div>
     </div>
   </div>
@@ -437,7 +441,11 @@
       {/if}
     </div>
   </div>
+  </div>
+  <!-- End left column -->
 
+  <!-- Right column: Steps -->
+  <div class="flex flex-col gap-8">
   <div class="card bg-base-100 shadow">
     <div class="card-body">
       <div class="flex items-center justify-between">
@@ -669,8 +677,10 @@
       {/if}
     </div>
   </div>
+  </div>
+  <!-- End right column -->
 
-  <div class="flex justify-end gap-3">
+  <div class="lg:col-span-2 flex justify-end gap-3">
     <a href={cancelUrl} class="btn btn-ghost">Cancel</a>
     <button type="submit" class="btn btn-primary" disabled={loading}>
       {#if loading}

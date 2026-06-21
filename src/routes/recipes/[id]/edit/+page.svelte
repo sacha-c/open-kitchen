@@ -9,7 +9,7 @@
   <title>Edit {data.recipe.name} — OpenKitchen</title>
 </svelte:head>
 
-<div class="mx-auto max-w-3xl px-4 py-8">
+<div class="mx-auto max-w-6xl px-4 py-8">
   <div class="mb-8 flex items-center justify-between">
     <h1 class="text-3xl font-bold">Edit Recipe</h1>
     <a
