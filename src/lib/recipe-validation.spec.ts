@@ -73,16 +73,12 @@ describe("recipeFormSchema", () => {
     }
   });
 
-  it("requires at least one step", () => {
+  it("allows empty steps array", () => {
     const result = recipeFormSchema.safeParse({
       ...validRecipe,
       steps: [],
     });
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      const stepsError = result.error.issues.find((i) => i.path[0] === "steps");
-      expect(stepsError).toBeDefined();
-    }
+    expect(result.success).toBe(true);
   });
 
   it("allows empty ingredients array", () => {

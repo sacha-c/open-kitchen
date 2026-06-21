@@ -51,7 +51,7 @@
   }
 
   let {
-    recipe = { name: "", servings: "", language: "en", imageUrl: null },
+    recipe = { name: "", servings: "2", language: "en", imageUrl: null },
     ingredients: initialIngredients = [],
     steps: initialSteps = [],
     catalogs = { units: [], allIngredients: [] },
@@ -98,15 +98,7 @@
         cecotecUnitId: i.cecotecUnitId ?? "",
       }));
     }
-    return [
-      {
-        name: "",
-        amount: "",
-        unit: catalogs.units?.[0]?.name ?? "g",
-        cecotecIngredientId: "",
-        cecotecUnitId: catalogs.units?.[0]?.id ?? "",
-      },
-    ];
+    return [];
   }
 
   function restoreSteps(): FormStep[] {
@@ -124,16 +116,7 @@
         power: s.power,
       }));
     }
-    return [
-      {
-        description: "",
-        operationType: 1,
-        totalTime: 0,
-        speed: "0",
-        temperature: 0,
-        power: 0,
-      },
-    ];
+    return [];
   }
 
   let ingredientsList = $state<FormIngredient[]>(restoreIngredients());
