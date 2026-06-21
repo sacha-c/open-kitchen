@@ -83,27 +83,14 @@
         >
       </figure>
     {:else}
-      <div
-        class="bg-base-200 flex h-48 items-center justify-center rounded-t-2xl"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-          class="text-base-content/20 h-16 w-16"
+      <figure class="h-48 w-full overflow-hidden rounded-t-2xl">
+        <img
+          src="/recipe-placeholder.svg"
+          alt=""
           aria-hidden="true"
-          role="img"
+          class="h-full w-full object-cover"
         >
-          <title>No image</title>
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="m2.25 15.75 5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0022.5 18.75V5.25A2.25 2.25 0 0020.25 3H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z"
-          />
-        </svg>
-      </div>
+      </figure>
     {/if}
     <div class="card-body gap-4">
       <div class="flex flex-wrap gap-4 text-sm">

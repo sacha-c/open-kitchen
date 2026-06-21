@@ -1,6 +1,8 @@
 <script lang="ts">
   import type { SubmitFunction } from "@sveltejs/kit";
   import { enhance } from "$app/forms";
+  import { beforeNavigate } from "$app/navigation";
+  import { untrack } from "svelte";
   import { formatCookingTime } from "$lib/format-cooking-time";
   import {
     getStepTypeBadgeClass,
@@ -200,6 +202,20 @@
     return formResult?.errors?.[name];
   }
 
+  // Unsaved changes tracking: snapshot initial serialized state (untrack to avoid state_referenced_locally warning)
+  const initialSnapshot = untrack(() => JSON.stringify({ recipe, ingredients: initialIngredients, steps: initialSteps }));
+  let isDirty = $derived(
+    !loading && JSON.stringify({ recipe: { name: formResult?.values?.name ?? recipe.name, servings: formResult?.values?.servings ?? recipe.servings }, ingredients: ingredientsList, steps: stepsList }) !== initialSnapshot,
+  );
+
+  beforeNavigate(({ cancel }) => {
+    if (isDirty) {
+      if (!window.confirm("You have unsaved changes. Leave anyway?")) {
+        cancel();
+      }
+    }
+  });
+
   const handleSubmit: SubmitFunction = () => {
     loading = true;
     return async ({ update }) => {
@@ -311,7 +327,13 @@
               Image upload/replace coming soon
             </span>
           {:else}
-            <span class="text-base-content/40 text-sm">
+            <img
+              src="/recipe-placeholder.svg"
+              alt=""
+              aria-hidden="true"
+              class="absolute inset-0 w-full h-full object-cover opacity-40"
+            >
+            <span class="text-base-content/60 relative z-10 text-sm bg-base-100/60 px-2 py-1 rounded">
               Image upload coming soon
             </span>
           {/if}
