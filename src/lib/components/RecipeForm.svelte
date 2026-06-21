@@ -61,7 +61,6 @@
   }: Props = $props();
 
   let loading = $state(false);
-  const SPEED_OPTIONS = Array.from({ length: 11 }, (_, i) => String(i));
 
   interface FormIngredient {
     name: string;
@@ -567,21 +566,26 @@
                 {/if}
               </div>
 
-              <div class="form-control">
-                <label class="label text-sm" for={`step-speed-${i}`}
-                  >Speed</label
-                >
-                <select
+              <div class="form-control col-span-2">
+                <div class="label">
+                  <label class="label-text text-sm" for={`step-speed-${i}`}>Speed</label>
+                  <span class="label-text-alt font-bold text-base">{step.speed}</span>
+                </div>
+                <input
                   id={`step-speed-${i}`}
-                  class="select select-bordered select-sm w-full"
                   name={`steps[${i}].speed`}
+                  type="range"
+                  class="range range-sm"
+                  min="0"
+                  max="10"
+                  step="1"
                   bind:value={step.speed}
-                  required
                 >
-                  {#each SPEED_OPTIONS as s (s)}
-                    <option value={s}>{s}</option>
+                <div class="flex justify-between px-1 text-xs text-base-content/40">
+                  {#each Array.from({ length: 11 }, (_, k) => k) as tick (tick)}
+                    <span>{tick}</span>
                   {/each}
-                </select>
+                </div>
               </div>
 
               <div class="form-control">
@@ -607,25 +611,25 @@
               </div>
 
               <div class="form-control">
-                <label class="label text-sm" for={`step-power-${i}`}
-                  >Power</label
-                >
+                <div class="label">
+                  <label class="label-text text-sm" for={`step-power-${i}`}>Power</label>
+                  <span class="label-text-alt font-bold text-base">{step.power}</span>
+                </div>
                 <input
                   id={`step-power-${i}`}
                   name={`steps[${i}].power`}
-                  type="number"
-                  class="input input-bordered input-sm w-full"
-                  min={0}
-                  max={10}
-                  required
+                  type="range"
+                  class="range range-sm"
+                  min="0"
+                  max="10"
+                  step="1"
                   bind:value={step.power}
-                  aria-invalid={fieldError(`steps.${i}.power`) ? "true" : undefined}
                 >
-                {#if fieldError(`steps.${i}.power`)}
-                  <span class="label-text-alt text-error mt-1"
-                    >{fieldError(`steps.${i}.power`)}</span
-                  >
-                {/if}
+                <div class="flex justify-between px-1 text-xs text-base-content/40">
+                  {#each Array.from({ length: 11 }, (_, k) => k) as tick (tick)}
+                    <span>{tick}</span>
+                  {/each}
+                </div>
               </div>
             </div>
           {:else}
