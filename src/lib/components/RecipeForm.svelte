@@ -125,6 +125,19 @@
   let ingredientsList = $state<FormIngredient[]>(restoreIngredients());
   let stepsList = $state<FormStep[]>(restoreSteps());
 
+  // Collapsed state per step: existing steps start collapsed, new ones start expanded.
+  // If the form was re-rendered after a validation error (formResult has steps), keep all expanded.
+  let stepsCollapsed = $state<boolean[]>(
+    stepsList.map(() => {
+      const hasFormErrorSteps = !!(
+        formResult?.values?.steps &&
+        Array.isArray(formResult.values.steps) &&
+        (formResult.values.steps as unknown[]).length > 0
+      );
+      return initialSteps.length > 0 && !hasFormErrorSteps;
+    }),
+  );
+
   let cookingTime = $derived(
     stepsList.reduce((sum, s) => sum + (Number(s.totalTime) || 0), 0),
   );
@@ -160,10 +173,12 @@
       temperature: 0,
       power: 0,
     });
+    stepsCollapsed.push(false); // new steps start expanded
   }
 
   function removeStep(index: number) {
     stepsList.splice(index, 1);
+    stepsCollapsed.splice(index, 1);
   }
 
   function moveStep(index: number, direction: -1 | 1) {
@@ -172,6 +187,13 @@
     const temp = stepsList[index];
     stepsList[index] = stepsList[target];
     stepsList[target] = temp;
+    const tempCollapsed = stepsCollapsed[index];
+    stepsCollapsed[index] = stepsCollapsed[target];
+    stepsCollapsed[target] = tempCollapsed;
+  }
+
+  function toggleStepCollapse(index: number) {
+    stepsCollapsed[index] = !stepsCollapsed[index];
   }
 
   function fieldError(name: string): string | undefined {
@@ -461,19 +483,39 @@
 
       {#each stepsList as step, i (i)}
         <div
-          class="bg-base-200/50 flex flex-col gap-3 rounded-lg p-4 border-l-4"
+          class="bg-base-200/50 flex flex-col gap-3 rounded-lg border-l-4"
           class:border-info={step.operationType === 1}
           class:border-warning={step.operationType === 2}
           class:border-neutral={step.operationType === 0}
         >
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <span class="text-sm font-semibold">Step {i + 1}</span>
-              <span class="badge badge-sm {getStepTypeBadgeClass(step.operationType)}">
+          <!-- Step header: always visible, click to toggle collapse -->
+          <div class="flex items-center justify-between p-4 pb-0" class:pb-4={stepsCollapsed[i]}>
+            <button
+              type="button"
+              class="flex items-center gap-2 text-left flex-1 min-w-0"
+              onclick={() => toggleStepCollapse(i)}
+              aria-expanded={!stepsCollapsed[i]}
+            >
+              <!-- Chevron icon -->
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                class="h-4 w-4 shrink-0 text-base-content/40 transition-transform"
+                class:rotate-[-90deg]={stepsCollapsed[i]}
+                aria-hidden="true"
+              >
+                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+              </svg>
+              <span class="text-sm font-semibold shrink-0">Step {i + 1}</span>
+              <span class="badge badge-sm shrink-0 {getStepTypeBadgeClass(step.operationType)}">
                 {getStepTypeLabel(step.operationType)}
               </span>
-            </div>
-            <div class="flex gap-1">
+              {#if stepsCollapsed[i] && step.description}
+                <span class="text-xs text-base-content/50 truncate">{step.description}</span>
+              {/if}
+            </button>
+            <div class="flex gap-1 shrink-0 ml-2">
               <button
                 type="button"
                 class="btn btn-ghost btn-xs"
@@ -503,41 +545,43 @@
             </div>
           </div>
 
-          <div class="form-control">
-            <label class="label text-sm" for={`step-desc-${i}`}
-              >Description</label
-            >
-            <textarea
-              id={`step-desc-${i}`}
-              name={`steps[${i}].description`}
-              class="textarea textarea-bordered w-full"
-              maxlength={1000}
-              rows={2}
-              required
-              bind:value={step.description}
-              aria-invalid={fieldError(`steps.${i}.description`) ? "true" : undefined}
-            ></textarea>
-            {#if fieldError(`steps.${i}.description`)}
-              <span class="label-text-alt text-error mt-1"
-                >{fieldError(`steps.${i}.description`)}</span
+          <!-- Step content: hidden when collapsed (inputs still submit) -->
+          <div class="flex flex-col gap-3 px-4 pb-4" class:hidden={stepsCollapsed[i]}>
+            <div class="form-control">
+              <label class="label text-sm" for={`step-desc-${i}`}
+                >Description</label
               >
-            {/if}
-          </div>
+              <textarea
+                id={`step-desc-${i}`}
+                name={`steps[${i}].description`}
+                class="textarea textarea-bordered w-full"
+                maxlength={1000}
+                rows={2}
+                required
+                bind:value={step.description}
+                aria-invalid={fieldError(`steps.${i}.description`) ? "true" : undefined}
+              ></textarea>
+              {#if fieldError(`steps.${i}.description`)}
+                <span class="label-text-alt text-error mt-1"
+                  >{fieldError(`steps.${i}.description`)}</span
+                >
+              {/if}
+            </div>
 
-          <div class="form-control">
-            <label class="label text-sm" for={`step-type-${i}`}>Step Type</label>
-            <select
-              id={`step-type-${i}`}
-              class="select select-bordered select-sm w-full"
-              name={`steps[${i}].operationType`}
-              bind:value={step.operationType}
-              required
-            >
-              <option value={1}>Preparation</option>
-              <option value={2}>Cooking</option>
-              <option value={0}>Manual</option>
-            </select>
-          </div>
+            <div class="form-control">
+              <label class="label text-sm" for={`step-type-${i}`}>Step Type</label>
+              <select
+                id={`step-type-${i}`}
+                class="select select-bordered select-sm w-full"
+                name={`steps[${i}].operationType`}
+                bind:value={step.operationType}
+                required
+              >
+                <option value={1}>Preparation</option>
+                <option value={2}>Cooking</option>
+                <option value={0}>Manual</option>
+              </select>
+            </div>
 
           {#if step.operationType === 2}
             <div class="bg-base-300/50 grid grid-cols-2 gap-3 rounded-lg p-3">
@@ -664,6 +708,8 @@
             <input type="hidden" name={`steps[${i}].temperature`} value="0">
             <input type="hidden" name={`steps[${i}].power`} value="0">
           {/if}
+          </div>
+          <!-- End collapsible content -->
         </div>
       {/each}
 
