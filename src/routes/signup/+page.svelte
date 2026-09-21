@@ -25,7 +25,10 @@
 <div class="flex min-h-screen items-center justify-center px-4">
   <div class="card bg-base-100 w-full max-w-sm shadow-xl">
     <div class="card-body">
-      <h1 class="card-title text-2xl font-bold">OpenKitchen</h1>
+      <h1 class="card-title text-2xl font-bold">
+        <img src="/logo.png" alt="" class="h-8 w-8">
+        OpenKitchen
+      </h1>
       <p class="text-base-content/60 text-sm">Create a new account</p>
 
       {#if form?.message}
