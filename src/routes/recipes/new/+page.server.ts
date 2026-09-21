@@ -1,4 +1,5 @@
 import { fail, redirect } from "@sveltejs/kit";
+import { eq } from "drizzle-orm";
 import { getLocale } from "$lib/paraglide/runtime";
 import {
   calculateCookingTime,
@@ -10,13 +11,23 @@ import {
   getUnitCatalog,
 } from "$lib/server/cecotec/catalog";
 import { db } from "$lib/server/db";
-import { recipe, recipeIngredient, recipeStep } from "$lib/server/db/schema";
+import {
+  cecotecCredentials,
+  recipe,
+  recipeIngredient,
+  recipeStep,
+} from "$lib/server/db/schema";
 import type { Actions, PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ locals }) => {
-  if (!locals.session) {
+  if (!locals.session || !locals.user) {
     redirect(303, "/");
   }
+
+  const credentials = await db
+    .select({ id: cecotecCredentials.id })
+    .from(cecotecCredentials)
+    .where(eq(cecotecCredentials.userId, locals.user.id));
 
   const locale = getLocale();
   const lang: "en" | "es" = locale === "en" ? "en" : "es";
@@ -28,7 +39,11 @@ export const load: PageServerLoad = async ({ locals }) => {
 
   const units = getUnitCatalog();
 
-  return { allIngredients, units };
+  return {
+    allIngredients,
+    units,
+    hasCecotecCredentials: credentials.length > 0,
+  };
 };
 
 export const actions: Actions = {
@@ -69,6 +84,7 @@ export const actions: Actions = {
         servings: data.servings,
         cookingTime,
         language: data.language,
+        imageUrl: data.imageUrl,
         syncStatus: "pending",
         createdAt: now,
         updatedAt: now,

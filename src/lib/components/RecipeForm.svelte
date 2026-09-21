@@ -3,7 +3,13 @@
   import { untrack } from "svelte";
   import { enhance } from "$app/forms";
   import { beforeNavigate } from "$app/navigation";
+  import { resolve } from "$app/paths";
   import { formatCookingTime } from "$lib/format-cooking-time";
+  import {
+    getImageValidationError,
+    IMAGE_ACCEPT,
+    MAX_IMAGE_SIZE_LABEL,
+  } from "$lib/image-upload-policy";
   import {
     getStepTypeBadgeClass,
     getStepTypeLabel,
@@ -52,7 +58,8 @@
       allIngredients?: CatalogItem[];
     };
     formResult?: FormResult | null;
-    cancelUrl: string;
+    hasCecotecCredentials?: boolean;
+    cancelUrl: "/recipes" | `/recipes/${string}`;
     submitLabel: string;
   }
 
@@ -62,11 +69,22 @@
     steps: initialSteps = [],
     catalogs = { units: [], allIngredients: [] },
     formResult = null,
+    hasCecotecCredentials = false,
     cancelUrl,
     submitLabel,
   }: Props = $props();
 
   let loading = $state(false);
+  let imageUploading = $state(false);
+  let imageError = $state<string | null>(null);
+  const initialImageUrl = untrack(
+    () =>
+      (formResult?.values?.imageUrl as string | null | undefined) ??
+      recipe.imageUrl ??
+      "",
+  );
+  let imageUrl = $state(initialImageUrl);
+  let imagePreviewUrl = $state(initialImageUrl);
 
   interface FormIngredient {
     name: string;
@@ -202,6 +220,56 @@
     return formResult?.errors?.[name];
   }
 
+  async function uploadSelectedImage(event: Event) {
+    const input = event.currentTarget as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    const validationError = getImageValidationError(file);
+    if (validationError) {
+      imageError = validationError;
+      input.value = "";
+      return;
+    }
+
+    imageError = null;
+    imageUploading = true;
+    const localPreviewUrl = URL.createObjectURL(file);
+    imagePreviewUrl = localPreviewUrl;
+
+    try {
+      const formData = new FormData();
+      formData.set("file", file);
+      const response = await fetch(resolve("/api/upload-image"), {
+        method: "POST",
+        body: formData,
+      });
+      const result = (await response.json().catch(() => null)) as {
+        error?: unknown;
+        url?: unknown;
+      } | null;
+
+      if (!response.ok || typeof result?.url !== "string") {
+        imagePreviewUrl = imageUrl;
+        imageError =
+          typeof result?.error === "string"
+            ? result.error
+            : "Image upload failed. Please try again.";
+        return;
+      }
+
+      imageUrl = result.url;
+      imagePreviewUrl = result.url;
+    } catch {
+      imagePreviewUrl = imageUrl;
+      imageError = "Image upload failed. Please try again.";
+    } finally {
+      URL.revokeObjectURL(localPreviewUrl);
+      imageUploading = false;
+      input.value = "";
+    }
+  }
+
   // Unsaved changes tracking: snapshot initial serialized state (untrack to avoid state_referenced_locally warning)
   const initialSnapshot = untrack(() =>
     JSON.stringify({
@@ -331,21 +399,17 @@
         </div>
 
         <div class="form-control">
-          <span class="label">Image</span>
+          <label class="label" for="recipe-image">Image</label>
+          <input type="hidden" name="imageUrl" value={imageUrl}>
           <div
             class="bg-base-200 flex h-32 items-center justify-center rounded-lg border-2 border-dashed relative overflow-hidden"
           >
-            {#if recipe.imageUrl}
+            {#if imagePreviewUrl}
               <img
-                src={recipe.imageUrl}
-                alt="Current"
-                class="absolute inset-0 w-full h-full object-cover opacity-50"
+                src={imagePreviewUrl}
+                alt="Recipe preview"
+                class="absolute inset-0 h-full w-full object-cover"
               >
-              <span
-                class="text-base-content relative z-10 font-semibold bg-base-100/80 px-3 py-1 rounded"
-              >
-                Image upload/replace coming soon
-              </span>
             {:else}
               <img
                 src="/recipe-placeholder.svg"
@@ -353,13 +417,48 @@
                 aria-hidden="true"
                 class="absolute inset-0 w-full h-full object-cover opacity-40"
               >
-              <span
-                class="text-base-content/60 relative z-10 text-sm bg-base-100/60 px-2 py-1 rounded"
+            {/if}
+            {#if imageUploading}
+              <div
+                class="bg-base-100/80 absolute inset-0 flex items-center justify-center"
+                aria-live="polite"
               >
-                Image upload coming soon
+                <span class="loading loading-spinner loading-md"></span>
+                <span class="ml-2 text-sm font-medium">Uploading…</span>
+              </div>
+            {:else if hasCecotecCredentials}
+              <span
+                class="text-base-content relative z-10 rounded bg-base-100/85 px-3 py-1 text-sm font-medium"
+              >
+                {imageUrl ? "Choose a replacement" : "Choose an image"}
               </span>
             {/if}
           </div>
+          <input
+            id="recipe-image"
+            type="file"
+            class="file-input file-input-bordered mt-2 w-full"
+            accept={IMAGE_ACCEPT}
+            disabled={!hasCecotecCredentials || imageUploading}
+            onchange={uploadSelectedImage}
+          >
+          {#if imageError}
+            <span class="label-text-alt text-error mt-1" role="alert">
+              {imageError}
+            </span>
+          {/if}
+          {#if !hasCecotecCredentials}
+            <span class="label-text-alt mt-1">
+              <a class="link link-primary" href={resolve("/profile")}
+                >Connect your Cecotec account</a
+              >
+              to upload images.
+            </span>
+          {:else}
+            <span class="label-text-alt mt-1">
+              JPEG, PNG, GIF, or WebP. Maximum {MAX_IMAGE_SIZE_LABEL}.
+            </span>
+          {/if}
         </div>
       </div>
     </div>
@@ -811,11 +910,15 @@
   <div
     class="lg:col-span-2 sticky bottom-0 z-10 flex justify-end gap-3 border-t border-base-200 bg-base-100/95 py-4 backdrop-blur-sm"
   >
-    <a href={cancelUrl} class="btn btn-ghost">Cancel</a>
-    <button type="submit" class="btn btn-primary" disabled={loading}>
-      {#if loading}
+    <a href={resolve(cancelUrl)} class="btn btn-ghost">Cancel</a>
+    <button
+      type="submit"
+      class="btn btn-primary"
+      disabled={loading || imageUploading}
+    >
+      {#if loading || imageUploading}
         <span class="loading loading-spinner loading-sm"></span>
-        Saving…
+        {imageUploading ? "Uploading image…" : "Saving…"}
       {:else}
         {submitLabel}
       {/if}

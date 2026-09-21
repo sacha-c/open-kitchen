@@ -25,8 +25,9 @@
     ingredients={data.ingredients}
     steps={data.steps}
     catalogs={{ units: data.units, allIngredients: data.allIngredients }}
+    hasCecotecCredentials={data.hasCecotecCredentials}
     formResult={form}
-    cancelUrl={resolve(`/recipes/${data.recipe.id}`)}
+    cancelUrl={`/recipes/${data.recipe.id}`}
     submitLabel="Save Changes"
   />
 </div>

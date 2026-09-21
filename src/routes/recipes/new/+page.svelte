@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { resolve } from "$app/paths";
   import RecipeForm from "$lib/components/RecipeForm.svelte";
 
   let { data, form } = $props();
@@ -12,8 +11,9 @@
 
   <RecipeForm
     catalogs={{ units: data.units, allIngredients: data.allIngredients }}
+    hasCecotecCredentials={data.hasCecotecCredentials}
     formResult={form}
-    cancelUrl={resolve("/recipes")}
+    cancelUrl="/recipes"
     submitLabel="Create Recipe"
   />
 </div>

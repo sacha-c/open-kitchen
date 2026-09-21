@@ -120,6 +120,15 @@ async function fetchAndUploadImage(
   return uploadImage(token, buffer, filename, mimeType);
 }
 
+export function isCecotecImageUrl(imageUrl: string): boolean {
+  try {
+    const url = new URL(imageUrl);
+    return url.protocol === "https:" && url.hostname === "file.cecotecapps.net";
+  } catch {
+    return false;
+  }
+}
+
 export async function syncRecipe(recipeId: string): Promise<SyncResult> {
   const [recipeRow] = await db
     .select()
@@ -177,10 +186,9 @@ export async function syncRecipe(recipeId: string): Promise<SyncResult> {
     }
     let cecotecImageUrl: string | undefined;
     if (recipeRow.imageUrl) {
-      cecotecImageUrl = await fetchAndUploadImage(
-        accessToken,
-        recipeRow.imageUrl,
-      );
+      cecotecImageUrl = isCecotecImageUrl(recipeRow.imageUrl)
+        ? recipeRow.imageUrl
+        : await fetchAndUploadImage(accessToken, recipeRow.imageUrl);
     }
 
     const cecotecInput = transformRecipeForCecotec(

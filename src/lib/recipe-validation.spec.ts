@@ -10,6 +10,7 @@ describe("recipeFormSchema", () => {
     name: "Test Recipe",
     servings: "4",
     language: "en" as const,
+    imageUrl: null,
     ingredients: [{ name: "Butter", amount: "50", unit: "g" }],
     steps: [
       {
@@ -71,6 +72,19 @@ describe("recipeFormSchema", () => {
       });
       expect(result.success).toBe(true);
     }
+  });
+
+  it("accepts a valid image URL and rejects invalid URLs", () => {
+    expect(
+      recipeFormSchema.safeParse({
+        ...validRecipe,
+        imageUrl: "https://file.cecotecapps.net/recipe.jpg",
+      }).success,
+    ).toBe(true);
+    expect(
+      recipeFormSchema.safeParse({ ...validRecipe, imageUrl: "not-a-url" })
+        .success,
+    ).toBe(false);
   });
 
   it("allows empty steps array", () => {
@@ -364,6 +378,7 @@ describe("parseFormDataToRecipe", () => {
       name: "My Recipe",
       servings: "4",
       language: "es",
+      imageUrl: null,
       ingredients: [
         {
           name: "Butter",
