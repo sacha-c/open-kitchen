@@ -30,7 +30,10 @@ test.describe("Recipe list page", () => {
 
   test("displays recipe cards when recipes exist", async ({ page }) => {
     await signIn(page);
-    await page.getByRole("link", { name: "My Recipes" }).click();
+    await page
+      .locator("nav")
+      .getByRole("link", { name: "My Recipes", exact: true })
+      .click();
     await page.waitForURL("/recipes");
 
     await expect(
@@ -107,7 +110,11 @@ test.describe("Recipe list page", () => {
 
     const nav = page.locator("nav");
     await expect(nav).toBeVisible();
-    await expect(nav.getByRole("link", { name: "My Recipes" })).toBeVisible();
-    await expect(nav.getByText(TEST_USER.name)).toBeVisible();
+    await expect(
+      nav.getByRole("link", { name: "My Recipes", exact: true }),
+    ).toBeVisible();
+    await expect(
+      nav.getByRole("button", { name: TEST_USER.name }),
+    ).toBeVisible();
   });
 });

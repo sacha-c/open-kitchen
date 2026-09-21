@@ -19,7 +19,7 @@
 
 <div class="mx-auto max-w-4xl px-4 py-8 sm:px-8">
   <!-- Header -->
-  <div class="mb-6 flex items-start justify-between gap-4">
+  <div class="mb-6 flex flex-wrap items-start justify-between gap-4">
     <div>
       <a
         href={resolve("/recipes")}
@@ -29,10 +29,10 @@
       </a>
       <h1 class="mt-1 text-3xl font-bold">{data.recipe.name}</h1>
     </div>
-    <div class="flex shrink-0 items-center gap-1">
+    <div class="flex shrink-0 items-center gap-2">
       <a
         href={resolve(`/recipes/${data.recipe.id}/edit`)}
-        class="btn btn-square btn-ghost btn-sm"
+        class="btn btn-square btn-ghost"
         aria-label="Edit recipe"
         title="Edit recipe"
       >
@@ -42,7 +42,7 @@
           viewBox="0 0 24 24"
           stroke-width="1.5"
           stroke="currentColor"
-          class="h-4 w-4"
+          class="h-5 w-5"
           aria-hidden="true"
         >
           <path
@@ -53,7 +53,7 @@
         </svg>
       </a>
       <button
-        class="btn btn-square btn-ghost btn-sm text-error"
+        class="btn btn-square btn-ghost text-error"
         type="button"
         aria-label="Delete recipe"
         title="Delete recipe"
@@ -65,7 +65,7 @@
           viewBox="0 0 24 24"
           stroke-width="1.5"
           stroke="currentColor"
-          class="h-4 w-4"
+          class="h-5 w-5"
           aria-hidden="true"
         >
           <path
@@ -87,11 +87,7 @@
             };
           }}
         >
-          <button
-            class="btn btn-primary btn-sm"
-            type="submit"
-            disabled={syncing}
-          >
+          <button class="btn btn-primary" type="submit" disabled={syncing}>
             {#if syncing}
               <span class="loading loading-spinner loading-xs"></span>
               Syncing…

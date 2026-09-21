@@ -10,7 +10,7 @@
 </svelte:head>
 
 <div class="mx-auto max-w-6xl px-4 py-8 sm:px-8">
-  <div class="mb-8 flex items-center justify-between">
+  <div class="mb-8 flex flex-wrap items-center justify-between gap-3">
     <h1 class="text-3xl font-bold">Edit Recipe</h1>
     <a
       href={resolve(`/recipes/${data.recipe.id}`)}
