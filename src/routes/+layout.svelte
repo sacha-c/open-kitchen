@@ -2,6 +2,7 @@
   import { enhance } from "$app/forms";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
+  import ThemeToggle from "$lib/components/ThemeToggle.svelte";
   import { locales, localizeHref } from "$lib/paraglide/runtime";
   import "./layout.css";
 
@@ -63,6 +64,7 @@
               <a href={resolve("/recipes")}>My Recipes</a>
             </li>
             <li><a href={resolve("/profile")}>Profile</a></li>
+            <ThemeToggle variant="menu-item" />
             <li>
               <form
                 method="POST"
@@ -88,6 +90,10 @@
         </div>
       </div>
     </nav>
+  {:else}
+    <div class="fixed top-4 right-4 z-10">
+      <ThemeToggle />
+    </div>
   {/if}
   <main>{@render children()}</main>
 </div>
