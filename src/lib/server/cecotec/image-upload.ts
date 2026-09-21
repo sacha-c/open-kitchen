@@ -54,7 +54,8 @@ export async function uploadRecipeImage(
 
   const password = decrypt(credentials.encryptedPassword);
   const { accessToken } = await authenticate(credentials.email, password);
-  const extension = IMAGE_EXTENSIONS[file.type as keyof typeof IMAGE_EXTENSIONS];
+  const extension =
+    IMAGE_EXTENSIONS[file.type as keyof typeof IMAGE_EXTENSIONS];
   const filename = `${crypto.randomUUID()}.${extension}`;
   const buffer = Buffer.from(await file.arrayBuffer());
 

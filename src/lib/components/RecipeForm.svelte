@@ -77,10 +77,11 @@
   let loading = $state(false);
   let imageUploading = $state(false);
   let imageError = $state<string | null>(null);
-  const initialImageUrl = untrack(() =>
-    (formResult?.values?.imageUrl as string | null | undefined) ??
+  const initialImageUrl = untrack(
+    () =>
+      (formResult?.values?.imageUrl as string | null | undefined) ??
       recipe.imageUrl ??
-      ""
+      "",
   );
   let imageUrl = $state(initialImageUrl);
   let imagePreviewUrl = $state(initialImageUrl);
@@ -450,7 +451,8 @@
             <span class="label-text-alt mt-1">
               <a class="link link-primary" href={resolve("/profile")}
                 >Connect your Cecotec account</a
-              > to upload images.
+              >
+              to upload images.
             </span>
           {:else}
             <span class="label-text-alt mt-1">

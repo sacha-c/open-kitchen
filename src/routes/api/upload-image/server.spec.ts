@@ -1,13 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const mockUploadRecipeImage = vi.fn<
-  (userId: string, file: File) => Promise<string>
->();
+const mockUploadRecipeImage =
+  vi.fn<(userId: string, file: File) => Promise<string>>();
 
 vi.mock("$lib/server/cecotec/image-upload", async (importOriginal) => {
-  const actual = await importOriginal<
-    typeof import("$lib/server/cecotec/image-upload")
-  >();
+  const actual =
+    await importOriginal<typeof import("$lib/server/cecotec/image-upload")>();
   return {
     ...actual,
     uploadRecipeImage: (userId: string, file: File) =>
@@ -66,7 +64,10 @@ describe("POST /api/upload-image", () => {
       request: requestWith(file),
     } as never)) as Response;
 
-    expect(mockUploadRecipeImage).toHaveBeenCalledWith("user-1", expect.any(File));
+    expect(mockUploadRecipeImage).toHaveBeenCalledWith(
+      "user-1",
+      expect.any(File),
+    );
     expect(response.status).toBe(200);
     await expect(response.json()).resolves.toEqual({
       url: "https://file.cecotecapps.net/recipe.jpg",

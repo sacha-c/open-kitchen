@@ -283,9 +283,9 @@ describe("transformRecipeForCecotec", () => {
 
 describe("isCecotecImageUrl", () => {
   it("only trusts HTTPS URLs on the Cecotec image host", () => {
-    expect(
-      isCecotecImageUrl("https://file.cecotecapps.net/recipe.jpg"),
-    ).toBe(true);
+    expect(isCecotecImageUrl("https://file.cecotecapps.net/recipe.jpg")).toBe(
+      true,
+    );
     expect(
       isCecotecImageUrl("https://file.cecotecapps.net.evil.test/recipe.jpg"),
     ).toBe(false);
