@@ -324,7 +324,7 @@
             id="name"
             name="name"
             type="text"
-            class="input input-bordered w-full"
+            class="input w-full"
             maxlength={200}
             required
             value={formResult?.values?.name ?? recipe.name}
@@ -345,7 +345,7 @@
               id="servings"
               name="servings"
               type="text"
-              class="input input-bordered w-full"
+              class="input w-full"
               placeholder="e.g. 2, 4-6"
               required
               value={formResult?.values?.servings ?? recipe.servings}
@@ -364,7 +364,7 @@
             <select
               id="language"
               name="language"
-              class="select select-bordered w-full"
+              class="select w-full"
               required
             >
               <option
@@ -391,7 +391,7 @@
           <div class="form-control">
             <span class="label">Cooking Time</span>
             <div
-              class="input input-bordered bg-base-200/60 flex items-center text-sm font-medium"
+              class="input bg-base-200/60 flex items-center text-sm font-medium"
             >
               {formatCookingTime(cookingTime)}
             </div>
@@ -402,7 +402,7 @@
           <label class="label" for="recipe-image">Image</label>
           <input type="hidden" name="imageUrl" value={imageUrl}>
           <div
-            class="bg-base-200 flex h-32 items-center justify-center rounded-lg border-2 border-dashed relative overflow-hidden"
+            class="bg-base-200 border-base-300 rounded-box relative flex h-28 items-center justify-center overflow-hidden border-2 border-dashed"
           >
             {#if imagePreviewUrl}
               <img
@@ -428,16 +428,16 @@
               </div>
             {:else if hasCecotecCredentials}
               <span
-                class="text-base-content relative z-10 rounded bg-base-100/85 px-3 py-1 text-sm font-medium"
+                class="text-base-content bg-base-100/85 relative z-10 rounded px-3 py-1 text-center text-sm font-medium"
               >
-                {imageUrl ? "Choose a replacement" : "Choose an image"}
+                {imageUrl ? "Choose a replacement photo" : "Click to add a photo of your dish"}
               </span>
             {/if}
           </div>
           <input
             id="recipe-image"
             type="file"
-            class="file-input file-input-bordered mt-2 w-full"
+            class="file-input mt-2 w-full"
             accept={IMAGE_ACCEPT}
             disabled={!hasCecotecCredentials || imageUploading}
             onchange={uploadSelectedImage}
@@ -491,7 +491,7 @@
                   name={`ingredients[${i}].name`}
                   type="text"
                   list={`ingredient-list-${i}`}
-                  class="input input-bordered input-sm w-full"
+                  class="input input-sm w-full"
                   class:input-error={fieldError(`ingredients.${i}.name`)}
                   placeholder="Search ingredient…"
                   autocomplete="off"
@@ -523,7 +523,7 @@
                   <input
                     name={`ingredients[${i}].amount`}
                     type="text"
-                    class="input input-bordered input-sm w-full"
+                    class="input input-sm w-full"
                     placeholder="Amt"
                     bind:value={ingredient.amount}
                     aria-invalid={fieldError(`ingredients.${i}.amount`) ? "true" : undefined}
@@ -537,7 +537,7 @@
 
                 <div class="form-control flex-1 sm:w-24 sm:flex-none">
                   <select
-                    class="select select-bordered select-sm w-full"
+                    class="select select-sm w-full"
                     class:select-error={fieldError(`ingredients.${i}.unit`)}
                     name={`ingredients[${i}].unit`}
                     bind:value={ingredient.unit}
@@ -711,7 +711,7 @@
                 <textarea
                   id={`step-desc-${i}`}
                   name={`steps[${i}].description`}
-                  class="textarea textarea-bordered w-full"
+                  class="textarea w-full"
                   maxlength={1000}
                   rows={2}
                   required
@@ -731,7 +731,7 @@
                 >
                 <select
                   id={`step-type-${i}`}
-                  class="select select-bordered select-sm w-full"
+                  class="select select-sm w-full"
                   name={`steps[${i}].operationType`}
                   bind:value={step.operationType}
                   required
@@ -755,7 +755,7 @@
                         <input
                           id={`step-time-min-${i}`}
                           type="number"
-                          class="input input-bordered input-sm w-20"
+                          class="input input-sm w-20"
                           class:input-error={fieldError(`steps.${i}.totalTime`)}
                           min={0}
                           max={90}
@@ -773,7 +773,7 @@
                         <input
                           id={`step-time-sec-${i}`}
                           type="number"
-                          class="input input-bordered input-sm w-20"
+                          class="input input-sm w-20"
                           class:input-error={fieldError(`steps.${i}.totalTime`)}
                           min={0}
                           max={59}
@@ -841,7 +841,7 @@
                       id={`step-temp-${i}`}
                       name={`steps[${i}].temperature`}
                       type="number"
-                      class="input input-bordered input-sm w-full"
+                      class="input input-sm w-full"
                       min={0}
                       max={200}
                       required

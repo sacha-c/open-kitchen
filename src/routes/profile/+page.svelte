@@ -42,7 +42,7 @@
 
 <svelte:head><title>OpenKitchen — Profile</title></svelte:head>
 
-<div class="mx-auto max-w-2xl px-4 py-10">
+<div class="mx-auto max-w-2xl px-4 py-8 sm:px-8">
   <!-- Account Info -->
   <div class="card bg-base-100 mb-6 shadow-sm">
     <div class="card-body">
@@ -53,7 +53,7 @@
           <label class="label" for="profile-name">Name</label>
           <input
             id="profile-name"
-            class="input input-bordered w-full"
+            class="input w-full"
             type="text"
             value={data.user.name}
             disabled
@@ -63,7 +63,7 @@
           <label class="label" for="profile-email">Email</label>
           <input
             id="profile-email"
-            class="input input-bordered w-full"
+            class="input w-full"
             type="email"
             value={data.user.email}
             disabled
@@ -119,7 +119,7 @@
           <input
             id="cecotec-email"
             name="email"
-            class="input input-bordered w-full"
+            class="input w-full"
             class:input-error={form?.errors?.email}
             type="email"
             placeholder="your@cecotec-account.com"
@@ -143,7 +143,7 @@
           <input
             id="cecotec-password"
             name="password"
-            class="input input-bordered w-full"
+            class="input w-full"
             class:input-error={form?.errors?.password}
             type="password"
             placeholder={linked ? "Enter password to update" : "Your Cecotec password"}

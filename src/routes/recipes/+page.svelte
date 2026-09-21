@@ -1,14 +1,13 @@
 <script lang="ts">
-  import SyncStatusBadge from "$lib/components/SyncStatusBadge.svelte";
-  import { formatCookingTime } from "$lib/format-cooking-time";
+  import RecipeCard from "$lib/components/RecipeCard.svelte";
 
   let { data } = $props();
 </script>
 
 <svelte:head> <title>My Recipes — OpenKitchen</title> </svelte:head>
 
-<div class="mx-auto max-w-6xl px-4 py-8">
-  <div class="mb-8 flex items-center justify-between">
+<div class="mx-auto max-w-6xl px-4 py-8 sm:px-8">
+  <div class="mb-8 flex flex-wrap items-center justify-between gap-3">
     <h1 class="text-3xl font-bold">My Recipes</h1>
     <a href="/recipes/new" class="btn btn-primary">+ New Recipe</a>
   </div>
@@ -43,46 +42,7 @@
   {:else}
     <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {#each data.recipes as recipe (recipe.id)}
-        <a
-          href="/recipes/{recipe.id}"
-          class="card bg-base-100 shadow-md transition-shadow hover:shadow-lg"
-        >
-          <figure class="bg-base-200 h-48">
-            {#if recipe.imageUrl}
-              <img
-                src={recipe.imageUrl}
-                alt={recipe.name}
-                class="h-full w-full object-cover"
-              >
-            {:else}
-              <img
-                src="/recipe-placeholder.svg"
-                alt=""
-                aria-hidden="true"
-                class="h-full w-full object-cover opacity-60"
-              >
-            {/if}
-          </figure>
-          <div class="card-body gap-3 p-4">
-            <h2 class="card-title text-lg">{recipe.name}</h2>
-            <div class="text-base-content/60 flex flex-wrap gap-3 text-sm">
-              <span title="Servings">🍽 {recipe.servings}</span>
-              <span title="Cooking time">
-                ⏱ {formatCookingTime(recipe.cookingTime)}
-              </span>
-              <span title="Steps">📋 {recipe.stepCount} steps</span>
-            </div>
-            <div class="card-actions mt-1">
-              <SyncStatusBadge
-                status={recipe.syncStatus}
-                syncedAt={recipe.syncedAt
-                  ? new Date(recipe.syncedAt)
-                  : null}
-                syncError={recipe.syncError}
-              />
-            </div>
-          </div>
-        </a>
+        <RecipeCard {recipe} />
       {/each}
     </div>
   {/if}

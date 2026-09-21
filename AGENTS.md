@@ -27,6 +27,16 @@
 - `pnpm db:generate` / `pnpm db:migrate` / `pnpm db:push` — drizzle migrations
 - `pnpm services:start` / `pnpm services:stop` — start/stop local Docker services (Postgres, etc.)
 
+## Design System ("Modern Culinary")
+
+The app uses a custom DaisyUI 5 theme (`culinary` light / `culinary-dark` dark, `--prefersdark`) defined entirely in `src/routes/layout.css` via `@plugin "daisyui/theme"` blocks. Always reach for DaisyUI's semantic tokens/classes (`btn-primary`, `bg-base-100`, `text-base-content/60`, `badge-success`, etc.) instead of hardcoded colors — that's what lets the whole app re-theme from one file.
+
+- **Color roles**: `primary` = terracotta (CTAs, links), `secondary`/`success` = sage green (synced/positive status), `accent` = soft peach/gold, `neutral`/`info`/`warning` = muted step-type colors, `error` = muted brick red. `base-100` is pure white (cards, inputs), `base-200` is the off-white page background (the app's `--root-bg` is pointed at `base-200` so cards stand out against it), `base-300` is a light gray for dividers/borders. `base-content` is a deep slate (`#2B2D42`); use its opacity modifiers (`/60`, `/50`, `/40`) for secondary/muted text instead of a separate gray token.
+- **Typography**: headings and `.card-title` automatically render in the display serif (Playfair Display) via a global rule in `layout.css` — don't add font classes to individual headings. Body/UI text uses Inter (`font-sans`, the default). Both are self-hosted via `@fontsource`.
+- **Radius/shadows**: theme radius tokens give cards/modals `1rem` (`rounded-box`), buttons/inputs/selects `0.75rem` (`rounded-field`). Prefer `shadow-sm`/`shadow-md` over heavier shadows to keep the flat, modern look (`--depth: 0` in the theme).
+- **Form fields**: `.input`/`.select`/`.textarea` are styled globally (in `layout.css`) as borderless `base-200` fields that pick up a `primary`-colored border on focus — don't add `input-bordered`/`select-bordered`/`textarea-bordered` (those DaisyUI 4 modifiers no longer exist in DaisyUI 5 and are no-ops).
+- **Spacing**: follow an 8px grid — use Tailwind spacing multiples of 2 (`gap-4`, `p-4`, `py-8`, etc.) rather than odd values.
+
 ## Code Conventions
 
 - **No barrel re-exports**: Do not create `index.ts` files that only re-export from other modules. Import directly from the source file (e.g. `$lib/server/cecotec/client` not `$lib/server/cecotec`). Barrels obscure the dependency graph, can cause circular imports, and make mocking harder in tests.
