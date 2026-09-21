@@ -19,6 +19,21 @@
     <link rel="apple-touch-icon" href="%sveltekit.assets%/apple-touch-icon.png">
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script>
+      (() => {
+        try {
+          const theme = localStorage.getItem("theme");
+          if (theme === "light" || theme === "dark") {
+            document.documentElement.setAttribute(
+              "data-theme",
+              theme === "dark" ? "culinary-dark" : "culinary",
+            );
+          }
+        } catch {
+          // localStorage may be unavailable (private browsing, disabled storage)
+        }
+      })();
+    </script>
     %sveltekit.head%
   </head>
 
