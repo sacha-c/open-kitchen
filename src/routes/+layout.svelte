@@ -18,23 +18,7 @@
           href={resolve("/")}
           class="font-display flex items-center gap-2 text-xl font-bold tracking-tight"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="text-primary h-6 w-6"
-            aria-hidden="true"
-            role="img"
-          >
-            <title>OpenKitchen</title>
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M3 10.5h18M4 10.5v6a2 2 0 002 2h12a2 2 0 002-2v-6M2.25 10.5a1 1 0 011-1h17.5a1 1 0 011 1M9 5.5c0-1 .75-2 1.5-2M14.5 5.5c0-1-.75-2-1.5-2"
-            />
-          </svg>
+          <img src="/logo.png" alt="" class="h-8 w-8" />
           OpenKitchen
         </a>
       </div>
