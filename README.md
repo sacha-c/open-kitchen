@@ -40,3 +40,14 @@ npm run build
 You can preview the production build with `npm run preview`.
 
 > To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+
+## Recipe images
+
+Recipe images are uploaded directly to the Cecotec CDN and the returned URL is
+stored with the recipe. OpenKitchen does not maintain a second copy in Vercel
+Blob or another object store. This keeps the upload flow simple, but image
+uploads require the user to connect their Cecotec account first.
+
+Uploads accept JPEG, PNG, GIF, and WebP files up to 5 MB. The 5 MB limit is an
+OpenKitchen policy; Cecotec does not publish a size or dimension limit for its
+`put-file` endpoint.

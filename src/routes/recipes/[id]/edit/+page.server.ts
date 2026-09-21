@@ -152,6 +152,7 @@ export const actions: Actions = {
           servings: data.servings,
           cookingTime,
           language: data.language,
+          imageUrl: data.imageUrl,
           syncStatus: "pending", // Resetting to pending since it was edited
           updatedAt: now,
         })

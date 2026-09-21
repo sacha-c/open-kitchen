@@ -156,9 +156,12 @@ const creds = {
 // Import after mocks
 // ---------------------------------------------------------------------------
 
-const { transformRecipeForCecotec, syncRecipe, syncAllPending } = await import(
-  "./engine"
-);
+const {
+  isCecotecImageUrl,
+  transformRecipeForCecotec,
+  syncRecipe,
+  syncAllPending,
+} = await import("./engine");
 
 // ---------------------------------------------------------------------------
 // transformRecipeForCecotec
@@ -275,6 +278,20 @@ describe("transformRecipeForCecotec", () => {
     );
     // Can't resolve → dropped silently
     expect(result.ingredients).toEqual([]);
+  });
+});
+
+describe("isCecotecImageUrl", () => {
+  it("only trusts HTTPS URLs on the Cecotec image host", () => {
+    expect(
+      isCecotecImageUrl("https://file.cecotecapps.net/recipe.jpg"),
+    ).toBe(true);
+    expect(
+      isCecotecImageUrl("https://file.cecotecapps.net.evil.test/recipe.jpg"),
+    ).toBe(false);
+    expect(isCecotecImageUrl("http://file.cecotecapps.net/recipe.jpg")).toBe(
+      false,
+    );
   });
 });
 
@@ -433,6 +450,25 @@ describe("syncRecipe", () => {
 
     expect(result.status).toBe("error");
     expect(result.error).toBe("Upload failed");
+  });
+
+  it("reuses an existing Cecotec CDN image without uploading it again", async () => {
+    const cecotecImageUrl = "https://file.cecotecapps.net/recipe.jpg";
+    const recipeWithImage = { ...recipeRow, imageUrl: cecotecImageUrl };
+    mockSelect
+      .mockReturnValueOnce(chain([recipeWithImage]))
+      .mockReturnValueOnce(chainWithOrderBy([]))
+      .mockReturnValueOnce(chainWithOrderBy([]))
+      .mockReturnValueOnce(chain([creds]));
+
+    await syncRecipe("recipe-1");
+
+    expect(mockUploadImage).not.toHaveBeenCalled();
+    expect(mockCreateRecipe).toHaveBeenCalledWith(
+      "tok123",
+      expect.objectContaining({ imageUrl: cecotecImageUrl }),
+      "MamboTouch",
+    );
   });
 
   it("returns error result when recipe is not found (no DB update)", async () => {

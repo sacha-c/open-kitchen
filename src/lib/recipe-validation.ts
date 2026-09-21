@@ -54,6 +54,7 @@ export const recipeFormSchema = createInsertSchema(recipe, {
     language: true,
   })
   .extend({
+    imageUrl: z.url("Image URL is invalid").nullable(),
     ingredients: z.array(ingredientSchema),
     steps: z.array(stepSchema),
   });
@@ -75,6 +76,7 @@ export function parseFormDataToRecipe(formData: FormData): unknown {
   const name = formData.get("name")?.toString() ?? "";
   const servings = formData.get("servings")?.toString() ?? "";
   const language = formData.get("language")?.toString() ?? "";
+  const imageUrl = formData.get("imageUrl")?.toString() || null;
 
   const ingredients: Record<string, string | null>[] = [];
   const steps: Record<string, string | number>[] = [];
@@ -109,5 +111,5 @@ export function parseFormDataToRecipe(formData: FormData): unknown {
     j++;
   }
 
-  return { name, servings, language, ingredients, steps };
+  return { name, servings, language, imageUrl, ingredients, steps };
 }
