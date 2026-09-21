@@ -75,9 +75,7 @@
       </div>
     </nav>
   {:else}
-    <div class="fixed top-4 right-4 z-10">
-      <ThemeToggle />
-    </div>
+    <div class="fixed top-4 right-4 z-10"><ThemeToggle /></div>
   {/if}
   <main>{@render children()}</main>
 </div>
