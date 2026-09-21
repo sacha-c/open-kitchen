@@ -78,9 +78,11 @@ In general you should follow these guidelines, however it is also important to k
   - `POST /api/blade-cook/recipe/createRecipeApp/add` — create recipe (draft)
   - `POST /api/blade-cook/recipe/createRecipeApp/update` — publish/update recipe
   - `GET /api/blade-cook/recipe/createRecipeApp/selectPage` — list user's custom recipes (flat metadata only, no steps/ingredients)
-  - `GET /api/blade-cook/kitCloud/front/user/recipe/app/detail` — get full recipe detail including steps; params: `id`, `number`, `code`, `recipeType`, `selectedLanguage`, `appOrDevice`, `sourceType`; steps are in `data.multiLanguageRelations[0].recipeDeviceParameterDtos`
+  - `GET /api/blade-cook/kitCloud/front/user/recipe/app/detail` — get full recipe detail including steps; params: `id`, `number`, `code`, `recipeType`, `selectedLanguage`, `appOrDevice`, `sourceType`; steps are in `data.multiLanguageRelations[0].recipeDeviceParameterDtos`. Also serves **public catalog recipes** (see below), not just user-authored ones.
   - `PUT /api/blade-cook/recipe/createRecipeApp/deleteRecipe` — delete recipe by ID
   - `POST /api/blade-resource/oss/endpoint/put-file` — upload image to CDN
+  - `GET /api/blade-cook/kitCloud/category/app/top/categorys` — list the public catalog's browse categories (taxonomy). Params: `sourceType=1`, `code` (language). Response: `data[]` of `{ id, recipeCategoryName, imageUrl, ... }`.
+  - `GET /api/blade-cook/kitCloud/front/recipe/app/page/compatible/list` — **public recipe catalog listing/search** (browse, distinct from `selectPage` which lists the user's own recipes). Params: `deviceSn` (can be empty), `currentPageNo`, `pageSize`, `sourceType=1`, `categoryIds` (empty for all, or a category `id` from the categories endpoint to filter), `appOrDevice=1`, `compatibleType=0`, `code` (language), `isPot=0`. Response: `data.records[]` (each with `id`, `number`, `defaultName`, `landscapeImageUrl`, `cookingTime` (seconds), `views`, `starAvg`, `recipeCategoryIds`/`recipeCategoryNames`; note `serviceSize` is **not** populated in the listing, only in the detail response) plus `data.total`/`data.pages`/`data.size`/`data.current` for pagination.
 - **Model code**: `"MamboTouch"`
 - **Recipe creation flow**: POST add (creates hidden draft) → POST update with `recipeStatus: 1` (publishes it).
 - **Update behavior (verified in issue #9 — full-circle confirmed)**:
@@ -89,6 +91,11 @@ In general you should follow these guidelines, however it is also important to k
   - `id` (`recipeId`) and `number` (CookbookId) remain stable across updates.
   - `ingredientsRelationVosList` is not persisted via API alone (server requires multilanguage relation record created by the official app — known limitation).
   - **Recommended sync strategy**: update-in-place (preserves CookbookId). Fall back to delete+recreate only on update failure.
+- **Public recipe catalog (verified in issue #61)**:
+  - The catalog is browsed via `GET /api/blade-cook/kitCloud/front/recipe/app/page/compatible/list` (paginated, optionally filtered by `categoryIds`) and its taxonomy via `GET /api/blade-cook/kitCloud/category/app/top/categorys`.
+  - The **existing** `GET /api/blade-cook/kitCloud/front/user/recipe/app/detail` endpoint works unchanged for public catalog recipes (same `recipeType=1`/`sourceType=1` params as for custom recipes) — no separate detail endpoint is needed.
+  - Unlike custom recipes, public catalog recipes **do** return a populated `ingredientsRelationVosList` inside `data.multiLanguageRelations[0]` when read back — the known limitation above is specific to *writing* ingredients for user-authored recipes, not reading them for catalog recipes.
+  - **Recommended "browse + import" flow**: list via `.../page/compatible/list` (id/number/name/image/servings\* /cookingTime), fetch full detail via the existing detail endpoint for steps + ingredients, then create the recipe locally the same way a user-authored recipe is created. (\*`serviceSize` requires the detail call — it's blank in the listing.)
 
 ## Recipe Data Model (Cecotec)
 
