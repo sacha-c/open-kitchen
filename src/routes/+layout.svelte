@@ -18,7 +18,7 @@
           href={resolve("/")}
           class="font-display flex items-center gap-2 text-xl font-bold tracking-tight"
         >
-          <img src="/logo.png" alt="" class="h-8 w-8" />
+          <img src="/logo.png" alt="" class="h-8 w-8">
           OpenKitchen
         </a>
       </div>
