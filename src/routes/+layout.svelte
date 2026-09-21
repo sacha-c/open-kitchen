@@ -9,14 +9,45 @@
 
 <div class="app">
   {#if data.user}
-    <nav class="navbar bg-base-100 shadow-sm">
+    <nav class="navbar border-base-300 bg-base-100 border-b px-4 sm:px-8">
       <div class="flex-1">
-        <a href={resolve("/")} class="btn btn-ghost text-xl">OpenKitchen</a>
+        <a
+          href={resolve("/")}
+          class="font-display flex items-center gap-2 text-xl font-bold tracking-tight"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="text-primary h-6 w-6"
+            aria-hidden="true"
+            role="img"
+          >
+            <title>OpenKitchen</title>
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M3 10.5h18M4 10.5v6a2 2 0 002 2h12a2 2 0 002-2v-6M2.25 10.5a1 1 0 011-1h17.5a1 1 0 011 1M9 5.5c0-1 .75-2 1.5-2M14.5 5.5c0-1-.75-2-1.5-2"
+            />
+          </svg>
+          OpenKitchen
+        </a>
       </div>
       <div class="flex-none">
-        <ul class="menu menu-horizontal gap-1 px-1">
+        <ul class="menu menu-horizontal gap-1 px-1 font-medium">
           <li><a href={resolve("/recipes")}>My Recipes</a></li>
-          <li><a href={resolve("/profile")}>{data.user.name}</a></li>
+          <li>
+            <a href={resolve("/profile")} class="flex items-center gap-2">
+              <span
+                class="bg-primary text-primary-content flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold uppercase"
+              >
+                {data.user.name.charAt(0)}
+              </span>
+              {data.user.name}
+            </a>
+          </li>
         </ul>
       </div>
     </nav>

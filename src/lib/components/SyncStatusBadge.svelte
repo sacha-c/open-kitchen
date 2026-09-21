@@ -4,9 +4,17 @@
     syncedAt?: Date | null;
     syncError?: string | null;
     syncing?: boolean;
+    /** Renders just the pill, without the date/error affordances — for overlaying on imagery. */
+    compact?: boolean;
   }
 
-  let { status, syncedAt, syncError, syncing = false }: Props = $props();
+  let {
+    status,
+    syncedAt,
+    syncError,
+    syncing = false,
+    compact = false,
+  }: Props = $props();
 
   let badgeClass = $derived(
     syncing
@@ -33,13 +41,15 @@
   {#if syncing}
     <span class="loading loading-spinner loading-xs text-info"></span>
   {/if}
-  <span class="badge badge-sm {badgeClass}">{label}</span>
-  {#if !syncing && status === "synced" && syncedAt}
+  <span class="badge badge-sm {badgeClass} {compact ? 'shadow-sm' : ''}"
+    >{label}</span
+  >
+  {#if !compact && !syncing && status === "synced" && syncedAt}
     <span class="text-base-content/50 text-xs">
       {syncedAt.toLocaleDateString()}
     </span>
   {/if}
-  {#if !syncing && status === "error" && syncError}
+  {#if !compact && !syncing && status === "error" && syncError}
     <div class="tooltip tooltip-error" data-tip={syncError}>
       <button
         class="btn btn-circle btn-ghost btn-xs"

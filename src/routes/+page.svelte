@@ -75,7 +75,7 @@
             <input
               id="email"
               name="email"
-              class="input input-bordered w-full"
+              class="input w-full"
               type="email"
               placeholder="you@example.com"
               value={form?.email ?? ""}
@@ -98,7 +98,7 @@
             <input
               id="password"
               name="password"
-              class="input input-bordered w-full"
+              class="input w-full"
               type="password"
               placeholder="Your password"
               autocomplete="current-password"

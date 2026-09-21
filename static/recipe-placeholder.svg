@@ -1,17 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" fill="none">
-  <rect width="400" height="300" fill="#e9edf2"/>
-  <!-- Pot body -->
-  <rect x="135" y="140" width="130" height="95" rx="16" fill="#b0bec5"/>
-  <!-- Pot rim -->
-  <rect x="120" y="130" width="160" height="20" rx="8" fill="#90a4ae"/>
-  <!-- Pot handles -->
-  <rect x="90" y="138" width="40" height="14" rx="7" fill="#90a4ae"/>
-  <rect x="270" y="138" width="40" height="14" rx="7" fill="#90a4ae"/>
-  <!-- Steam lines -->
-  <path d="M180 118 Q175 100 180 82" stroke="#cfd8dc" stroke-width="5" stroke-linecap="round"/>
-  <path d="M200 112 Q195 92 200 72" stroke="#cfd8dc" stroke-width="5" stroke-linecap="round"/>
-  <path d="M220 118 Q225 100 220 82" stroke="#cfd8dc" stroke-width="5" stroke-linecap="round"/>
-  <!-- Lid -->
-  <ellipse cx="200" cy="130" rx="65" ry="10" fill="#b0bec5"/>
-  <circle cx="200" cy="122" r="10" fill="#90a4ae"/>
+  <defs>
+    <radialGradient id="placeholder-mesh" cx="30%" cy="25%" r="85%">
+      <stop offset="0%" stop-color="#fbe8cf"/>
+      <stop offset="55%" stop-color="#f6ddc4"/>
+      <stop offset="100%" stop-color="#f2cc8f"/>
+    </radialGradient>
+  </defs>
+  <rect width="400" height="300" fill="url(#placeholder-mesh)"/>
+  <!-- Minimalist line-art pot -->
+  <g stroke="#e07a5f" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.85">
+    <path d="M140 145h120"/>
+    <path d="M148 145v55a14 14 0 0014 14h76a14 14 0 0014-14v-55"/>
+    <path d="M118 145a1 1 0 011-1h162a1 1 0 011 1"/>
+    <path d="M172 128c0-9 6.5-17 13-17"/>
+    <path d="M215 128c0-9-6.5-17-13-17"/>
+  </g>
 </svg>
