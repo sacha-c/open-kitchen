@@ -25,7 +25,9 @@
   </a>
 
   {#if form?.message}
-    <div role="alert" class="alert alert-error mt-4 mb-2"><span>{form.message}</span></div>
+    <div role="alert" class="alert alert-error mt-4 mb-2">
+      <span>{form.message}</span>
+    </div>
   {/if}
 
   {#if data.error}
@@ -51,7 +53,10 @@
     <div class="mt-2 mb-6 flex flex-wrap items-start justify-between gap-4">
       <h1 class="text-3xl font-bold">{data.recipe.name}</h1>
       {#if data.importedRecipeId}
-        <a href={resolve(`/recipes/${data.importedRecipeId}`)} class="btn btn-outline shrink-0">
+        <a
+          href={resolve(`/recipes/${data.importedRecipeId}`)}
+          class="btn btn-outline shrink-0"
+        >
           Already imported — View recipe
         </a>
       {:else}
@@ -66,8 +71,12 @@
             };
           }}
         >
-          <input type="hidden" name="number" value={data.number} >
-          <button class="btn btn-primary shrink-0" type="submit" disabled={importing}>
+          <input type="hidden" name="number" value={data.number}>
+          <button
+            class="btn btn-primary shrink-0"
+            type="submit"
+            disabled={importing}
+          >
             {#if importing}
               <span class="loading loading-spinner loading-xs"></span>
               Importing…
