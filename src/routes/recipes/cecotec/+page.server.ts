@@ -7,11 +7,46 @@ import {
   listPublicCatalog,
 } from "$lib/server/cecotec/client";
 import { getAuthenticatedCecotecSession } from "$lib/server/cecotec/session";
+import type { CecotecCatalogRecipe } from "$lib/server/cecotec/types";
 import { db } from "$lib/server/db";
 import { recipe } from "$lib/server/db/schema";
 import type { PageServerLoad } from "./$types";
 
 const PAGE_SIZE = 20;
+
+// Cecotec's catalog sometimes republishes what is effectively the same
+// recipe under a different id/number (same name/image/cooking time, near-
+// identical steps — verified in issue #60). We don't need perfect
+// correctness here, just to show the better-performing one: group by the
+// fields already available in the listing response (no extra API calls)
+// and keep whichever has the most views, falling back to rating.
+function popularityScore(r: CecotecCatalogRecipe): number {
+  return r.views ?? 0;
+}
+
+function ratingScore(r: CecotecCatalogRecipe): number {
+  const n = typeof r.starAvg === "number" ? r.starAvg : Number(r.starAvg);
+  return Number.isFinite(n) ? n : 0;
+}
+
+function dedupeCatalogRecords(
+  records: CecotecCatalogRecipe[],
+): CecotecCatalogRecipe[] {
+  const bestByKey = new Map<string, CecotecCatalogRecipe>();
+  for (const record of records) {
+    const key = `${record.defaultName}|${record.landscapeImageUrl ?? ""}|${record.cookingTime}`;
+    const current = bestByKey.get(key);
+    if (
+      !current ||
+      popularityScore(record) > popularityScore(current) ||
+      (popularityScore(record) === popularityScore(current) &&
+        ratingScore(record) > ratingScore(current))
+    ) {
+      bestByKey.set(key, record);
+    }
+  }
+  return [...bestByKey.values()];
+}
 
 export const load: PageServerLoad = async ({ locals, url }) => {
   if (!locals.session || !locals.user) {
@@ -75,7 +110,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
         id: c.id,
         name: c.recipeCategoryName,
       })),
-      recipes: catalog.records.map((r) => ({
+      recipes: dedupeCatalogRecords(catalog.records).map((r) => ({
         id: r.id,
         number: r.number,
         name: r.defaultName,

@@ -179,6 +179,91 @@ describe("load", () => {
     ]);
   });
 
+  it("keeps only the most-viewed entry among near-duplicate recipes (same name/image/cookingTime)", async () => {
+    mockGetAuthenticatedCecotecSession.mockResolvedValue({
+      accessToken: "tok",
+      email: "cec@example.com",
+    });
+    mockListCatalogCategories.mockResolvedValue([]);
+    mockListPublicCatalog.mockResolvedValue({
+      records: [
+        {
+          id: "100",
+          number: "42",
+          defaultName: "Cheesecake donuts",
+          landscapeImageUrl: "https://x/img.jpg",
+          cookingTime: 60,
+          views: 79,
+          starAvg: 0,
+        },
+        {
+          id: "200",
+          number: "43",
+          defaultName: "Cheesecake donuts",
+          landscapeImageUrl: "https://x/img.jpg",
+          cookingTime: 60,
+          views: 823,
+          starAvg: 4.75,
+        },
+        { id: "300", number: "44", defaultName: "Pasta", cookingTime: 600 },
+      ],
+      total: 3,
+      pages: 1,
+      size: 20,
+      current: 1,
+    });
+
+    const result = (await load({
+      locals: makeLocals(),
+      url: new URL("http://localhost/recipes/cecotec"),
+    } as never)) as Record<string, unknown>;
+
+    expect(result.recipes).toHaveLength(2);
+    expect(result.recipes).toMatchObject([
+      { number: "43", views: 823 },
+      { number: "44", name: "Pasta" },
+    ]);
+  });
+
+  it("treats recipes with different names/images/cookingTime as distinct, not duplicates", async () => {
+    mockGetAuthenticatedCecotecSession.mockResolvedValue({
+      accessToken: "tok",
+      email: "cec@example.com",
+    });
+    mockListCatalogCategories.mockResolvedValue([]);
+    mockListPublicCatalog.mockResolvedValue({
+      records: [
+        {
+          id: "100",
+          number: "42",
+          defaultName: "Summer cannelloni",
+          landscapeImageUrl: "https://x/img.jpg",
+          cookingTime: 1701,
+          views: 815,
+        },
+        {
+          id: "200",
+          number: "43",
+          defaultName: "Summer cannelloni",
+          landscapeImageUrl: "https://x/img.jpg",
+          cookingTime: 1750,
+          views: 79,
+        },
+      ],
+      total: 2,
+      pages: 1,
+      size: 20,
+      current: 1,
+    });
+
+    const result = (await load({
+      locals: makeLocals(),
+      url: new URL("http://localhost/recipes/cecotec"),
+    } as never)) as Record<string, unknown>;
+
+    expect(result.recipes).toHaveLength(2);
+  });
+
   it("maps the ca locale to es when calling the catalog endpoints", async () => {
     mockGetLocale.mockReturnValue("ca");
     mockGetAuthenticatedCecotecSession.mockResolvedValue({
