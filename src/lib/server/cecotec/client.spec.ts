@@ -546,6 +546,7 @@ describe("listPublicCatalog", () => {
       categoryId: "cat-1",
       currentPageNo: 2,
       pageSize: 10,
+      search: "cheesecake",
     });
 
     const [url] = spy.mock.calls[0] as [string, RequestInit];
@@ -556,9 +557,10 @@ describe("listPublicCatalog", () => {
     expect(url).toContain("categoryIds=cat-1");
     expect(url).toContain("currentPageNo=2");
     expect(url).toContain("pageSize=10");
+    expect(url).toContain("recipeName=cheesecake");
   });
 
-  it("defaults categoryIds to empty and page/size to 1/20", async () => {
+  it("defaults categoryIds and recipeName to empty and page/size to 1/20", async () => {
     const spy = mockTextFetch({
       code: "200",
       data: { records: [], total: 0, pages: 0, size: 20, current: 1 },
@@ -569,6 +571,7 @@ describe("listPublicCatalog", () => {
 
     const [url] = spy.mock.calls[0] as [string, RequestInit];
     expect(url).toContain("categoryIds=");
+    expect(url).toContain("recipeName=");
     expect(url).toContain("currentPageNo=1");
     expect(url).toContain("pageSize=20");
   });

@@ -395,6 +395,7 @@ export async function listPublicCatalog(
     categoryId?: string;
     currentPageNo?: number;
     pageSize?: number;
+    search?: string;
   },
 ): Promise<CecotecCatalogListResult> {
   const params = new URLSearchParams({
@@ -407,6 +408,10 @@ export async function listPublicCatalog(
     compatibleType: "0",
     code: options.code,
     isPot: "0",
+    // Undocumented but confirmed live (2026-09-22): case-insensitive
+    // substring match against the recipe's name in the requested language.
+    // No typo tolerance (e.g. "canneloni" doesn't match "cannelloni").
+    recipeName: options.search ?? "",
   });
 
   const response = await fetch(

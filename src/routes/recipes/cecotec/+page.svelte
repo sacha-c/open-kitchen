@@ -7,6 +7,7 @@
   function categoryHref(categoryId: string | null): string {
     const params = new URLSearchParams();
     if (categoryId) params.set("category", categoryId);
+    if (data.search) params.set("search", data.search);
     const query = params.toString();
     return query
       ? `${resolve("/recipes/cecotec")}?${query}`
@@ -17,6 +18,7 @@
     const params = new URLSearchParams();
     if (data.selectedCategoryId)
       params.set("category", data.selectedCategoryId);
+    if (data.search) params.set("search", data.search);
     params.set("page", String(page));
     return `${resolve("/recipes/cecotec")}?${params.toString()}`;
   }
@@ -83,6 +85,37 @@
       <span>{data.error}</span>
     </div>
   {:else}
+    <form method="GET" class="mb-6 flex gap-2">
+      {#if data.selectedCategoryId}
+        <input type="hidden" name="category" value={data.selectedCategoryId}>
+      {/if}
+      <label class="input grow">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="text-base-content/40 h-4 w-4 shrink-0"
+          aria-hidden="true"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+          />
+        </svg>
+        <input
+          type="search"
+          name="search"
+          value={data.search ?? ""}
+          placeholder="Search recipes…"
+          aria-label="Search Cecotec recipes"
+        >
+      </label>
+      <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+
     {#if data.categories.length > 0}
       <div class="mb-6 flex flex-wrap gap-2">
         <a
@@ -107,7 +140,11 @@
         <h2 class="text-base-content/60 mb-2 text-xl font-semibold">
           No recipes found
         </h2>
-        <p class="text-base-content/40">Try a different category.</p>
+        <p class="text-base-content/40">
+          Try a different search{data.categories.length > 0
+            ? " or category"
+            : ""}.
+        </p>
       </div>
     {:else}
       <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">

@@ -54,6 +54,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
   }
 
   const categoryId = url.searchParams.get("category");
+  const search = url.searchParams.get("search")?.trim() || null;
   const page = Number(url.searchParams.get("page") ?? "1") || 1;
   const emptyResult = {
     categories: [] as { id: string; name: string }[],
@@ -68,6 +69,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
       importedRecipeId: string | null;
     }[],
     selectedCategoryId: categoryId,
+    search,
     page,
     totalPages: 0,
   };
@@ -90,6 +92,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
         categoryId: categoryId ?? undefined,
         currentPageNo: page,
         pageSize: PAGE_SIZE,
+        search: search ?? undefined,
       }),
       db
         .select({
@@ -127,6 +130,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
         importedRecipeId: localRecipeIdByCatalogNumber.get(r.number) ?? null,
       })),
       selectedCategoryId: categoryId,
+      search,
       page: catalog.current,
       totalPages: catalog.pages,
     };
