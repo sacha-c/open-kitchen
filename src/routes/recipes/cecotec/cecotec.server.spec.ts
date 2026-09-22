@@ -165,7 +165,9 @@ describe("load", () => {
       current: 1,
     });
     mockSelect.mockReturnValue(
-      buildSelectChain([{ id: "local-recipe-1", cecotecNumber: "42" }]),
+      buildSelectChain([
+        { id: "local-recipe-1", importedFromCecotecNumber: "42" },
+      ]),
     );
 
     const result = (await load({

@@ -1,5 +1,5 @@
 import { redirect } from "@sveltejs/kit";
-import { eq } from "drizzle-orm";
+import { and, eq, isNotNull } from "drizzle-orm";
 import { getLocale } from "$lib/paraglide/runtime";
 import {
   CecotecError,
@@ -92,15 +92,21 @@ export const load: PageServerLoad = async ({ locals, url }) => {
         pageSize: PAGE_SIZE,
       }),
       db
-        .select({ id: recipe.id, cecotecNumber: recipe.cecotecNumber })
+        .select({
+          id: recipe.id,
+          importedFromCecotecNumber: recipe.importedFromCecotecNumber,
+        })
         .from(recipe)
-        .where(eq(recipe.userId, locals.user.id)),
+        .where(
+          and(
+            eq(recipe.userId, locals.user.id),
+            isNotNull(recipe.importedFromCecotecNumber),
+          ),
+        ),
     ]);
 
-    const localRecipeIdByCecotecNumber = new Map(
-      importedRecipes
-        .filter((r) => r.cecotecNumber !== null)
-        .map((r) => [r.cecotecNumber as string, r.id]),
+    const localRecipeIdByCatalogNumber = new Map(
+      importedRecipes.map((r) => [r.importedFromCecotecNumber as string, r.id]),
     );
 
     return {
@@ -118,7 +124,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
         cookingTime: r.cookingTime,
         views: r.views ?? null,
         starAvg: r.starAvg != null ? String(r.starAvg) : null,
-        importedRecipeId: localRecipeIdByCecotecNumber.get(r.number) ?? null,
+        importedRecipeId: localRecipeIdByCatalogNumber.get(r.number) ?? null,
       })),
       selectedCategoryId: categoryId,
       page: catalog.current,

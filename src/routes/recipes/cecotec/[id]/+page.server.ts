@@ -33,7 +33,10 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
     .select({ id: recipe.id })
     .from(recipe)
     .where(
-      and(eq(recipe.userId, locals.user.id), eq(recipe.cecotecNumber, number)),
+      and(
+        eq(recipe.userId, locals.user.id),
+        eq(recipe.importedFromCecotecNumber, number),
+      ),
     );
 
   try {
@@ -90,7 +93,12 @@ export const actions: Actions = {
     const [existing] = await db
       .select({ id: recipe.id })
       .from(recipe)
-      .where(and(eq(recipe.userId, userId), eq(recipe.cecotecNumber, number)));
+      .where(
+        and(
+          eq(recipe.userId, userId),
+          eq(recipe.importedFromCecotecNumber, number),
+        ),
+      );
 
     if (existing) {
       redirect(303, `/recipes/${existing.id}`);
@@ -116,6 +124,14 @@ export const actions: Actions = {
       const recipeId = crypto.randomUUID();
       const now = new Date();
 
+      // syncStatus starts "pending", same as a manually-created recipe:
+      // "Sync Now" will publish it as a brand new recipe under the user's
+      // own account. We deliberately don't set cecotecRecipeId/cecotecNumber
+      // to the catalog's id/number — those identify Cecotec's own catalog
+      // entry, not anything owned by this user, so treating them as this
+      // row's Cecotec identity broke sync (updateRecipe silently no-ops
+      // against a recipe you don't own). importedFromCecotecNumber tracks
+      // provenance separately and is never touched by the sync engine.
       await db.transaction(async (tx) => {
         await tx.insert(recipe).values({
           id: recipeId,
@@ -125,10 +141,8 @@ export const actions: Actions = {
           cookingTime: mapped.cookingTime,
           language: locale,
           imageUrl: mapped.imageUrl,
-          cecotecRecipeId: params.id,
-          cecotecNumber: number,
-          syncStatus: "synced",
-          syncedAt: now,
+          importedFromCecotecNumber: number,
+          syncStatus: "pending",
           createdAt: now,
           updatedAt: now,
         });
