@@ -12,6 +12,7 @@ import type {
   CecotecDevice,
   CecotecIngredient,
   CecotecRecipe,
+  CecotecRecipeDetail,
   CecotecRecipeInput,
   CecotecRecipeStep,
 } from "./types";
@@ -23,6 +24,7 @@ import {
   devicesResponseSchema,
   listRecipesResponseDataSchema,
   parseCecotecEnvelope,
+  recipeDetailResponseDataSchema,
   uploadImageResponseDataSchema,
 } from "./types";
 
@@ -435,6 +437,50 @@ export async function listPublicCatalog(
   return catalogListResponseDataSchema.parse(envelopeData);
 }
 
+export async function getRecipeDetail(
+  token: string,
+  id: string,
+  number: string,
+  code: string,
+): Promise<CecotecRecipeDetail> {
+  const params = new URLSearchParams({
+    id,
+    number,
+    code,
+    recipeType: "1",
+    selectedLanguage: code,
+    appOrDevice: "1",
+    sourceType: "1",
+  });
+
+  const response = await fetch(
+    `${CECOTEC_BASE_URL}/api/blade-cook/kitCloud/front/user/recipe/app/detail?${params}`,
+    {
+      headers: {
+        ...COMMON_HEADERS,
+        authorization: `Bearer ${token}`,
+        "blade-auth": `bearer ${token}`,
+      },
+    },
+  );
+
+  if (!response.ok) {
+    throw new CecotecError(`Get recipe detail failed: HTTP ${response.status}`);
+  }
+
+  let envelopeData: unknown;
+  try {
+    const cleanRawObject = await parseCecotecResponse(response);
+    envelopeData = parseCecotecEnvelope(cleanRawObject);
+  } catch (e) {
+    throw new CecotecError(
+      e instanceof Error ? e.message : "Get recipe detail failed",
+    );
+  }
+
+  return recipeDetailResponseDataSchema.parse(envelopeData);
+}
+
 export async function getDevices(token: string): Promise<CecotecDevice[]> {
   const params = new URLSearchParams({
     sourceType: "1",
@@ -477,6 +523,7 @@ export type {
   CecotecDevice,
   CecotecIngredient,
   CecotecRecipe,
+  CecotecRecipeDetail,
   CecotecRecipeInput,
   CecotecRecipeStep,
 };

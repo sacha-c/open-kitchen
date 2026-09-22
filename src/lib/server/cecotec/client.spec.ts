@@ -6,6 +6,7 @@ import {
   deleteRecipe,
   encryptPassword,
   getDevices,
+  getRecipeDetail,
   listCatalogCategories,
   listPublicCatalog,
   listRecipes,
@@ -583,6 +584,141 @@ describe("listPublicCatalog", () => {
     vi.stubGlobal("fetch", mockTextFetch(errorEnvelope("Not found")));
     await expect(
       listPublicCatalog("token", { code: "en" }),
+    ).rejects.toBeInstanceOf(CecotecError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// getRecipeDetail
+// ---------------------------------------------------------------------------
+
+describe("getRecipeDetail", () => {
+  function mockTextFetch(body: unknown, status = 200) {
+    return vi.fn().mockResolvedValue({
+      ok: status >= 200 && status < 300,
+      status,
+      text: () => Promise.resolve(JSON.stringify(body)),
+    });
+  }
+
+  // Trimmed down version of a real detail response (ids/number are quoted
+  // strings on the wire for this endpoint, unlike the /add endpoint).
+  const realisticDetail = {
+    code: "200",
+    data: {
+      id: "2086775324330119169",
+      number: "85037",
+      defaultName: "Summer cannelloni",
+      serviceSize: "5",
+      cookingTime: 1701.0,
+      landscapeImageUrl: "https://x/soup.jpg",
+      multiLanguageRelations: [
+        {
+          code: "en",
+          name: "Summer cannelloni",
+          recipeDeviceParameterDtos: [
+            {
+              stepDesc: "Put the blades in place.",
+              operationType: 1,
+              singleTotalTime: 0,
+              cookSteps: [
+                {
+                  time: 0,
+                  power: 0,
+                  speed: "0",
+                  temperature: 0,
+                  accessoriesType: -1,
+                  reel: "",
+                },
+              ],
+            },
+          ],
+          ingredientsRelationVosList: [
+            {
+              ingredientId: "1473608053080961025",
+              foodIngredient: "Carrot",
+              unitId: "1468065253094465538",
+              unit: "g",
+              amount: "100",
+            },
+          ],
+        },
+      ],
+    },
+  };
+
+  it("returns parsed recipe detail, preserving large IDs", async () => {
+    vi.stubGlobal("fetch", mockTextFetch(realisticDetail));
+
+    const result = await getRecipeDetail(
+      "token",
+      "2086775324330119169",
+      "85037",
+      "en",
+    );
+
+    expect(result.id).toBe("2086775324330119169");
+    expect(result.number).toBe("85037");
+    expect(result.defaultName).toBe("Summer cannelloni");
+    expect(result.serviceSize).toBe("5");
+    expect(result.cookingTime).toBe(1701);
+    expect(result.multiLanguageRelations).toHaveLength(1);
+    expect(
+      result.multiLanguageRelations[0].recipeDeviceParameterDtos,
+    ).toHaveLength(1);
+    expect(
+      result.multiLanguageRelations[0].ingredientsRelationVosList?.[0]
+        .foodIngredient,
+    ).toBe("Carrot");
+  });
+
+  it("parses recipes with no ingredients (ingredientsRelationVosList absent)", async () => {
+    const noIngredients = structuredClone(realisticDetail);
+    const { ingredientsRelationVosList: _omit, ...relationWithoutIngredients } =
+      noIngredients.data.multiLanguageRelations[0];
+    noIngredients.data.multiLanguageRelations[0] =
+      relationWithoutIngredients as (typeof noIngredients.data.multiLanguageRelations)[0];
+    vi.stubGlobal("fetch", mockTextFetch(noIngredients));
+
+    const result = await getRecipeDetail(
+      "token",
+      "2086775324330119169",
+      "85037",
+      "en",
+    );
+
+    expect(
+      result.multiLanguageRelations[0].ingredientsRelationVosList,
+    ).toBeUndefined();
+  });
+
+  it("builds query params from id, number and code", async () => {
+    const spy = mockTextFetch(realisticDetail);
+    vi.stubGlobal("fetch", spy);
+
+    await getRecipeDetail("token", "100", "42", "es");
+
+    const [url] = spy.mock.calls[0] as [string, RequestInit];
+    expect(url).toContain(
+      "/api/blade-cook/kitCloud/front/user/recipe/app/detail",
+    );
+    expect(url).toContain("id=100");
+    expect(url).toContain("number=42");
+    expect(url).toContain("code=es");
+    expect(url).toContain("selectedLanguage=es");
+  });
+
+  it("throws CecotecError on HTTP error", async () => {
+    vi.stubGlobal("fetch", mockTextFetch({}, 500));
+    await expect(
+      getRecipeDetail("token", "100", "42", "en"),
+    ).rejects.toBeInstanceOf(CecotecError);
+  });
+
+  it("throws CecotecError on API-level error", async () => {
+    vi.stubGlobal("fetch", mockTextFetch(errorEnvelope("Not found")));
+    await expect(
+      getRecipeDetail("token", "100", "42", "en"),
     ).rejects.toBeInstanceOf(CecotecError);
   });
 });

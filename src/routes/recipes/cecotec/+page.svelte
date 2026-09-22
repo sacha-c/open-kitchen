@@ -20,6 +20,10 @@
     params.set("page", String(page));
     return `${resolve("/recipes/cecotec")}?${params.toString()}`;
   }
+
+  function detailHref(recipe: { id: string; number: string }): string {
+    return `${resolve(`/recipes/cecotec/${recipe.id}`)}?number=${recipe.number}`;
+  }
 </script>
 
 <svelte:head> <title>Cecotec Recipes — OpenKitchen</title> </svelte:head>
@@ -108,8 +112,11 @@
     {:else}
       <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {#each data.recipes as recipe (recipe.id)}
-          <div class="card bg-base-100 shadow-sm">
-            <figure class="bg-base-200 aspect-4/3 overflow-hidden">
+          <a
+            href={detailHref(recipe)}
+            class="card bg-base-100 shadow-sm transition-shadow hover:shadow-md"
+          >
+            <figure class="bg-base-200 relative aspect-4/3 overflow-hidden">
               {#if recipe.imageUrl}
                 <img
                   src={recipe.imageUrl}
@@ -123,6 +130,11 @@
                   aria-hidden="true"
                   class="h-full w-full object-cover opacity-60"
                 >
+              {/if}
+              {#if recipe.importedRecipeId}
+                <div class="absolute top-3 right-3">
+                  <span class="badge badge-success badge-sm">Imported</span>
+                </div>
               {/if}
             </figure>
             <div class="card-body gap-2 p-4">
@@ -197,7 +209,7 @@
                 {/if}
               </div>
             </div>
-          </div>
+          </a>
         {/each}
       </div>
 
