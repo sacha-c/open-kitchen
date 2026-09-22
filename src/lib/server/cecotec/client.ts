@@ -7,6 +7,8 @@ import {
 } from "./constants";
 import type {
   CecotecAuthResult,
+  CecotecCatalogListResult,
+  CecotecCategory,
   CecotecDevice,
   CecotecIngredient,
   CecotecRecipe,
@@ -15,6 +17,8 @@ import type {
 } from "./types";
 import {
   authResponseSchema,
+  catalogListResponseDataSchema,
+  categoriesResponseDataSchema,
   createRecipeResponseDataSchema,
   devicesResponseSchema,
   listRecipesResponseDataSchema,
@@ -345,6 +349,92 @@ export async function updateRecipe(
   }
 }
 
+export async function listCatalogCategories(
+  token: string,
+  code: string,
+): Promise<CecotecCategory[]> {
+  const params = new URLSearchParams({
+    sourceType: "1",
+    code,
+  });
+
+  const response = await fetch(
+    `${CECOTEC_BASE_URL}/api/blade-cook/kitCloud/category/app/top/categorys?${params}`,
+    {
+      headers: {
+        ...COMMON_HEADERS,
+        authorization: `Bearer ${token}`,
+        "blade-auth": `bearer ${token}`,
+      },
+    },
+  );
+
+  if (!response.ok) {
+    throw new CecotecError(`List categories failed: HTTP ${response.status}`);
+  }
+
+  const raw = await response.json();
+  let envelopeData: unknown;
+  try {
+    envelopeData = parseCecotecEnvelope(raw);
+  } catch (e) {
+    throw new CecotecError(
+      e instanceof Error ? e.message : "List categories failed",
+    );
+  }
+
+  return categoriesResponseDataSchema.parse(envelopeData);
+}
+
+export async function listPublicCatalog(
+  token: string,
+  options: {
+    code: string;
+    categoryId?: string;
+    currentPageNo?: number;
+    pageSize?: number;
+  },
+): Promise<CecotecCatalogListResult> {
+  const params = new URLSearchParams({
+    deviceSn: "",
+    currentPageNo: String(options.currentPageNo ?? 1),
+    pageSize: String(options.pageSize ?? 20),
+    sourceType: "1",
+    categoryIds: options.categoryId ?? "",
+    appOrDevice: "1",
+    compatibleType: "0",
+    code: options.code,
+    isPot: "0",
+  });
+
+  const response = await fetch(
+    `${CECOTEC_BASE_URL}/api/blade-cook/kitCloud/front/recipe/app/page/compatible/list?${params}`,
+    {
+      headers: {
+        ...COMMON_HEADERS,
+        authorization: `Bearer ${token}`,
+        "blade-auth": `bearer ${token}`,
+      },
+    },
+  );
+
+  if (!response.ok) {
+    throw new CecotecError(`List catalog failed: HTTP ${response.status}`);
+  }
+
+  let envelopeData: unknown;
+  try {
+    const cleanRawObject = await parseCecotecResponse(response);
+    envelopeData = parseCecotecEnvelope(cleanRawObject);
+  } catch (e) {
+    throw new CecotecError(
+      e instanceof Error ? e.message : "List catalog failed",
+    );
+  }
+
+  return catalogListResponseDataSchema.parse(envelopeData);
+}
+
 export async function getDevices(token: string): Promise<CecotecDevice[]> {
   const params = new URLSearchParams({
     sourceType: "1",
@@ -382,6 +472,8 @@ export async function getDevices(token: string): Promise<CecotecDevice[]> {
 
 export type {
   CecotecAuthResult,
+  CecotecCatalogListResult,
+  CecotecCategory,
   CecotecDevice,
   CecotecIngredient,
   CecotecRecipe,

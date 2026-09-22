@@ -112,7 +112,36 @@
         </div>
       </a>
 
-      {#if !data.hasCecotecCredentials}
+      {#if data.hasCecotecCredentials}
+        <a
+          href={resolve("/recipes/cecotec")}
+          class="card bg-base-100 shadow-sm transition-shadow hover:shadow-md"
+        >
+          <div class="card-body flex-row items-center gap-4">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="text-base-content/40 h-8 w-8 shrink-0"
+              aria-hidden="true"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-19.5 0v6a2.25 2.25 0 002.25 2.25h15a2.25 2.25 0 002.25-2.25v-6m-19.5 0h19.5M8.25 9.75V4.5a2.25 2.25 0 012.25-2.25h3a2.25 2.25 0 012.25 2.25v5.25"
+              />
+            </svg>
+            <div>
+              <h2 class="card-title text-lg">Cecotec Recipes</h2>
+              <p class="text-base-content/60 text-sm">
+                Browse and import recipes from the Cecotec catalog.
+              </p>
+            </div>
+          </div>
+        </a>
+      {:else}
         <a
           href={resolve("/profile")}
           class="card bg-base-100 shadow-sm transition-shadow hover:shadow-md"

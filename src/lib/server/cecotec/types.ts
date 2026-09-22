@@ -95,6 +95,39 @@ export const cecotecDeviceSchema = z.object({
 
 export const devicesResponseSchema = z.array(cecotecDeviceSchema);
 
+// A recipe card from the public catalog listing.
+// serviceSize is intentionally absent: the listing endpoint never populates it
+// (only the detail endpoint does).
+export const cecotecCatalogRecipeSchema = z.object({
+  id: z.union([z.string(), z.number()]).transform(String),
+  number: z.union([z.string(), z.number()]).transform(String),
+  defaultName: z.string(),
+  landscapeImageUrl: z.string().optional(),
+  cookingTime: z.number(),
+  views: z.number().optional(),
+  starAvg: z.union([z.string(), z.number()]).optional(),
+  recipeCategoryIds: z
+    .array(z.union([z.string(), z.number()]).transform(String))
+    .optional(),
+  recipeCategoryNames: z.array(z.string()).optional(),
+});
+
+export const catalogListResponseDataSchema = z.object({
+  records: z.array(cecotecCatalogRecipeSchema),
+  total: z.number(),
+  pages: z.number(),
+  size: z.number(),
+  current: z.number(),
+});
+
+export const cecotecCategorySchema = z.object({
+  id: z.union([z.string(), z.number()]).transform(String),
+  recipeCategoryName: z.string(),
+  imageUrl: z.string().optional(),
+});
+
+export const categoriesResponseDataSchema = z.array(cecotecCategorySchema);
+
 // =============================================================================
 // Inferred TypeScript types
 // =============================================================================
@@ -105,6 +138,11 @@ export type CecotecIngredient = z.infer<typeof cecotecIngredientSchema>;
 export type CecotecRecipeInput = z.infer<typeof cecotecRecipeInputSchema>;
 export type CecotecRecipe = z.infer<typeof cecotecRecipeSchema>;
 export type CecotecDevice = z.infer<typeof cecotecDeviceSchema>;
+export type CecotecCatalogRecipe = z.infer<typeof cecotecCatalogRecipeSchema>;
+export type CecotecCatalogListResult = z.infer<
+  typeof catalogListResponseDataSchema
+>;
+export type CecotecCategory = z.infer<typeof cecotecCategorySchema>;
 
 export interface CecotecAuthResult {
   accessToken: string;
