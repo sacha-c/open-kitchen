@@ -2,14 +2,13 @@ import { redirect } from "@sveltejs/kit";
 import { eq } from "drizzle-orm";
 import { getLocale } from "$lib/paraglide/runtime";
 import {
-  authenticate,
   CecotecError,
   listCatalogCategories,
   listPublicCatalog,
 } from "$lib/server/cecotec/client";
-import { decrypt } from "$lib/server/crypto";
+import { getAuthenticatedCecotecSession } from "$lib/server/cecotec/session";
 import { db } from "$lib/server/db";
-import { cecotecCredentials } from "$lib/server/db/schema";
+import { recipe } from "$lib/server/db/schema";
 import type { PageServerLoad } from "./$types";
 
 const PAGE_SIZE = 20;
@@ -19,46 +18,55 @@ export const load: PageServerLoad = async ({ locals, url }) => {
     redirect(303, "/");
   }
 
-  const [creds] = await db
-    .select()
-    .from(cecotecCredentials)
-    .where(eq(cecotecCredentials.userId, locals.user.id));
-
   const categoryId = url.searchParams.get("category");
   const page = Number(url.searchParams.get("page") ?? "1") || 1;
-
-  if (!creds) {
-    return {
-      linked: false,
-      error: null,
-      categories: [],
-      recipes: [],
-      selectedCategoryId: categoryId,
-      page,
-      totalPages: 0,
-    };
-  }
-
-  // Cecotec's catalog only has en/es content; ca falls back to es (same
-  // mapping used elsewhere for Cecotec calls, e.g. transformRecipeForCecotec).
-  const locale = getLocale();
-  const code: "en" | "es" = locale === "en" ? "en" : "es";
+  const emptyResult = {
+    categories: [] as { id: string; name: string }[],
+    recipes: [] as {
+      id: string;
+      number: string;
+      name: string;
+      imageUrl: string | null;
+      cookingTime: number;
+      views: number | null;
+      starAvg: string | null;
+      importedRecipeId: string | null;
+    }[],
+    selectedCategoryId: categoryId,
+    page,
+    totalPages: 0,
+  };
 
   try {
-    const { accessToken } = await authenticate(
-      creds.email,
-      decrypt(creds.encryptedPassword),
-    );
+    const session = await getAuthenticatedCecotecSession(locals.user.id);
+    if (!session) {
+      return { linked: false, error: null, ...emptyResult };
+    }
 
-    const [categories, catalog] = await Promise.all([
-      listCatalogCategories(accessToken, code),
-      listPublicCatalog(accessToken, {
+    // Cecotec's catalog only has en/es content; ca falls back to es (same
+    // mapping used elsewhere for Cecotec calls, e.g. transformRecipeForCecotec).
+    const locale = getLocale();
+    const code: "en" | "es" = locale === "en" ? "en" : "es";
+
+    const [categories, catalog, importedRecipes] = await Promise.all([
+      listCatalogCategories(session.accessToken, code),
+      listPublicCatalog(session.accessToken, {
         code,
         categoryId: categoryId ?? undefined,
         currentPageNo: page,
         pageSize: PAGE_SIZE,
       }),
+      db
+        .select({ id: recipe.id, cecotecNumber: recipe.cecotecNumber })
+        .from(recipe)
+        .where(eq(recipe.userId, locals.user.id)),
     ]);
+
+    const localRecipeIdByCecotecNumber = new Map(
+      importedRecipes
+        .filter((r) => r.cecotecNumber !== null)
+        .map((r) => [r.cecotecNumber as string, r.id]),
+    );
 
     return {
       linked: true,
@@ -75,6 +83,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
         cookingTime: r.cookingTime,
         views: r.views ?? null,
         starAvg: r.starAvg != null ? String(r.starAvg) : null,
+        importedRecipeId: localRecipeIdByCecotecNumber.get(r.number) ?? null,
       })),
       selectedCategoryId: categoryId,
       page: catalog.current,
@@ -82,15 +91,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
     };
   } catch (e) {
     if (e instanceof CecotecError) {
-      return {
-        linked: true,
-        error: e.message,
-        categories: [],
-        recipes: [],
-        selectedCategoryId: categoryId,
-        page,
-        totalPages: 0,
-      };
+      return { linked: true, error: e.message, ...emptyResult };
     }
     throw e;
   }

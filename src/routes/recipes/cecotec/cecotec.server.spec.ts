@@ -4,10 +4,9 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 // Mocks — set up before importing the module under test
 // ---------------------------------------------------------------------------
 
-const mockAuthenticate = vi.fn();
+const mockGetAuthenticatedCecotecSession = vi.fn();
 const mockListCatalogCategories = vi.fn();
 const mockListPublicCatalog = vi.fn();
-const mockDecrypt = vi.fn((_ciphertext: string): string => "decrypted-pass");
 const mockSelect = vi.fn();
 const mockGetLocale = vi.fn((): string => "en");
 
@@ -23,7 +22,6 @@ vi.mock("$lib/paraglide/runtime", () => ({
 }));
 
 vi.mock("$lib/server/cecotec/client", () => ({
-  authenticate: (...args: unknown[]) => mockAuthenticate(...args),
   listCatalogCategories: (...args: unknown[]) =>
     mockListCatalogCategories(...args),
   listPublicCatalog: (...args: unknown[]) => mockListPublicCatalog(...args),
@@ -35,8 +33,9 @@ vi.mock("$lib/server/cecotec/client", () => ({
   },
 }));
 
-vi.mock("$lib/server/crypto", () => ({
-  decrypt: (ciphertext: string) => mockDecrypt(ciphertext),
+vi.mock("$lib/server/cecotec/session", () => ({
+  getAuthenticatedCecotecSession: (...args: unknown[]) =>
+    mockGetAuthenticatedCecotecSession(...args),
 }));
 
 function buildSelectChain(finalValue: unknown) {
@@ -72,11 +71,11 @@ const { load } = await import("./+page.server");
 
 describe("load", () => {
   beforeEach(() => {
-    mockAuthenticate.mockReset();
+    mockGetAuthenticatedCecotecSession.mockReset();
     mockListCatalogCategories.mockReset();
     mockListPublicCatalog.mockReset();
-    mockDecrypt.mockClear();
     mockSelect.mockReset();
+    mockSelect.mockReturnValue(buildSelectChain([]));
     mockGetLocale.mockReturnValue("en");
   });
 
@@ -91,7 +90,7 @@ describe("load", () => {
   });
 
   it("returns an empty state when no Cecotec credentials are linked", async () => {
-    mockSelect.mockReturnValue(buildSelectChain([]));
+    mockGetAuthenticatedCecotecSession.mockResolvedValue(null);
 
     const result = (await load({
       locals: makeLocals(),
@@ -101,19 +100,13 @@ describe("load", () => {
     expect(result.linked).toBe(false);
     expect(result.recipes).toEqual([]);
     expect(result.categories).toEqual([]);
-    expect(mockAuthenticate).not.toHaveBeenCalled();
+    expect(mockListPublicCatalog).not.toHaveBeenCalled();
   });
 
   it("fetches categories and catalog when credentials are linked", async () => {
-    mockSelect.mockReturnValue(
-      buildSelectChain([
-        { email: "cec@example.com", encryptedPassword: "iv:tag:enc" },
-      ]),
-    );
-    mockAuthenticate.mockResolvedValue({
+    mockGetAuthenticatedCecotecSession.mockResolvedValue({
       accessToken: "tok",
-      refreshToken: "ref",
-      userId: "uid",
+      email: "cec@example.com",
     });
     mockListCatalogCategories.mockResolvedValue([
       { id: "1", recipeCategoryName: "Soups" },
@@ -143,23 +136,54 @@ describe("load", () => {
 
     expect(result.linked).toBe(true);
     expect(result.error).toBeNull();
-    expect(mockDecrypt).toHaveBeenCalledWith("iv:tag:enc");
     expect(result.categories).toEqual([{ id: "1", name: "Soups" }]);
-    expect(result.recipes).toMatchObject([{ name: "Tomato Soup" }]);
+    expect(result.recipes).toMatchObject([
+      { name: "Tomato Soup", importedRecipeId: null },
+    ]);
     expect(result.totalPages).toBe(1);
+  });
+
+  it("marks a recipe as already imported when a matching local recipe exists", async () => {
+    mockGetAuthenticatedCecotecSession.mockResolvedValue({
+      accessToken: "tok",
+      email: "cec@example.com",
+    });
+    mockListCatalogCategories.mockResolvedValue([]);
+    mockListPublicCatalog.mockResolvedValue({
+      records: [
+        {
+          id: "100",
+          number: "42",
+          defaultName: "Tomato Soup",
+          cookingTime: 900,
+        },
+        { id: "200", number: "43", defaultName: "Pasta", cookingTime: 600 },
+      ],
+      total: 2,
+      pages: 1,
+      size: 20,
+      current: 1,
+    });
+    mockSelect.mockReturnValue(
+      buildSelectChain([{ id: "local-recipe-1", cecotecNumber: "42" }]),
+    );
+
+    const result = (await load({
+      locals: makeLocals(),
+      url: new URL("http://localhost/recipes/cecotec"),
+    } as never)) as Record<string, unknown>;
+
+    expect(result.recipes).toMatchObject([
+      { number: "42", importedRecipeId: "local-recipe-1" },
+      { number: "43", importedRecipeId: null },
+    ]);
   });
 
   it("maps the ca locale to es when calling the catalog endpoints", async () => {
     mockGetLocale.mockReturnValue("ca");
-    mockSelect.mockReturnValue(
-      buildSelectChain([
-        { email: "cec@example.com", encryptedPassword: "iv:tag:enc" },
-      ]),
-    );
-    mockAuthenticate.mockResolvedValue({
+    mockGetAuthenticatedCecotecSession.mockResolvedValue({
       accessToken: "tok",
-      refreshToken: "ref",
-      userId: "uid",
+      email: "cec@example.com",
     });
     mockListCatalogCategories.mockResolvedValue([]);
     mockListPublicCatalog.mockResolvedValue({
@@ -184,12 +208,9 @@ describe("load", () => {
 
   it("returns a page-level error instead of crashing on a Cecotec API error", async () => {
     const { CecotecError } = await import("$lib/server/cecotec/client");
-    mockSelect.mockReturnValue(
-      buildSelectChain([
-        { email: "cec@example.com", encryptedPassword: "iv:tag:enc" },
-      ]),
+    mockGetAuthenticatedCecotecSession.mockRejectedValue(
+      new CecotecError("Session expired"),
     );
-    mockAuthenticate.mockRejectedValue(new CecotecError("Session expired"));
 
     const result = (await load({
       locals: makeLocals(),
@@ -202,15 +223,9 @@ describe("load", () => {
   });
 
   it("passes the category and page query params through to the catalog call", async () => {
-    mockSelect.mockReturnValue(
-      buildSelectChain([
-        { email: "cec@example.com", encryptedPassword: "iv:tag:enc" },
-      ]),
-    );
-    mockAuthenticate.mockResolvedValue({
+    mockGetAuthenticatedCecotecSession.mockResolvedValue({
       accessToken: "tok",
-      refreshToken: "ref",
-      userId: "uid",
+      email: "cec@example.com",
     });
     mockListCatalogCategories.mockResolvedValue([]);
     mockListPublicCatalog.mockResolvedValue({

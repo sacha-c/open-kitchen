@@ -128,6 +128,42 @@ export const cecotecCategorySchema = z.object({
 
 export const categoriesResponseDataSchema = z.array(cecotecCategorySchema);
 
+// Detail-endpoint shapes: the field names here differ from the write-side
+// (creation) shapes above (e.g. ingredients use ingredientId/foodIngredient
+// instead of foodIngredientsId/code), since this is what the API returns
+// when reading a recipe back, not what it accepts when creating one.
+export const cecotecDetailIngredientSchema = z.object({
+  ingredientId: z.string(),
+  foodIngredient: z.string(),
+  unitId: z.string(),
+  unit: z.string(),
+  amount: z.string(),
+});
+
+export const cecotecDetailStepSchema = z.object({
+  stepDesc: z.string(),
+  operationType: z.number(),
+  singleTotalTime: z.number(),
+  cookSteps: z.array(cecotecCookStepSchema),
+});
+
+export const cecotecMultiLanguageRelationSchema = z.object({
+  code: z.string(),
+  name: z.string(),
+  recipeDeviceParameterDtos: z.array(cecotecDetailStepSchema),
+  ingredientsRelationVosList: z.array(cecotecDetailIngredientSchema).optional(),
+});
+
+export const recipeDetailResponseDataSchema = z.object({
+  id: z.union([z.string(), z.number()]).transform(String),
+  number: z.union([z.string(), z.number()]).transform(String),
+  defaultName: z.string(),
+  serviceSize: z.string(),
+  cookingTime: z.number(),
+  landscapeImageUrl: z.string().optional(),
+  multiLanguageRelations: z.array(cecotecMultiLanguageRelationSchema),
+});
+
 // =============================================================================
 // Inferred TypeScript types
 // =============================================================================
@@ -143,6 +179,16 @@ export type CecotecCatalogListResult = z.infer<
   typeof catalogListResponseDataSchema
 >;
 export type CecotecCategory = z.infer<typeof cecotecCategorySchema>;
+export type CecotecDetailIngredient = z.infer<
+  typeof cecotecDetailIngredientSchema
+>;
+export type CecotecDetailStep = z.infer<typeof cecotecDetailStepSchema>;
+export type CecotecMultiLanguageRelation = z.infer<
+  typeof cecotecMultiLanguageRelationSchema
+>;
+export type CecotecRecipeDetail = z.infer<
+  typeof recipeDetailResponseDataSchema
+>;
 
 export interface CecotecAuthResult {
   accessToken: string;
