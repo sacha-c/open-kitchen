@@ -10,6 +10,7 @@
     IMAGE_ACCEPT,
     MAX_IMAGE_SIZE_LABEL,
   } from "$lib/image-upload-policy";
+  import * as m from "$lib/paraglide/messages";
   import {
     getStepTypeBadgeClass,
     getStepTypeLabel,
@@ -254,7 +255,7 @@
         imageError =
           typeof result?.error === "string"
             ? result.error
-            : "Image upload failed. Please try again.";
+            : m.error_image_upload_failed();
         return;
       }
 
@@ -262,7 +263,7 @@
       imagePreviewUrl = result.url;
     } catch {
       imagePreviewUrl = imageUrl;
-      imageError = "Image upload failed. Please try again.";
+      imageError = m.error_image_upload_failed();
     } finally {
       URL.revokeObjectURL(localPreviewUrl);
       imageUploading = false;
@@ -292,7 +293,7 @@
 
   beforeNavigate(({ cancel }) => {
     if (isDirty) {
-      if (!window.confirm("You have unsaved changes. Leave anyway?")) {
+      if (!window.confirm(m.recipe_form_confirm_leave())) {
         cancel();
       }
     }
@@ -316,10 +317,10 @@
   <div class="flex flex-col gap-8">
     <div class="card bg-base-100 shadow">
       <div class="card-body">
-        <h2 class="card-title text-lg">Recipe Details</h2>
+        <h2 class="card-title text-lg">{m.recipe_form_details_heading()}</h2>
 
         <div class="form-control">
-          <label class="label" for="name">Name</label>
+          <label class="label" for="name">{m.common_name_label()}</label>
           <input
             id="name"
             name="name"
@@ -340,13 +341,13 @@
 
         <div class="grid grid-cols-3 gap-4">
           <div class="form-control">
-            <label class="label" for="servings">Servings</label>
+            <label class="label" for="servings">{m.label_servings()}</label>
             <input
               id="servings"
               name="servings"
               type="text"
               class="input w-full"
-              placeholder="e.g. 2, 4-6"
+              placeholder={m.recipe_form_servings_placeholder()}
               required
               value={formResult?.values?.servings ?? recipe.servings}
               aria-invalid={fieldError("servings") ? "true" : undefined}
@@ -360,7 +361,7 @@
           </div>
 
           <div class="form-control">
-            <label class="label" for="language">Language</label>
+            <label class="label" for="language">{m.language_label()}</label>
             <select
               id="language"
               name="language"
@@ -389,7 +390,7 @@
           </div>
 
           <div class="form-control">
-            <span class="label">Cooking Time</span>
+            <span class="label">{m.label_cooking_time()}</span>
             <div
               class="input bg-base-200/60 flex items-center text-sm font-medium"
             >
@@ -399,7 +400,7 @@
         </div>
 
         <div class="form-control">
-          <label class="label" for="recipe-image">Image</label>
+          <label class="label" for="recipe-image">{m.recipe_form_image_label()}</label>
           <input type="hidden" name="imageUrl" value={imageUrl}>
           <div
             class="bg-base-200 border-base-300 rounded-box relative flex h-28 items-center justify-center overflow-hidden border-2 border-dashed"
@@ -407,7 +408,7 @@
             {#if imagePreviewUrl}
               <img
                 src={imagePreviewUrl}
-                alt="Recipe preview"
+                alt={m.recipe_form_image_preview_alt()}
                 class="absolute inset-0 h-full w-full object-cover"
               >
             {:else}
@@ -424,13 +425,17 @@
                 aria-live="polite"
               >
                 <span class="loading loading-spinner loading-md"></span>
-                <span class="ml-2 text-sm font-medium">Uploading…</span>
+                <span class="ml-2 text-sm font-medium"
+                  >{m.recipe_form_uploading()}</span
+                >
               </div>
             {:else if hasCecotecCredentials}
               <span
                 class="text-base-content bg-base-100/85 relative z-10 rounded px-3 py-1 text-center text-sm font-medium"
               >
-                {imageUrl ? "Choose a replacement photo" : "Click to add a photo of your dish"}
+                {imageUrl
+                  ? m.recipe_form_image_cta_replace()
+                  : m.recipe_form_image_cta_add()}
               </span>
             {/if}
           </div>
@@ -450,13 +455,13 @@
           {#if !hasCecotecCredentials}
             <span class="label-text-alt mt-1">
               <a class="link link-primary" href={resolve("/profile")}
-                >Connect your Cecotec account</a
+                >{m.recipe_form_connect_cecotec_link()}</a
               >
-              to upload images.
+              {m.recipe_form_connect_cecotec_suffix()}
             </span>
           {:else}
             <span class="label-text-alt mt-1">
-              JPEG, PNG, GIF, or WebP. Maximum {MAX_IMAGE_SIZE_LABEL}.
+              {m.recipe_form_image_help({ maxSize: MAX_IMAGE_SIZE_LABEL })}
             </span>
           {/if}
         </div>
@@ -466,13 +471,13 @@
     <div class="card bg-base-100 shadow">
       <div class="card-body">
         <div class="flex items-center justify-between">
-          <h2 class="card-title text-lg">Ingredients</h2>
+          <h2 class="card-title text-lg">{m.label_ingredients_heading()}</h2>
           <button
             type="button"
             class="btn btn-sm btn-ghost"
             onclick={addIngredient}
           >
-            + Add Ingredient
+            {m.recipe_form_add_ingredient()}
           </button>
         </div>
 
@@ -493,7 +498,7 @@
                   list={`ingredient-list-${i}`}
                   class="input input-sm w-full"
                   class:input-error={fieldError(`ingredients.${i}.name`)}
-                  placeholder="Search ingredient…"
+                  placeholder={m.recipe_form_ingredient_search_placeholder()}
                   autocomplete="off"
                   bind:value={ingredient.name}
                   oninput={(e) => {
@@ -524,7 +529,7 @@
                     name={`ingredients[${i}].amount`}
                     type="text"
                     class="input input-sm w-full"
-                    placeholder="Amt"
+                    placeholder={m.recipe_form_amount_placeholder()}
                     bind:value={ingredient.amount}
                     aria-invalid={fieldError(`ingredients.${i}.amount`) ? "true" : undefined}
                   >
@@ -573,7 +578,7 @@
                     class="btn btn-ghost btn-xs"
                     disabled={i === 0}
                     onclick={() => moveIngredient(i, -1)}
-                    title="Move up"
+                    title={m.action_move_up()}
                   >
                     ↑
                   </button>
@@ -582,7 +587,7 @@
                     class="btn btn-ghost btn-xs"
                     disabled={i === ingredientsList.length - 1}
                     onclick={() => moveIngredient(i, 1)}
-                    title="Move down"
+                    title={m.action_move_down()}
                   >
                     ↓
                   </button>
@@ -590,7 +595,7 @@
                     type="button"
                     class="btn btn-ghost btn-xs text-error"
                     onclick={() => removeIngredient(i)}
-                    title="Remove"
+                    title={m.action_remove()}
                   >
                     ✕
                   </button>
@@ -602,13 +607,13 @@
 
         {#if ingredientsList.length === 0}
           <p class="text-base-content/40 py-4 text-center text-sm">
-            No ingredients added.
+            {m.recipe_form_no_ingredients()}
             <button
               type="button"
               class="link text-primary"
               onclick={addIngredient}
             >
-              Add one
+              {m.action_add_one()}
             </button>
           </p>
         {/if}
@@ -622,9 +627,9 @@
     <div class="card bg-base-100 shadow">
       <div class="card-body">
         <div class="flex items-center justify-between">
-          <h2 class="card-title text-lg">Steps</h2>
+          <h2 class="card-title text-lg">{m.label_steps_heading()}</h2>
           <button type="button" class="btn btn-sm btn-ghost" onclick={addStep}>
-            + Add Step
+            {m.recipe_form_add_step()}
           </button>
         </div>
 
@@ -665,7 +670,9 @@
                     clip-rule="evenodd"
                   />
                 </svg>
-                <span class="text-sm font-semibold shrink-0">Step {i + 1}</span>
+                <span class="text-sm font-semibold shrink-0"
+                  >{m.recipe_form_step_heading({ number: i + 1 })}</span
+                >
                 <span
                   class="badge badge-sm shrink-0 {getStepTypeBadgeClass(step.operationType)}"
                 >
@@ -683,7 +690,7 @@
                   class="btn btn-ghost btn-xs"
                   disabled={i === 0}
                   onclick={() => moveStep(i, -1)}
-                  title="Move up"
+                  title={m.action_move_up()}
                 >
                   ↑
                 </button>
@@ -692,7 +699,7 @@
                   class="btn btn-ghost btn-xs"
                   disabled={i === stepsList.length - 1}
                   onclick={() => moveStep(i, 1)}
-                  title="Move down"
+                  title={m.action_move_down()}
                 >
                   ↓
                 </button>
@@ -700,7 +707,7 @@
                   type="button"
                   class="btn btn-ghost btn-xs text-error"
                   onclick={() => removeStep(i)}
-                  title="Remove"
+                  title={m.action_remove()}
                 >
                   ✕
                 </button>
@@ -714,7 +721,7 @@
             >
               <div class="form-control">
                 <label class="label text-sm" for={`step-desc-${i}`}
-                  >Description</label
+                  >{m.recipe_form_description_label()}</label
                 >
                 <textarea
                   id={`step-desc-${i}`}
@@ -735,7 +742,7 @@
 
               <div class="form-control">
                 <label class="label text-sm" for={`step-type-${i}`}
-                  >Step Type</label
+                  >{m.recipe_form_step_type_label()}</label
                 >
                 <select
                   id={`step-type-${i}`}
@@ -744,9 +751,9 @@
                   bind:value={step.operationType}
                   required
                 >
-                  <option value={1}>Preparation</option>
-                  <option value={2}>Cooking</option>
-                  <option value={0}>Manual</option>
+                  <option value={1}>{m.step_type_preparation()}</option>
+                  <option value={2}>{m.step_type_cooking()}</option>
+                  <option value={0}>{m.step_type_manual()}</option>
                 </select>
               </div>
 
@@ -756,7 +763,7 @@
                 >
                   <div class="form-control col-span-2">
                     <label class="label text-sm" for={`step-time-min-${i}`}
-                      >Duration</label
+                      >{m.recipe_form_duration_label()}</label
                     >
                     <div class="flex items-center gap-2">
                       <div class="flex items-center gap-1">
@@ -768,14 +775,16 @@
                           min={0}
                           max={90}
                           value={Math.floor(step.totalTime / 60)}
-                          aria-label="Minutes"
+                          aria-label={m.recipe_form_minutes_aria()}
                           aria-invalid={fieldError(`steps.${i}.totalTime`) ? "true" : undefined}
                           oninput={(e) => {
                         const mins = Math.max(0, Math.min(90, Number((e.target as HTMLInputElement).value) || 0));
                         step.totalTime = mins * 60 + (step.totalTime % 60);
                       }}
                         >
-                        <span class="text-base-content/60 text-sm">min</span>
+                        <span class="text-base-content/60 text-sm"
+                          >{m.unit_min()}</span
+                        >
                       </div>
                       <div class="flex items-center gap-1">
                         <input
@@ -786,14 +795,16 @@
                           min={0}
                           max={59}
                           value={step.totalTime % 60}
-                          aria-label="Seconds"
+                          aria-label={m.recipe_form_seconds_aria()}
                           aria-invalid={fieldError(`steps.${i}.totalTime`) ? "true" : undefined}
                           oninput={(e) => {
                         const secs = Math.max(0, Math.min(59, Number((e.target as HTMLInputElement).value) || 0));
                         step.totalTime = Math.floor(step.totalTime / 60) * 60 + secs;
                       }}
                         >
-                        <span class="text-base-content/60 text-sm">sec</span>
+                        <span class="text-base-content/60 text-sm"
+                          >{m.unit_sec()}</span
+                        >
                       </div>
                       {#if step.totalTime > 0}
                         <span class="text-base-content/50 text-xs"
@@ -816,7 +827,7 @@
                   <div class="form-control col-span-2">
                     <div class="label">
                       <label class="label-text text-sm" for={`step-speed-${i}`}
-                        >Speed</label
+                        >{m.label_speed()}</label
                       >
                       <span class="label-text-alt font-bold text-base"
                         >{step.speed}</span
@@ -843,7 +854,7 @@
 
                   <div class="form-control">
                     <label class="label text-sm" for={`step-temp-${i}`}
-                      >Temperature (°C)</label
+                      >{m.recipe_form_temperature_label()}</label
                     >
                     <input
                       id={`step-temp-${i}`}
@@ -866,7 +877,7 @@
                   <div class="form-control">
                     <div class="label">
                       <label class="label-text text-sm" for={`step-power-${i}`}
-                        >Power</label
+                        >{m.label_power()}</label
                       >
                       <span class="label-text-alt font-bold text-base"
                         >{step.power}</span
@@ -904,9 +915,9 @@
 
         {#if stepsList.length === 0}
           <p class="text-base-content/40 py-4 text-center text-sm">
-            No steps added.
+            {m.recipe_form_no_steps()}
             <button type="button" class="link text-primary" onclick={addStep}>
-              Add one
+              {m.action_add_one()}
             </button>
           </p>
         {/if}
@@ -918,7 +929,7 @@
   <div
     class="lg:col-span-2 sticky bottom-0 z-10 flex justify-end gap-3 border-t border-base-200 bg-base-100/95 py-4 backdrop-blur-sm"
   >
-    <a href={resolve(cancelUrl)} class="btn btn-ghost">Cancel</a>
+    <a href={resolve(cancelUrl)} class="btn btn-ghost">{m.common_cancel()}</a>
     <button
       type="submit"
       class="btn btn-primary"
@@ -926,7 +937,7 @@
     >
       {#if loading || imageUploading}
         <span class="loading loading-spinner loading-sm"></span>
-        {imageUploading ? "Uploading image…" : "Saving…"}
+        {imageUploading ? m.recipe_form_uploading_image() : m.recipe_form_saving()}
       {:else}
         {submitLabel}
       {/if}

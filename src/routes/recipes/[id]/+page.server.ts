@@ -1,5 +1,6 @@
 import { error, fail, redirect } from "@sveltejs/kit";
 import { and, asc, eq } from "drizzle-orm";
+import * as m from "$lib/paraglide/messages";
 import { db } from "$lib/server/db";
 import {
   cecotecCredentials,
@@ -24,7 +25,7 @@ export const load: PageServerLoad = async ({ locals, params }) => {
     .where(and(eq(recipe.id, recipeId), eq(recipe.userId, userId)));
 
   if (!recipeRow) {
-    error(404, "Recipe not found");
+    error(404, m.error_recipe_not_found());
   }
 
   const [steps, ingredients, credentials] = await Promise.all([
@@ -92,7 +93,7 @@ export const actions: Actions = {
       .where(eq(recipe.id, recipeId));
 
     if (!recipeRow || recipeRow.userId !== userId) {
-      return fail(404, { message: "Recipe not found" });
+      return fail(404, { message: m.error_recipe_not_found() });
     }
 
     await db.delete(recipe).where(eq(recipe.id, recipeId));
@@ -114,7 +115,7 @@ export const actions: Actions = {
       .where(and(eq(recipe.id, recipeId), eq(recipe.userId, userId)));
 
     if (!recipeRow) {
-      return fail(404, { message: "Recipe not found" });
+      return fail(404, { message: m.error_recipe_not_found() });
     }
 
     await syncRecipe(recipeId);

@@ -1,4 +1,5 @@
 import { json } from "@sveltejs/kit";
+import * as m from "$lib/paraglide/messages";
 import { CecotecError } from "$lib/server/cecotec/client";
 import {
   ImageUploadError,
@@ -8,14 +9,14 @@ import type { RequestHandler } from "./$types";
 
 export const POST: RequestHandler = async ({ locals, request }) => {
   if (!locals.session || !locals.user) {
-    return json({ error: "Unauthorized" }, { status: 401 });
+    return json({ error: m.error_unauthorized() }, { status: 401 });
   }
 
   const formData = await request.formData();
   const file = formData.get("file");
 
   if (!(file instanceof File) || file.size === 0) {
-    return json({ error: "An image file is required." }, { status: 400 });
+    return json({ error: m.error_image_file_required() }, { status: 400 });
   }
 
   try {

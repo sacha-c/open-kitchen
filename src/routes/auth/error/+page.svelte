@@ -1,4 +1,8 @@
-<svelte:head> <title>OpenKitchen — Authentication Error</title> </svelte:head>
+<script lang="ts">
+  import * as m from "$lib/paraglide/messages";
+</script>
+
+<svelte:head> <title>{m.auth_error_page_title()}</title> </svelte:head>
 
 <div class="flex min-h-screen items-center justify-center px-4">
   <div class="card bg-base-100 w-full max-w-sm shadow-xl">
@@ -13,18 +17,18 @@
         aria-hidden="true"
         role="img"
       >
-        <title>Authentication error</title>
+        <title>{m.auth_error_icon_title()}</title>
         <path
           stroke-linecap="round"
           stroke-linejoin="round"
           d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
         />
       </svg>
-      <h1 class="card-title">Authentication Error</h1>
+      <h1 class="card-title">{m.auth_error_heading()}</h1>
       <p class="text-base-content/60 text-sm">
-        Something went wrong while signing you in. Please try again.
+        {m.auth_error_message()}
       </p>
-      <a href="/" class="btn btn-primary mt-4 w-full">Back to Sign In</a>
+      <a href="/" class="btn btn-primary mt-4 w-full">{m.auth_error_back_to_signin()}</a>
     </div>
   </div>
 </div>

@@ -1,4 +1,5 @@
 import { fail, redirect } from "@sveltejs/kit";
+import * as m from "$lib/paraglide/messages";
 import { auth } from "$lib/server/auth";
 import type { Actions, PageServerLoad } from "./$types";
 
@@ -17,13 +18,13 @@ export const actions: Actions = {
     const errors: Record<string, string> = {};
 
     if (!name) {
-      errors.name = "Please enter your name.";
+      errors.name = m.error_name_required();
     }
     if (!/^[\w-.+]+@([\w-]+\.)+[\w-]{2,8}$/.test(email)) {
-      errors.email = "Please enter a valid email address.";
+      errors.email = m.error_invalid_email();
     }
     if (password.length < 8) {
-      errors.password = "Password must be at least 8 characters.";
+      errors.password = m.error_password_too_short({ min: 8 });
     }
     if (Object.keys(errors).length > 0) {
       return fail(400, { errors, email, name });
@@ -37,7 +38,7 @@ export const actions: Actions = {
       return fail(400, {
         email,
         name,
-        message: "Could not create account. The email may already be in use.",
+        message: m.error_signup_failed(),
       });
     }
 

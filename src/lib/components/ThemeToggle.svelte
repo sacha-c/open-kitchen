@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import * as m from "$lib/paraglide/messages";
 
   type Theme = "light" | "dark";
 
@@ -40,7 +41,7 @@
   }
 
   let label = $derived(
-    theme === "dark" ? "Switch to light mode" : "Switch to dark mode",
+    theme === "dark" ? m.switch_to_light_mode() : m.switch_to_dark_mode(),
   );
 </script>
 
@@ -55,7 +56,7 @@
     aria-hidden="true"
     role="img"
   >
-    <title>Sun icon</title>
+    <title>{m.sun_icon_title()}</title>
     <path
       stroke-linecap="round"
       stroke-linejoin="round"
@@ -75,7 +76,7 @@
     aria-hidden="true"
     role="img"
   >
-    <title>Moon icon</title>
+    <title>{m.moon_icon_title()}</title>
     <path
       stroke-linecap="round"
       stroke-linejoin="round"
@@ -87,8 +88,8 @@
 {#if variant === "menu-item"}
   <li class="hover:bg-transparent focus:bg-transparent active:bg-transparent">
     <div class="flex items-center justify-between gap-3 hover:bg-transparent">
-      <span class="text-base-content/70">Theme</span>
-      <div class="join" role="radiogroup" aria-label="Theme">
+      <span class="text-base-content/70">{m.theme_label()}</span>
+      <div class="join" role="radiogroup" aria-label={m.theme_label()}>
         <button
           type="button"
           role="radio"
@@ -100,7 +101,7 @@
           onclick={() => setTheme("light")}
         >
           {@render sunIcon()}
-          Light
+          {m.theme_light()}
         </button>
         <button
           type="button"
@@ -113,7 +114,7 @@
           onclick={() => setTheme("dark")}
         >
           {@render moonIcon()}
-          Dark
+          {m.theme_dark()}
         </button>
       </div>
     </div>

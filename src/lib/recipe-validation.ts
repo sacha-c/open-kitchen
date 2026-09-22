@@ -1,67 +1,74 @@
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
+import * as m from "$lib/paraglide/messages";
 import { recipe, recipeIngredient, recipeStep } from "$lib/server/db/schema";
 
-export const ingredientSchema = createInsertSchema(recipeIngredient, {
-  name: (schema) => schema.min(1, "Ingredient name is required"),
-  amount: (schema) => schema.min(1, "Amount is required"),
-  unit: (schema) => schema.min(1, "Unit is required"),
-})
-  .pick({
-    name: true,
-    amount: true,
-    unit: true,
+export function createIngredientSchema() {
+  return createInsertSchema(recipeIngredient, {
+    name: (schema) => schema.min(1, m.error_ingredient_name_required()),
+    amount: (schema) => schema.min(1, m.error_amount_required()),
+    unit: (schema) => schema.min(1, m.error_unit_required()),
   })
-  .extend({
-    cecotecIngredientId: z.string().nullish(),
-    cecotecUnitId: z.string().nullish(),
-  });
+    .pick({
+      name: true,
+      amount: true,
+      unit: true,
+    })
+    .extend({
+      cecotecIngredientId: z.string().nullish(),
+      cecotecUnitId: z.string().nullish(),
+    });
+}
 
-export const stepSchema = createInsertSchema(recipeStep, {
-  description: (schema) => schema.min(1, "Step description is required"),
-  operationType: (schema) => schema.min(0).max(2),
-  totalTime: (schema) => schema.min(0).max(5400),
-  temperature: (schema) => schema.min(0).max(200),
-  power: (schema) => schema.min(0).max(10),
-})
-  .pick({
-    description: true,
-    operationType: true,
-    totalTime: true,
-    speed: true,
-    temperature: true,
-    power: true,
+export function createStepSchema() {
+  return createInsertSchema(recipeStep, {
+    description: (schema) => schema.min(1, m.error_step_description_required()),
+    operationType: (schema) => schema.min(0).max(2),
+    totalTime: (schema) => schema.min(0).max(5400),
+    temperature: (schema) => schema.min(0).max(200),
+    power: (schema) => schema.min(0).max(10),
   })
-  .superRefine((step, ctx) => {
-    if (step.operationType === 2) {
-      if (step.totalTime < 1) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Cooking time must be at least 1 second",
-          path: ["totalTime"],
-        });
+    .pick({
+      description: true,
+      operationType: true,
+      totalTime: true,
+      speed: true,
+      temperature: true,
+      power: true,
+    })
+    .superRefine((step, ctx) => {
+      if (step.operationType === 2) {
+        if (step.totalTime < 1) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: m.error_cooking_time_min(),
+            path: ["totalTime"],
+          });
+        }
       }
-    }
-  });
+    });
+}
 
-export const recipeFormSchema = createInsertSchema(recipe, {
-  name: (schema) => schema.min(1, "Recipe name is required"),
-  servings: (schema) => schema.min(1, "Servings is required"),
-})
-  .pick({
-    name: true,
-    servings: true,
-    language: true,
+export function createRecipeFormSchema() {
+  return createInsertSchema(recipe, {
+    name: (schema) => schema.min(1, m.error_recipe_name_required()),
+    servings: (schema) => schema.min(1, m.error_servings_required()),
   })
-  .extend({
-    imageUrl: z.url("Image URL is invalid").nullable(),
-    ingredients: z.array(ingredientSchema),
-    steps: z.array(stepSchema),
-  });
+    .pick({
+      name: true,
+      servings: true,
+      language: true,
+    })
+    .extend({
+      imageUrl: z.url(m.error_image_url_invalid()).nullable(),
+      ingredients: z.array(createIngredientSchema()),
+      steps: z.array(createStepSchema()),
+    });
+}
 
-export type RecipeFormData = z.infer<typeof recipeFormSchema>;
-export type IngredientFormData = z.infer<typeof ingredientSchema>;
-export type StepFormData = z.infer<typeof stepSchema>;
+export type RecipeFormData = z.infer<ReturnType<typeof createRecipeFormSchema>>;
+export type IngredientFormData = z.infer<ReturnType<typeof createIngredientSchema>>;
+export type StepFormData = z.infer<ReturnType<typeof createStepSchema>>;
 
 export function calculateCookingTime(
   steps: Pick<StepFormData, "totalTime">[],

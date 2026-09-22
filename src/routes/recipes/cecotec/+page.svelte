@@ -1,6 +1,7 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
   import { formatCookingTime } from "$lib/format-cooking-time";
+  import * as m from "$lib/paraglide/messages";
 
   let { data } = $props();
 
@@ -28,11 +29,11 @@
   }
 </script>
 
-<svelte:head> <title>Cecotec Recipes — OpenKitchen</title> </svelte:head>
+<svelte:head> <title>{m.cecotec_page_title()}</title> </svelte:head>
 
 <div class="mx-auto max-w-6xl px-4 py-8 sm:px-8">
   <div class="mb-8 flex flex-wrap items-center justify-between gap-3">
-    <h1 class="text-3xl font-bold">Cecotec Recipes</h1>
+    <h1 class="text-3xl font-bold">{m.nav_cecotec_recipes()}</h1>
   </div>
 
   {#if !data.linked}
@@ -47,7 +48,7 @@
         aria-hidden="true"
         role="img"
       >
-        <title>No Cecotec account linked</title>
+        <title>{m.cecotec_no_account_heading()}</title>
         <path
           stroke-linecap="round"
           stroke-linejoin="round"
@@ -55,14 +56,13 @@
         />
       </svg>
       <h2 class="text-base-content/60 mb-2 text-xl font-semibold">
-        No Cecotec account linked
+        {m.cecotec_no_account_heading()}
       </h2>
       <p class="text-base-content/40 mb-6">
-        Link your Cecotec account to browse and import recipes from the official
-        catalog.
+        {m.cecotec_no_account_desc()}
       </p>
       <a href={resolve("/profile")} class="btn btn-primary"
-        >Link Cecotec Account</a
+        >{m.cecotec_link_account_cta()}</a
       >
     </div>
   {:else if data.error}
@@ -109,11 +109,11 @@
           type="search"
           name="search"
           value={data.search ?? ""}
-          placeholder="Search recipes…"
-          aria-label="Search Cecotec recipes"
+          placeholder={m.cecotec_search_placeholder()}
+          aria-label={m.cecotec_search_aria()}
         >
       </label>
-      <button type="submit" class="btn btn-primary">Search</button>
+      <button type="submit" class="btn btn-primary">{m.common_search()}</button>
     </form>
 
     {#if data.categories.length > 0}
@@ -122,7 +122,7 @@
           href={categoryHref(null)}
           class="btn btn-sm {data.selectedCategoryId ? 'btn-outline' : 'btn-primary'}"
         >
-          All
+          {m.cecotec_category_all()}
         </a>
         {#each data.categories as category (category.id)}
           <a
@@ -138,12 +138,12 @@
     {#if data.recipes.length === 0}
       <div class="flex flex-col items-center justify-center py-24 text-center">
         <h2 class="text-base-content/60 mb-2 text-xl font-semibold">
-          No recipes found
+          {m.cecotec_no_results_heading()}
         </h2>
         <p class="text-base-content/40">
-          Try a different search{data.categories.length > 0
-            ? " or category"
-            : ""}.
+          {data.categories.length > 0
+            ? m.cecotec_no_results_desc_with_category()
+            : m.cecotec_no_results_desc_plain()}
         </p>
       </div>
     {:else}
@@ -170,7 +170,9 @@
               {/if}
               {#if recipe.importedRecipeId}
                 <div class="absolute top-3 right-3">
-                  <span class="badge badge-success badge-sm">Imported</span>
+                  <span class="badge badge-success badge-sm"
+                    >{m.cecotec_imported_badge()}</span
+                  >
                 </div>
               {/if}
             </figure>
@@ -179,7 +181,7 @@
               <div class="text-base-content/50 flex flex-wrap gap-4 text-sm">
                 <span
                   class="inline-flex items-center gap-1"
-                  title="Cooking time"
+                  title={m.card_cooking_time_title()}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -200,7 +202,7 @@
                   {formatCookingTime(recipe.cookingTime)}
                 </span>
                 {#if recipe.starAvg}
-                  <span class="inline-flex items-center gap-1" title="Rating">
+                  <span class="inline-flex items-center gap-1" title={m.cecotec_rating_title()}>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
@@ -220,7 +222,7 @@
                   </span>
                 {/if}
                 {#if recipe.views != null}
-                  <span class="inline-flex items-center gap-1" title="Views">
+                  <span class="inline-flex items-center gap-1" title={m.cecotec_views_title()}>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
@@ -258,10 +260,10 @@
             class:btn-disabled={data.page <= 1}
             aria-disabled={data.page <= 1}
           >
-            Previous
+            {m.pagination_previous()}
           </a>
           <span class="text-base-content/60 text-sm">
-            Page {data.page} of {data.totalPages}
+            {m.pagination_status({ page: data.page, total: data.totalPages })}
           </span>
           <a
             href={pageHref(data.page + 1)}
@@ -269,7 +271,7 @@
             class:btn-disabled={data.page >= data.totalPages}
             aria-disabled={data.page >= data.totalPages}
           >
-            Next
+            {m.pagination_next()}
           </a>
         </div>
       {/if}

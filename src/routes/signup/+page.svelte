@@ -1,5 +1,6 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
+  import * as m from "$lib/paraglide/messages";
   import type { SubmitFunction } from "./$types.js";
 
   interface FormResult {
@@ -20,7 +21,7 @@
   };
 </script>
 
-<svelte:head> <title>OpenKitchen — Sign Up</title> </svelte:head>
+<svelte:head> <title>{m.signup_page_title()}</title> </svelte:head>
 
 <div class="flex min-h-screen items-center justify-center px-4">
   <div class="card bg-base-100 w-full max-w-sm shadow-xl">
@@ -29,7 +30,7 @@
         <img src="/logo.png" alt="" class="h-8 w-8">
         OpenKitchen
       </h1>
-      <p class="text-base-content/60 text-sm">Create a new account</p>
+      <p class="text-base-content/60 text-sm">{m.auth_signup_heading()}</p>
 
       {#if form?.message}
         <div class="alert alert-error mt-2"><span>{form.message}</span></div>
@@ -42,13 +43,13 @@
         class="mt-4 flex flex-col gap-4"
       >
         <div class="form-control">
-          <label class="label" for="name">Name</label>
+          <label class="label" for="name">{m.common_name_label()}</label>
           <input
             id="name"
             name="name"
             class="input w-full"
             type="text"
-            placeholder="Your name"
+            placeholder={m.auth_signup_name_placeholder()}
             value={form?.name ?? ""}
             autocomplete="name"
             required
@@ -65,13 +66,13 @@
         </div>
 
         <div class="form-control">
-          <label class="label" for="email">Email</label>
+          <label class="label" for="email">{m.common_email_label()}</label>
           <input
             id="email"
             name="email"
             class="input w-full"
             type="email"
-            placeholder="you@example.com"
+            placeholder={m.common_email_placeholder()}
             value={form?.email ?? ""}
             autocomplete="email"
             required
@@ -88,13 +89,13 @@
         </div>
 
         <div class="form-control">
-          <label class="label" for="password">Password</label>
+          <label class="label" for="password">{m.common_password_label()}</label>
           <input
             id="password"
             name="password"
             class="input w-full"
             type="password"
-            placeholder="Min. 8 characters"
+            placeholder={m.auth_signup_password_placeholder()}
             autocomplete="new-password"
             required
             minlength={8}
@@ -118,15 +119,15 @@
           {#if loading}
             <span class="loading loading-spinner loading-sm"></span>
           {:else}
-            Create Account
+            {m.auth_signup_submit()}
           {/if}
         </button>
       </form>
 
-      <div class="divider text-xs">OR</div>
+      <div class="divider text-xs">{m.common_or_divider()}</div>
 
       <a href="/" class="btn btn-ghost btn-sm">
-        Already have an account? Sign in
+        {m.auth_signup_have_account()}
       </a>
     </div>
   </div>

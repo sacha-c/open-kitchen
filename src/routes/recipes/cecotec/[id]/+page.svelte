@@ -2,6 +2,7 @@
   import { enhance } from "$app/forms";
   import { resolve } from "$app/paths";
   import { formatCookingTime } from "$lib/format-cooking-time";
+  import * as m from "$lib/paraglide/messages";
   import {
     getStepTypeBadgeClass,
     getStepTypeLabel,
@@ -13,7 +14,11 @@
 </script>
 
 <svelte:head>
-  <title>{data.recipe?.name ?? "Cecotec Recipe"} — OpenKitchen</title>
+  <title
+    >{m.recipe_detail_page_title({
+      name: data.recipe?.name ?? m.cecotec_detail_fallback_name(),
+    })}</title
+  >
 </svelte:head>
 
 <div class="mx-auto max-w-4xl px-4 py-8 sm:px-8">
@@ -21,7 +26,7 @@
     href={resolve("/recipes/cecotec")}
     class="text-base-content/60 mb-4 inline-flex items-center gap-1 text-sm hover:underline"
   >
-    ← Cecotec Recipes
+    {m.cecotec_detail_back_link()}
   </a>
 
   {#if form?.message}
@@ -57,7 +62,7 @@
           href={resolve(`/recipes/${data.importedRecipeId}`)}
           class="btn btn-outline shrink-0"
         >
-          Already imported — View recipe
+          {m.cecotec_already_imported_link()}
         </a>
       {:else}
         <form
@@ -79,7 +84,7 @@
           >
             {#if importing}
               <span class="loading loading-spinner loading-xs"></span>
-              Importing…
+              {m.cecotec_importing()}
             {:else}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -96,7 +101,7 @@
                   d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
                 />
               </svg>
-              Import Recipe
+              {m.cecotec_import_cta()}
             {/if}
           </button>
         </form>
@@ -124,12 +129,15 @@
       {/if}
       <div class="card-body gap-4">
         <div class="flex flex-wrap gap-4 text-sm">
-          <span class="flex items-center gap-1" title="Servings">
-            <span class="text-base-content/60">Servings</span>
+          <span class="flex items-center gap-1" title={m.label_servings()}>
+            <span class="text-base-content/60">{m.label_servings()}</span>
             <span class="font-medium">{data.recipe.servings}</span>
           </span>
-          <span class="flex items-center gap-1" title="Total cooking time">
-            <span class="text-base-content/60">Time</span>
+          <span
+            class="flex items-center gap-1"
+            title={m.label_total_cooking_time_title()}
+          >
+            <span class="text-base-content/60">{m.label_time()}</span>
             <span class="font-medium"
               >{formatCookingTime(data.recipe.cookingTime)}</span
             >
@@ -141,7 +149,7 @@
     {#if data.recipe.ingredients.length > 0}
       <div class="card bg-base-100 mb-6 shadow-md">
         <div class="card-body">
-          <h2 class="card-title mb-2 text-xl">Ingredients</h2>
+          <h2 class="card-title mb-2 text-xl">{m.label_ingredients_heading()}</h2>
           <ul class="divide-base-300 divide-y">
             {#each data.recipe.ingredients as ingredient (ingredient.sortOrder)}
               <li class="flex items-center gap-2 py-2">
@@ -157,10 +165,9 @@
     {:else}
       <div class="card bg-base-100 mb-6 shadow-md">
         <div class="card-body">
-          <h2 class="card-title mb-2 text-xl">Ingredients</h2>
+          <h2 class="card-title mb-2 text-xl">{m.label_ingredients_heading()}</h2>
           <p class="text-base-content/60">
-            No ingredient data available for this recipe. You can add
-            ingredients manually after importing.
+            {m.cecotec_no_ingredient_data()}
           </p>
         </div>
       </div>
@@ -169,7 +176,7 @@
     {#if data.recipe.steps.length > 0}
       <div class="card bg-base-100 shadow-md">
         <div class="card-body">
-          <h2 class="card-title mb-4 text-xl">Steps</h2>
+          <h2 class="card-title mb-4 text-xl">{m.label_steps_heading()}</h2>
           <ol class="space-y-4">
             {#each data.recipe.steps as step (step.sortOrder)}
               <li class="flex gap-4">
@@ -193,7 +200,7 @@
                     >
                       {#if step.totalTime > 0}
                         <span class="flex items-center gap-1">
-                          <span class="text-base-content/60">Time</span>
+                          <span class="text-base-content/60">{m.label_time()}</span>
                           <span class="font-medium"
                             >{formatCookingTime(step.totalTime)}</span
                           >
@@ -201,19 +208,21 @@
                       {/if}
                       {#if step.speed !== "0"}
                         <span class="flex items-center gap-1">
-                          <span class="text-base-content/60">Speed</span>
+                          <span class="text-base-content/60">{m.label_speed()}</span>
                           <span class="font-medium">{step.speed}</span>
                         </span>
                       {/if}
                       {#if step.temperature > 0}
                         <span class="flex items-center gap-1">
-                          <span class="text-base-content/60">Temp</span>
+                          <span class="text-base-content/60"
+                            >{m.label_temp_short()}</span
+                          >
                           <span class="font-medium">{step.temperature}°C</span>
                         </span>
                       {/if}
                       {#if step.power > 0}
                         <span class="flex items-center gap-1">
-                          <span class="text-base-content/60">Power</span>
+                          <span class="text-base-content/60">{m.label_power()}</span>
                           <span class="font-medium">{step.power}</span>
                         </span>
                       {/if}

@@ -1,3 +1,5 @@
+import * as m from "$lib/paraglide/messages";
+
 /** Operation type constants matching the Cecotec API values */
 export const OPERATION_TYPES = {
   MANUAL: 0,
@@ -8,12 +10,6 @@ export const OPERATION_TYPES = {
 export type OperationType =
   (typeof OPERATION_TYPES)[keyof typeof OPERATION_TYPES];
 
-const LABELS: Record<number, string> = {
-  [OPERATION_TYPES.MANUAL]: "Manual",
-  [OPERATION_TYPES.PREPARATION]: "Preparation",
-  [OPERATION_TYPES.COOKING]: "Cooking",
-};
-
 const BADGE_CLASSES: Record<number, string> = {
   [OPERATION_TYPES.MANUAL]: "badge-neutral",
   [OPERATION_TYPES.PREPARATION]: "badge-info",
@@ -21,7 +17,9 @@ const BADGE_CLASSES: Record<number, string> = {
 };
 
 export function getStepTypeLabel(operationType: number): string {
-  return LABELS[operationType] ?? "Manual";
+  if (operationType === OPERATION_TYPES.PREPARATION) return m.step_type_preparation();
+  if (operationType === OPERATION_TYPES.COOKING) return m.step_type_cooking();
+  return m.step_type_manual();
 }
 
 export function getStepTypeBadgeClass(operationType: number): string {
