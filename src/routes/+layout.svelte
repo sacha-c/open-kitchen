@@ -1,9 +1,9 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
   import { resolve } from "$app/paths";
-  import { page } from "$app/state";
+  import LocaleToggle from "$lib/components/LocaleToggle.svelte";
   import ThemeToggle from "$lib/components/ThemeToggle.svelte";
-  import { locales, localizeHref } from "$lib/paraglide/runtime";
+  import * as m from "$lib/paraglide/messages";
   import "./layout.css";
 
   let { children, data } = $props();
@@ -25,8 +25,10 @@
       </div>
       <div class="flex flex-none items-center gap-2">
         <ul class="menu menu-horizontal hidden gap-1 px-1 font-medium sm:flex">
-          <li><a href={resolve("/recipes")}>My Recipes</a></li>
-          <li><a href={resolve("/recipes/cecotec")}>Cecotec Recipes</a></li>
+          <li><a href={resolve("/recipes")}>{m.nav_my_recipes()}</a></li>
+          <li>
+            <a href={resolve("/recipes/cecotec")}>{m.nav_cecotec_recipes()}</a>
+          </li>
         </ul>
         <div class="dropdown dropdown-end">
           <button
@@ -46,13 +48,15 @@
           >
             <li class="menu-title sm:hidden">{data.user.name}</li>
             <li class="sm:hidden">
-              <a href={resolve("/recipes")}>My Recipes</a>
+              <a href={resolve("/recipes")}>{m.nav_my_recipes()}</a>
             </li>
             <li class="sm:hidden">
-              <a href={resolve("/recipes/cecotec")}>Cecotec Recipes</a>
+              <a href={resolve("/recipes/cecotec")}>{m.nav_cecotec_recipes()}</a
+              >
             </li>
-            <li><a href={resolve("/profile")}>Profile</a></li>
+            <li><a href={resolve("/profile")}>{m.nav_profile()}</a></li>
             <ThemeToggle variant="menu-item" />
+            <LocaleToggle variant="menu-item" />
             <li>
               <form
                 method="POST"
@@ -70,7 +74,7 @@
                   type="submit"
                   disabled={signingOut}
                 >
-                  {signingOut ? "Signing out…" : "Sign Out"}
+                  {signingOut ? m.signing_out() : m.sign_out()}
                 </button>
               </form>
             </li>
@@ -79,13 +83,10 @@
       </div>
     </nav>
   {:else}
-    <div class="fixed top-4 right-4 z-10"><ThemeToggle /></div>
+    <div class="fixed top-4 right-4 z-10 flex items-center gap-1">
+      <LocaleToggle />
+      <ThemeToggle />
+    </div>
   {/if}
   <main>{@render children()}</main>
-</div>
-
-<div style="display:none">
-  {#each locales as locale (locale)}
-    <a href={localizeHref(page.url.pathname, { locale })}>{locale}</a>
-  {/each}
 </div>

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
+  import * as m from "$lib/paraglide/messages";
   import type { PageData } from "./$types.js";
 
   interface SaveResult {
@@ -40,17 +41,17 @@
   }
 </script>
 
-<svelte:head><title>OpenKitchen — Profile</title></svelte:head>
+<svelte:head><title>{m.profile_page_title()}</title></svelte:head>
 
 <div class="mx-auto max-w-2xl px-4 py-8 sm:px-8">
   <!-- Account Info -->
   <div class="card bg-base-100 mb-6 shadow-sm">
     <div class="card-body">
-      <h1 class="card-title text-2xl font-bold">Profile</h1>
+      <h1 class="card-title text-2xl font-bold">{m.nav_profile()}</h1>
 
       <div class="mt-4 flex flex-col gap-3">
         <div class="form-control">
-          <label class="label" for="profile-name">Name</label>
+          <label class="label" for="profile-name">{m.common_name_label()}</label>
           <input
             id="profile-name"
             class="input w-full"
@@ -60,7 +61,7 @@
           >
         </div>
         <div class="form-control">
-          <label class="label" for="profile-email">Email</label>
+          <label class="label" for="profile-email">{m.common_email_label()}</label>
           <input
             id="profile-email"
             class="input w-full"
@@ -77,17 +78,17 @@
   <div class="card bg-base-100 shadow-sm">
     <div class="card-body">
       <div class="flex items-center justify-between">
-        <h2 class="card-title text-xl">Cecotec Account</h2>
+        <h2 class="card-title text-xl">{m.profile_cecotec_heading()}</h2>
         {#if linked}
-          <span class="badge badge-success gap-1">Linked ✓</span>
+          <span class="badge badge-success gap-1">{m.profile_linked_badge()}</span>
         {:else}
-          <span class="badge badge-neutral">Not linked</span>
+          <span class="badge badge-neutral">{m.profile_not_linked_badge()}</span>
         {/if}
       </div>
 
       {#if linked && linkedEmail}
         <p class="text-base-content/60 text-sm">
-          Connected as <strong>{linkedEmail}</strong>
+          {m.profile_connected_as({ email: linkedEmail })}
         </p>
       {/if}
 
@@ -97,13 +98,13 @@
 
       {#if form?.success}
         <div class="alert alert-success mt-2">
-          <span>Cecotec account linked successfully.</span>
+          <span>{m.profile_link_success()}</span>
         </div>
       {/if}
 
       {#if form?.disconnected}
         <div class="alert alert-info mt-2">
-          <span>Cecotec account disconnected.</span>
+          <span>{m.profile_disconnect_success()}</span>
         </div>
       {/if}
 
@@ -115,14 +116,14 @@
         class="mt-2 flex flex-col gap-5"
       >
         <div class="form-control">
-          <label class="label" for="cecotec-email">Cecotec Email</label>
+          <label class="label" for="cecotec-email">{m.profile_cecotec_email_label()}</label>
           <input
             id="cecotec-email"
             name="email"
             class="input w-full"
             class:input-error={form?.errors?.email}
             type="email"
-            placeholder="your@cecotec-account.com"
+            placeholder={m.profile_cecotec_email_placeholder()}
             value={form?.email ?? data.cecotecEmail ?? ""}
             autocomplete="off"
             required
@@ -139,14 +140,16 @@
         </div>
 
         <div class="form-control">
-          <label class="label" for="cecotec-password">Cecotec Password</label>
+          <label class="label" for="cecotec-password">{m.profile_cecotec_password_label()}</label>
           <input
             id="cecotec-password"
             name="password"
             class="input w-full"
             class:input-error={form?.errors?.password}
             type="password"
-            placeholder={linked ? "Enter password to update" : "Your Cecotec password"}
+            placeholder={linked
+              ? m.profile_cecotec_password_placeholder_linked()
+              : m.profile_cecotec_password_placeholder_unlinked()}
             autocomplete="off"
             required
             aria-invalid={form?.errors?.password ? "true" : "false"}
@@ -168,7 +171,7 @@
           {#if loading}
             <span class="loading loading-spinner loading-sm"></span>
           {:else}
-            Save & Verify
+            {m.profile_save_verify()}
           {/if}
         </button>
       </form>
@@ -182,7 +185,7 @@
             type="submit"
             disabled={loading}
           >
-            Disconnect Cecotec Account
+            {m.profile_disconnect_cta()}
           </button>
         </form>
       {/if}

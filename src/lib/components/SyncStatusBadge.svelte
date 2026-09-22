@@ -1,4 +1,6 @@
 <script lang="ts">
+  import * as m from "$lib/paraglide/messages";
+
   interface Props {
     status: string;
     syncedAt?: Date | null;
@@ -28,12 +30,12 @@
 
   let label = $derived(
     syncing
-      ? "Syncing…"
+      ? m.sync_syncing()
       : status === "synced"
-        ? "Synced"
+        ? m.sync_synced()
         : status === "error"
-          ? "Error"
-          : "Pending",
+          ? m.sync_error()
+          : m.sync_pending(),
   );
 </script>
 
@@ -54,7 +56,7 @@
       <button
         class="btn btn-circle btn-ghost btn-xs"
         type="button"
-        aria-label="Sync error details"
+        aria-label={m.sync_error_details_aria()}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -64,7 +66,7 @@
           aria-hidden="true"
           role="img"
         >
-          <title>Error info</title>
+          <title>{m.sync_error_icon_title()}</title>
           <path
             stroke-linecap="round"
             stroke-linejoin="round"

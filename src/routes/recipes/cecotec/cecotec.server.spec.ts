@@ -17,7 +17,8 @@ vi.mock("$env/static/private", () => ({
   BETTER_AUTH_URL: "http://localhost:5173",
 }));
 
-vi.mock("$lib/paraglide/runtime", () => ({
+vi.mock("$lib/paraglide/runtime", async (importOriginal) => ({
+  ...(await importOriginal<object>()),
   getLocale: () => mockGetLocale(),
 }));
 

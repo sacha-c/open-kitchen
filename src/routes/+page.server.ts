@@ -1,5 +1,6 @@
 import { fail, redirect } from "@sveltejs/kit";
 import { count, desc, eq, inArray } from "drizzle-orm";
+import * as m from "$lib/paraglide/messages";
 import { auth } from "$lib/server/auth";
 import { db } from "$lib/server/db";
 import { cecotecCredentials, recipe, recipeStep } from "$lib/server/db/schema";
@@ -82,10 +83,10 @@ export const actions: Actions = {
     const errors: Record<string, string> = {};
 
     if (!/^[\w-.+]+@([\w-]+\.)+[\w-]{2,8}$/.test(email)) {
-      errors.email = "Please enter a valid email address.";
+      errors.email = m.error_invalid_email();
     }
     if (password.length < 6) {
-      errors.password = "Password must be at least 6 characters.";
+      errors.password = m.error_password_too_short({ min: 6 });
     }
     if (Object.keys(errors).length > 0) {
       return fail(400, { errors, email });
@@ -98,7 +99,7 @@ export const actions: Actions = {
     if (!response.ok) {
       return fail(400, {
         email,
-        message: "Invalid email or password.",
+        message: m.error_invalid_credentials(),
       });
     }
 

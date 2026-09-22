@@ -1,3 +1,5 @@
+import * as m from "$lib/paraglide/messages";
+
 export const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 export const MAX_IMAGE_SIZE_LABEL = "5 MB";
 
@@ -15,11 +17,11 @@ export function getImageValidationError(file: {
   type: string;
 }): string | null {
   if (!ACCEPTED_IMAGE_TYPES.some((type) => type === file.type)) {
-    return "Only JPEG, PNG, GIF, and WebP images are supported.";
+    return m.error_unsupported_image_type();
   }
 
   if (file.size > MAX_IMAGE_SIZE) {
-    return `Images must be ${MAX_IMAGE_SIZE_LABEL} or smaller.`;
+    return m.error_image_too_large({ maxSize: MAX_IMAGE_SIZE_LABEL });
   }
 
   return null;

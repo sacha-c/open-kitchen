@@ -3,8 +3,8 @@ import { eq } from "drizzle-orm";
 import { getLocale } from "$lib/paraglide/runtime";
 import {
   calculateCookingTime,
+  createRecipeFormSchema,
   parseFormDataToRecipe,
-  recipeFormSchema,
 } from "$lib/recipe-validation";
 import {
   getIngredientCatalog,
@@ -54,7 +54,7 @@ export const actions: Actions = {
 
     const formData = await request.formData();
     const raw = parseFormDataToRecipe(formData);
-    const result = recipeFormSchema.safeParse(raw);
+    const result = createRecipeFormSchema().safeParse(raw);
 
     if (!result.success) {
       const fieldErrors: Record<string, string> = {};

@@ -1,5 +1,6 @@
 import { error, fail, redirect } from "@sveltejs/kit";
 import { and, eq } from "drizzle-orm";
+import * as m from "$lib/paraglide/messages";
 import { getLocale } from "$lib/paraglide/runtime";
 import { mapCatalogDetailToImportedRecipe } from "$lib/server/cecotec/catalog-import";
 import { CecotecError, getRecipeDetail } from "$lib/server/cecotec/client";
@@ -21,7 +22,7 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
 
   const number = url.searchParams.get("number");
   if (!number) {
-    error(400, "Missing recipe number");
+    error(400, m.error_missing_recipe_number());
   }
 
   const session = await getAuthenticatedCecotecSession(locals.user.id);
@@ -85,7 +86,7 @@ export const actions: Actions = {
     const formData = await request.formData();
     const number = formData.get("number")?.toString();
     if (!number) {
-      return fail(400, { message: "Missing recipe number" });
+      return fail(400, { message: m.error_missing_recipe_number() });
     }
 
     const userId = locals.user.id;
@@ -108,7 +109,7 @@ export const actions: Actions = {
       const session = await getAuthenticatedCecotecSession(userId);
       if (!session) {
         return fail(400, {
-          message: "Connect your Cecotec account before importing recipes.",
+          message: m.error_connect_cecotec_before_import(),
         });
       }
 

@@ -3,6 +3,7 @@
   import { resolve } from "$app/paths";
   import SyncStatusBadge from "$lib/components/SyncStatusBadge.svelte";
   import { formatCookingTime } from "$lib/format-cooking-time";
+  import * as m from "$lib/paraglide/messages";
   import {
     getStepTypeBadgeClass,
     getStepTypeLabel,
@@ -15,7 +16,9 @@
   let syncing = $state(false);
 </script>
 
-<svelte:head> <title>{data.recipe.name} — OpenKitchen</title> </svelte:head>
+<svelte:head>
+  <title>{m.recipe_detail_page_title({ name: data.recipe.name })}</title>
+</svelte:head>
 
 <div class="mx-auto max-w-4xl px-4 py-8 sm:px-8">
   <!-- Header -->
@@ -25,7 +28,7 @@
         href={resolve("/recipes")}
         class="text-base-content/60 mb-2 inline-flex items-center gap-1 text-sm hover:underline"
       >
-        ← My Recipes
+        {m.recipe_detail_back_link()}
       </a>
       <h1 class="mt-1 text-3xl font-bold">{data.recipe.name}</h1>
     </div>
@@ -33,8 +36,8 @@
       <a
         href={resolve(`/recipes/${data.recipe.id}/edit`)}
         class="btn btn-square btn-ghost"
-        aria-label="Edit recipe"
-        title="Edit recipe"
+        aria-label={m.recipe_detail_edit_aria()}
+        title={m.recipe_detail_edit_aria()}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -55,8 +58,8 @@
       <button
         class="btn btn-square btn-ghost text-error"
         type="button"
-        aria-label="Delete recipe"
-        title="Delete recipe"
+        aria-label={m.recipe_detail_delete_aria()}
+        title={m.recipe_detail_delete_aria()}
         onclick={() => (showDeleteModal = true)}
       >
         <svg
@@ -90,7 +93,7 @@
           <button class="btn btn-primary" type="submit" disabled={syncing}>
             {#if syncing}
               <span class="loading loading-spinner loading-xs"></span>
-              Syncing…
+              {m.sync_syncing()}
             {:else}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -107,7 +110,7 @@
                   d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"
                 />
               </svg>
-              Sync Now
+              {m.recipe_detail_sync_now()}
             {/if}
           </button>
         </form>
@@ -137,18 +140,21 @@
     {/if}
     <div class="card-body gap-4">
       <div class="flex flex-wrap gap-4 text-sm">
-        <span class="flex items-center gap-1" title="Servings">
-          <span class="text-base-content/60">Servings</span>
+        <span class="flex items-center gap-1" title={m.label_servings()}>
+          <span class="text-base-content/60">{m.label_servings()}</span>
           <span class="font-medium">{data.recipe.servings}</span>
         </span>
-        <span class="flex items-center gap-1" title="Total cooking time">
-          <span class="text-base-content/60">Time</span>
+        <span
+          class="flex items-center gap-1"
+          title={m.label_total_cooking_time_title()}
+        >
+          <span class="text-base-content/60">{m.label_time()}</span>
           <span class="font-medium"
             >{formatCookingTime(data.recipe.cookingTime)}</span
           >
         </span>
-        <span class="flex items-center gap-1" title="Language">
-          <span class="text-base-content/60">Language</span>
+        <span class="flex items-center gap-1" title={m.language_label()}>
+          <span class="text-base-content/60">{m.language_label()}</span>
           <span class="badge badge-ghost badge-sm font-medium uppercase"
             >{data.recipe.language}</span
           >
@@ -169,7 +175,7 @@
   {#if data.ingredients.length > 0}
     <div class="card bg-base-100 mb-6 shadow-md">
       <div class="card-body">
-        <h2 class="card-title mb-2 text-xl">Ingredients</h2>
+        <h2 class="card-title mb-2 text-xl">{m.label_ingredients_heading()}</h2>
         <ul class="divide-base-300 divide-y">
           {#each data.ingredients as ingredient (ingredient.id)}
             <li class="flex items-center gap-2 py-2">
@@ -188,7 +194,7 @@
   {#if data.steps.length > 0}
     <div class="card bg-base-100 shadow-md">
       <div class="card-body">
-        <h2 class="card-title mb-4 text-xl">Steps</h2>
+        <h2 class="card-title mb-4 text-xl">{m.label_steps_heading()}</h2>
         <ol class="space-y-4">
           {#each data.steps as step, index (step.id)}
             <li class="flex gap-4">
@@ -212,7 +218,7 @@
                   >
                     {#if step.totalTime > 0}
                       <span class="flex items-center gap-1">
-                        <span class="text-base-content/60">Time</span>
+                        <span class="text-base-content/60">{m.label_time()}</span>
                         <span class="font-medium"
                           >{formatCookingTime(step.totalTime)}</span
                         >
@@ -220,19 +226,21 @@
                     {/if}
                     {#if step.speed !== "0"}
                       <span class="flex items-center gap-1">
-                        <span class="text-base-content/60">Speed</span>
+                        <span class="text-base-content/60">{m.label_speed()}</span>
                         <span class="font-medium">{step.speed}</span>
                       </span>
                     {/if}
                     {#if step.temperature > 0}
                       <span class="flex items-center gap-1">
-                        <span class="text-base-content/60">Temp</span>
+                        <span class="text-base-content/60"
+                          >{m.label_temp_short()}</span
+                        >
                         <span class="font-medium">{step.temperature}°C</span>
                       </span>
                     {/if}
                     {#if step.power > 0}
                       <span class="flex items-center gap-1">
-                        <span class="text-base-content/60">Power</span>
+                        <span class="text-base-content/60">{m.label_power()}</span>
                         <span class="font-medium">{step.power}</span>
                       </span>
                     {/if}
@@ -251,10 +259,9 @@
 {#if showDeleteModal}
   <div class="modal modal-open">
     <div class="modal-box">
-      <h3 class="text-lg font-bold">Delete Recipe</h3>
+      <h3 class="text-lg font-bold">{m.recipe_detail_delete_modal_title()}</h3>
       <p class="py-4">
-        Are you sure you want to delete <strong>{data.recipe.name}</strong>?
-        This action cannot be undone.
+        {m.recipe_detail_delete_modal_body({ name: data.recipe.name })}
       </p>
       <div class="modal-action">
         <button
@@ -263,7 +270,7 @@
           onclick={() => (showDeleteModal = false)}
           disabled={deleting}
         >
-          Cancel
+          {m.common_cancel()}
         </button>
         <form
           method="POST"
@@ -277,7 +284,7 @@
           }}
         >
           <button class="btn btn-error" type="submit" disabled={deleting}>
-            {deleting ? "Deleting…" : "Delete"}
+            {deleting ? m.recipe_detail_deleting() : m.common_delete()}
           </button>
         </form>
       </div>
@@ -285,7 +292,7 @@
     <button
       class="modal-backdrop"
       type="button"
-      aria-label="Close modal"
+      aria-label={m.recipe_detail_close_modal_aria()}
       onclick={() => (showDeleteModal = false)}
     ></button>
   </div>

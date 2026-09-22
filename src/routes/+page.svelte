@@ -2,6 +2,7 @@
   import { enhance } from "$app/forms";
   import { resolve } from "$app/paths";
   import RecipeCard from "$lib/components/RecipeCard.svelte";
+  import * as m from "$lib/paraglide/messages";
   import type { SubmitFunction } from "./$types.js";
 
   interface FormResult {
@@ -51,7 +52,7 @@
 
 {#if data.user}
   <div class="mx-auto max-w-6xl px-4 py-8 sm:px-8">
-    <h1 class="mb-8 text-3xl font-bold">Welcome, {firstName}!</h1>
+    <h1 class="mb-8 text-3xl font-bold">{m.dashboard_welcome({ name: firstName })}</h1>
 
     <div class="mb-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       <a
@@ -75,9 +76,9 @@
             />
           </svg>
           <div>
-            <h2 class="card-title text-lg">Create New Recipe</h2>
+            <h2 class="card-title text-lg">{m.dashboard_create_recipe_title()}</h2>
             <p class="text-base-content/60 text-sm">
-              Start a new recipe from scratch.
+              {m.dashboard_create_recipe_desc()}
             </p>
           </div>
         </div>
@@ -104,9 +105,11 @@
             />
           </svg>
           <div>
-            <h2 class="card-title text-lg">My Recipes</h2>
+            <h2 class="card-title text-lg">{m.nav_my_recipes()}</h2>
             <p class="text-base-content/60 text-sm">
-              {`${data.recipeCount} ${data.recipeCount === 1 ? "recipe" : "recipes"} saved.`}
+              {data.recipeCount === 1
+                ? m.dashboard_recipes_saved_one({ count: data.recipeCount })
+                : m.dashboard_recipes_saved_other({ count: data.recipeCount })}
             </p>
           </div>
         </div>
@@ -134,9 +137,9 @@
               />
             </svg>
             <div>
-              <h2 class="card-title text-lg">Cecotec Recipes</h2>
+              <h2 class="card-title text-lg">{m.nav_cecotec_recipes()}</h2>
               <p class="text-base-content/60 text-sm">
-                Browse and import recipes from the Cecotec catalog.
+                {m.dashboard_cecotec_desc()}
               </p>
             </div>
           </div>
@@ -163,9 +166,11 @@
               />
             </svg>
             <div>
-              <h2 class="card-title text-lg">Connect Cecotec Account</h2>
+              <h2 class="card-title text-lg">
+                {m.dashboard_connect_cecotec_title()}
+              </h2>
               <p class="text-base-content/60 text-sm">
-                Sync your recipes to your Cecotec device.
+                {m.dashboard_connect_cecotec_desc()}
               </p>
             </div>
           </div>
@@ -174,13 +179,13 @@
     </div>
 
     <div class="mb-4 flex items-center justify-between">
-      <h2 class="text-2xl font-bold">Recently Added</h2>
+      <h2 class="text-2xl font-bold">{m.dashboard_recently_added()}</h2>
       {#if data.recentRecipes.length > 0}
         <a
           href={resolve("/recipes")}
           class="text-primary text-sm font-medium hover:underline"
         >
-          View all →
+          {m.dashboard_view_all()}
         </a>
       {/if}
     </div>
@@ -189,10 +194,10 @@
       <div class="card bg-base-100 shadow-sm">
         <div class="card-body items-center py-12 text-center">
           <p class="text-base-content/60 mb-2">
-            You haven't created any recipes yet.
+            {m.dashboard_empty_state()}
           </p>
           <a href={resolve("/recipes/new")} class="btn btn-primary btn-sm">
-            Create your first recipe
+            {m.dashboard_create_first_recipe()}
           </a>
         </div>
       </div>
@@ -212,7 +217,7 @@
           <img src="/logo.png" alt="" class="h-8 w-8">
           OpenKitchen
         </h1>
-        <p class="text-base-content/60 text-sm">Sign in to your account</p>
+        <p class="text-base-content/60 text-sm">{m.auth_signin_subtitle()}</p>
 
         {#if form?.message}
           <div class="alert alert-error mt-2"><span>{form.message}</span></div>
@@ -226,13 +231,13 @@
           class="mt-4 flex flex-col gap-4"
         >
           <div class="form-control">
-            <label class="label" for="email">Email</label>
+            <label class="label" for="email">{m.common_email_label()}</label>
             <input
               id="email"
               name="email"
               class="input w-full"
               type="email"
-              placeholder="you@example.com"
+              placeholder={m.common_email_placeholder()}
               value={form?.email ?? ""}
               autocomplete="email"
               required
@@ -249,13 +254,13 @@
           </div>
 
           <div class="form-control">
-            <label class="label" for="password">Password</label>
+            <label class="label" for="password">{m.common_password_label()}</label>
             <input
               id="password"
               name="password"
               class="input w-full"
               type="password"
-              placeholder="Your password"
+              placeholder={m.auth_signin_password_placeholder()}
               autocomplete="current-password"
               required
               minlength={6}
@@ -279,15 +284,15 @@
             {#if loading}
               <span class="loading loading-spinner loading-sm"></span>
             {:else}
-              Sign In
+              {m.auth_signin_submit()}
             {/if}
           </button>
         </form>
 
-        <div class="divider text-xs">OR</div>
+        <div class="divider text-xs">{m.common_or_divider()}</div>
 
         <a href="/signup" class="btn btn-ghost btn-sm">
-          Don't have an account? Sign up
+          {m.auth_signin_no_account()}
         </a>
       </div>
     </div>

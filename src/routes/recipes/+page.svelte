@@ -1,15 +1,16 @@
 <script lang="ts">
   import RecipeCard from "$lib/components/RecipeCard.svelte";
+  import * as m from "$lib/paraglide/messages";
 
   let { data } = $props();
 </script>
 
-<svelte:head> <title>My Recipes — OpenKitchen</title> </svelte:head>
+<svelte:head> <title>{m.recipes_page_title()}</title> </svelte:head>
 
 <div class="mx-auto max-w-6xl px-4 py-8 sm:px-8">
   <div class="mb-8 flex flex-wrap items-center justify-between gap-3">
-    <h1 class="text-3xl font-bold">My Recipes</h1>
-    <a href="/recipes/new" class="btn btn-primary">+ New Recipe</a>
+    <h1 class="text-3xl font-bold">{m.nav_my_recipes()}</h1>
+    <a href="/recipes/new" class="btn btn-primary">{m.recipes_new_button()}</a>
   </div>
 
   {#if data.recipes.length === 0}
@@ -24,7 +25,7 @@
         aria-hidden="true"
         role="img"
       >
-        <title>No recipes</title>
+        <title>{m.recipes_empty_icon_title()}</title>
         <path
           stroke-linecap="round"
           stroke-linejoin="round"
@@ -32,12 +33,12 @@
         />
       </svg>
       <h2 class="text-base-content/60 mb-2 text-xl font-semibold">
-        No recipes yet
+        {m.recipes_empty_heading()}
       </h2>
       <p class="text-base-content/40 mb-6">
-        Create your first recipe to get started.
+        {m.recipes_empty_desc()}
       </p>
-      <a href="/recipes/new" class="btn btn-primary">Create Recipe</a>
+      <a href="/recipes/new" class="btn btn-primary">{m.label_create_recipe()}</a>
     </div>
   {:else}
     <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">

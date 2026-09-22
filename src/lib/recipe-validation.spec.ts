@@ -1,11 +1,13 @@
 import { describe, expect, it } from "vitest";
 import {
   calculateCookingTime,
+  createRecipeFormSchema,
   parseFormDataToRecipe,
-  recipeFormSchema,
 } from "$lib/recipe-validation";
 
 describe("recipeFormSchema", () => {
+  const recipeFormSchema = createRecipeFormSchema();
+
   const validRecipe = {
     name: "Test Recipe",
     servings: "4",

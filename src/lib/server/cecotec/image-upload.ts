@@ -3,6 +3,7 @@ import {
   getImageValidationError,
   MAX_IMAGE_SIZE,
 } from "$lib/image-upload-policy";
+import * as m from "$lib/paraglide/messages";
 import { authenticate, uploadImage } from "$lib/server/cecotec/client";
 import { decrypt } from "$lib/server/crypto";
 import { db } from "$lib/server/db";
@@ -46,10 +47,7 @@ export async function uploadRecipeImage(
     .where(eq(cecotecCredentials.userId, userId));
 
   if (!credentials) {
-    throw new ImageUploadError(
-      "Connect your Cecotec account before uploading images.",
-      400,
-    );
+    throw new ImageUploadError(m.error_connect_cecotec_before_upload(), 400);
   }
 
   const password = decrypt(credentials.encryptedPassword);

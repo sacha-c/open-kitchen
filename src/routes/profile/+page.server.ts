@@ -1,6 +1,7 @@
 import { fail, redirect } from "@sveltejs/kit";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
+import * as m from "$lib/paraglide/messages";
 import {
   authenticate,
   CecotecError,
@@ -33,13 +34,15 @@ export const load: PageServerLoad = async ({ locals }) => {
   };
 };
 
-const saveSchema = z.object({
-  email: z
-    .string()
-    .min(1, "Email is required.")
-    .email("Please enter a valid email address."),
-  password: z.string().min(1, "Password is required."),
-});
+function createSaveSchema() {
+  return z.object({
+    email: z
+      .string()
+      .min(1, m.error_email_required())
+      .email(m.error_invalid_email()),
+    password: z.string().min(1, m.error_cecotec_password_required()),
+  });
+}
 
 export const actions: Actions = {
   save: async ({ request, locals }) => {
@@ -54,7 +57,7 @@ export const actions: Actions = {
       password: (formData.get("password") ?? "").toString(),
     };
 
-    const parsed = saveSchema.safeParse(raw);
+    const parsed = createSaveSchema().safeParse(raw);
     if (!parsed.success) {
       const errors: Record<string, string> = {};
       for (const issue of parsed.error.issues) {
@@ -78,8 +81,7 @@ export const actions: Actions = {
       if (e instanceof CecotecError) {
         return fail(400, {
           email: raw.email,
-          message:
-            "Invalid Cecotec credentials. Please check your email and password.",
+          message: m.error_invalid_cecotec_credentials(),
         });
       }
       throw e;

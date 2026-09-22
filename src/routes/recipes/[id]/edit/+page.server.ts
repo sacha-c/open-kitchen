@@ -1,10 +1,11 @@
 import { type Actions, error, fail, redirect } from "@sveltejs/kit";
 import { and, asc, eq } from "drizzle-orm";
+import * as m from "$lib/paraglide/messages";
 import { getLocale } from "$lib/paraglide/runtime";
 import {
   calculateCookingTime,
+  createRecipeFormSchema,
   parseFormDataToRecipe,
-  recipeFormSchema,
 } from "$lib/recipe-validation";
 import {
   getIngredientCatalog,
@@ -33,7 +34,7 @@ export const load: PageServerLoad = async ({ locals, params }) => {
     .where(and(eq(recipe.id, recipeId), eq(recipe.userId, userId)));
 
   if (!recipeRow) {
-    error(404, "Recipe not found");
+    error(404, m.error_recipe_not_found());
   }
 
   const [steps, ingredients, credentials] = await Promise.all([
@@ -106,7 +107,7 @@ export const actions: Actions = {
 
     const recipeId = params.id;
     if (!recipeId) {
-      error(400, "Missing recipe ID");
+      error(400, m.error_missing_recipe_id());
     }
 
     const userId = locals.user.id;
@@ -118,12 +119,12 @@ export const actions: Actions = {
       .where(and(eq(recipe.id, recipeId), eq(recipe.userId, userId)));
 
     if (!existing) {
-      error(404, "Recipe not found");
+      error(404, m.error_recipe_not_found());
     }
 
     const formData = await request.formData();
     const raw = parseFormDataToRecipe(formData);
-    const result = recipeFormSchema.safeParse(raw);
+    const result = createRecipeFormSchema().safeParse(raw);
 
     if (!result.success) {
       const fieldErrors: Record<string, string> = {};
