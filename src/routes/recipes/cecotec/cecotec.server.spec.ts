@@ -266,6 +266,58 @@ describe("load", () => {
     expect(result.recipes).toHaveLength(2);
   });
 
+  it("forwards the search query param to listPublicCatalog and reflects it back", async () => {
+    mockGetAuthenticatedCecotecSession.mockResolvedValue({
+      accessToken: "tok",
+      email: "cec@example.com",
+    });
+    mockListCatalogCategories.mockResolvedValue([]);
+    mockListPublicCatalog.mockResolvedValue({
+      records: [],
+      total: 0,
+      pages: 0,
+      size: 20,
+      current: 1,
+    });
+
+    const result = (await load({
+      locals: makeLocals(),
+      url: new URL("http://localhost/recipes/cecotec?search=cheesecake"),
+    } as never)) as Record<string, unknown>;
+
+    expect(mockListPublicCatalog).toHaveBeenCalledWith(
+      "tok",
+      expect.objectContaining({ search: "cheesecake" }),
+    );
+    expect(result.search).toBe("cheesecake");
+  });
+
+  it("trims whitespace and treats a blank search as no search", async () => {
+    mockGetAuthenticatedCecotecSession.mockResolvedValue({
+      accessToken: "tok",
+      email: "cec@example.com",
+    });
+    mockListCatalogCategories.mockResolvedValue([]);
+    mockListPublicCatalog.mockResolvedValue({
+      records: [],
+      total: 0,
+      pages: 0,
+      size: 20,
+      current: 1,
+    });
+
+    const result = (await load({
+      locals: makeLocals(),
+      url: new URL("http://localhost/recipes/cecotec?search=%20%20"),
+    } as never)) as Record<string, unknown>;
+
+    expect(mockListPublicCatalog).toHaveBeenCalledWith(
+      "tok",
+      expect.objectContaining({ search: undefined }),
+    );
+    expect(result.search).toBeNull();
+  });
+
   it("maps the ca locale to es when calling the catalog endpoints", async () => {
     mockGetLocale.mockReturnValue("ca");
     mockGetAuthenticatedCecotecSession.mockResolvedValue({
