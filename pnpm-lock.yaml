@@ -35,7 +35,7 @@ importers:
         version: 2.4.9
       '@fontsource/fira-mono':
         specifier: ^5.2.7
-        version: 5.2.7
+        version: 5.3.0
       '@inlang/paraglide-js':
         specifier: ^2.10.0
         version: 2.15.1
@@ -1051,8 +1051,8 @@ packages:
     resolution: {integrity: sha512-vBZP4NlzfOlerQTnba4aqZoMhE/a9HY7HRqoOPaETQcSQuWEIyZMHGfVu6w9wGtGK5fED5qRs2DteVCjOH60sA==}
     engines: {node: '>=14'}
 
-  '@fontsource/fira-mono@5.2.7':
-    resolution: {integrity: sha512-wYrAn6i3nH6luqQBZxtWUpl4UTUvs9AEbEeZxksPMwIqyjRRaxHTNW3c2VfM50gabS2IS7pT8lVWS2USB4ukYA==}
+  '@fontsource/fira-mono@5.3.0':
+    resolution: {integrity: sha512-FZzRwKhpoXQU1uhEGKUg5AHUUdfiaTXxGCdBBeGHUmcZaqEDEmndSVvpXHkSViH25f/UiWfhcWTib+6A8o4qeQ==}
 
   '@fontsource/inter@5.3.0':
     resolution: {integrity: sha512-RofMylZmjlJEfELXeNHFWBRcSs75rGU/6bV2S2jfnvv/3rPXPGe0LgUJTklcHZ9lM4OZmAVFhcJPnACfb91A3g==}
@@ -4174,7 +4174,7 @@ snapshots:
 
   '@fastify/busboy@2.1.1': {}
 
-  '@fontsource/fira-mono@5.2.7': {}
+  '@fontsource/fira-mono@5.3.0': {}
 
   '@fontsource/inter@5.3.0': {}
 
