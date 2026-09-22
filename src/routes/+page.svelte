@@ -52,7 +52,9 @@
 
 {#if data.user}
   <div class="mx-auto max-w-6xl px-4 py-8 sm:px-8">
-    <h1 class="mb-8 text-3xl font-bold">{m.dashboard_welcome({ name: firstName })}</h1>
+    <h1 class="mb-8 text-3xl font-bold">
+      {m.dashboard_welcome({ name: firstName })}
+    </h1>
 
     <div class="mb-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       <a
@@ -76,7 +78,9 @@
             />
           </svg>
           <div>
-            <h2 class="card-title text-lg">{m.dashboard_create_recipe_title()}</h2>
+            <h2 class="card-title text-lg">
+              {m.dashboard_create_recipe_title()}
+            </h2>
             <p class="text-base-content/60 text-sm">
               {m.dashboard_create_recipe_desc()}
             </p>
@@ -193,9 +197,7 @@
     {#if data.recentRecipes.length === 0}
       <div class="card bg-base-100 shadow-sm">
         <div class="card-body items-center py-12 text-center">
-          <p class="text-base-content/60 mb-2">
-            {m.dashboard_empty_state()}
-          </p>
+          <p class="text-base-content/60 mb-2">{m.dashboard_empty_state()}</p>
           <a href={resolve("/recipes/new")} class="btn btn-primary btn-sm">
             {m.dashboard_create_first_recipe()}
           </a>
@@ -254,7 +256,9 @@
           </div>
 
           <div class="form-control">
-            <label class="label" for="password">{m.common_password_label()}</label>
+            <label class="label" for="password"
+              >{m.common_password_label()}</label
+            >
             <input
               id="password"
               name="password"

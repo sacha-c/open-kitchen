@@ -14,11 +14,11 @@
 </script>
 
 <svelte:head>
-  <title
-    >{m.recipe_detail_page_title({
+  <title>
+    {m.recipe_detail_page_title({
       name: data.recipe?.name ?? m.cecotec_detail_fallback_name(),
-    })}</title
-  >
+    })}
+  </title>
 </svelte:head>
 
 <div class="mx-auto max-w-4xl px-4 py-8 sm:px-8">
@@ -149,7 +149,9 @@
     {#if data.recipe.ingredients.length > 0}
       <div class="card bg-base-100 mb-6 shadow-md">
         <div class="card-body">
-          <h2 class="card-title mb-2 text-xl">{m.label_ingredients_heading()}</h2>
+          <h2 class="card-title mb-2 text-xl">
+            {m.label_ingredients_heading()}
+          </h2>
           <ul class="divide-base-300 divide-y">
             {#each data.recipe.ingredients as ingredient (ingredient.sortOrder)}
               <li class="flex items-center gap-2 py-2">
@@ -165,10 +167,10 @@
     {:else}
       <div class="card bg-base-100 mb-6 shadow-md">
         <div class="card-body">
-          <h2 class="card-title mb-2 text-xl">{m.label_ingredients_heading()}</h2>
-          <p class="text-base-content/60">
-            {m.cecotec_no_ingredient_data()}
-          </p>
+          <h2 class="card-title mb-2 text-xl">
+            {m.label_ingredients_heading()}
+          </h2>
+          <p class="text-base-content/60">{m.cecotec_no_ingredient_data()}</p>
         </div>
       </div>
     {/if}
@@ -200,7 +202,9 @@
                     >
                       {#if step.totalTime > 0}
                         <span class="flex items-center gap-1">
-                          <span class="text-base-content/60">{m.label_time()}</span>
+                          <span class="text-base-content/60"
+                            >{m.label_time()}</span
+                          >
                           <span class="font-medium"
                             >{formatCookingTime(step.totalTime)}</span
                           >
@@ -208,7 +212,9 @@
                       {/if}
                       {#if step.speed !== "0"}
                         <span class="flex items-center gap-1">
-                          <span class="text-base-content/60">{m.label_speed()}</span>
+                          <span class="text-base-content/60"
+                            >{m.label_speed()}</span
+                          >
                           <span class="font-medium">{step.speed}</span>
                         </span>
                       {/if}
@@ -222,7 +228,9 @@
                       {/if}
                       {#if step.power > 0}
                         <span class="flex items-center gap-1">
-                          <span class="text-base-content/60">{m.label_power()}</span>
+                          <span class="text-base-content/60"
+                            >{m.label_power()}</span
+                          >
                           <span class="font-medium">{step.power}</span>
                         </span>
                       {/if}

@@ -89,7 +89,9 @@
         </div>
 
         <div class="form-control">
-          <label class="label" for="password">{m.common_password_label()}</label>
+          <label class="label" for="password"
+            >{m.common_password_label()}</label
+          >
           <input
             id="password"
             name="password"

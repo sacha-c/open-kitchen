@@ -35,10 +35,10 @@
       <h2 class="text-base-content/60 mb-2 text-xl font-semibold">
         {m.recipes_empty_heading()}
       </h2>
-      <p class="text-base-content/40 mb-6">
-        {m.recipes_empty_desc()}
-      </p>
-      <a href="/recipes/new" class="btn btn-primary">{m.label_create_recipe()}</a>
+      <p class="text-base-content/40 mb-6">{m.recipes_empty_desc()}</p>
+      <a href="/recipes/new" class="btn btn-primary"
+        >{m.label_create_recipe()}</a
+      >
     </div>
   {:else}
     <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">

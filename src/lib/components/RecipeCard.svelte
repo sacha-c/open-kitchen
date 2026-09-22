@@ -50,7 +50,10 @@
   <div class="card-body gap-2 p-4">
     <h2 class="card-title text-lg">{recipe.name}</h2>
     <div class="text-base-content/50 flex flex-wrap gap-4 text-sm">
-      <span class="inline-flex items-center gap-1" title={m.card_cooking_time_title()}>
+      <span
+        class="inline-flex items-center gap-1"
+        title={m.card_cooking_time_title()}
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -84,7 +87,10 @@
         </svg>
         {recipe.servings}
       </span>
-      <span class="inline-flex items-center gap-1" title={m.label_steps_heading()}>
+      <span
+        class="inline-flex items-center gap-1"
+        title={m.label_steps_heading()}
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"

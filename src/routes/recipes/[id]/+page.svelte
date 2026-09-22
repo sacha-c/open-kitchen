@@ -218,7 +218,9 @@
                   >
                     {#if step.totalTime > 0}
                       <span class="flex items-center gap-1">
-                        <span class="text-base-content/60">{m.label_time()}</span>
+                        <span class="text-base-content/60"
+                          >{m.label_time()}</span
+                        >
                         <span class="font-medium"
                           >{formatCookingTime(step.totalTime)}</span
                         >
@@ -226,7 +228,9 @@
                     {/if}
                     {#if step.speed !== "0"}
                       <span class="flex items-center gap-1">
-                        <span class="text-base-content/60">{m.label_speed()}</span>
+                        <span class="text-base-content/60"
+                          >{m.label_speed()}</span
+                        >
                         <span class="font-medium">{step.speed}</span>
                       </span>
                     {/if}
@@ -240,7 +244,9 @@
                     {/if}
                     {#if step.power > 0}
                       <span class="flex items-center gap-1">
-                        <span class="text-base-content/60">{m.label_power()}</span>
+                        <span class="text-base-content/60"
+                          >{m.label_power()}</span
+                        >
                         <span class="font-medium">{step.power}</span>
                       </span>
                     {/if}

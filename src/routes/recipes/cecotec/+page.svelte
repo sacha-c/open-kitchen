@@ -58,9 +58,7 @@
       <h2 class="text-base-content/60 mb-2 text-xl font-semibold">
         {m.cecotec_no_account_heading()}
       </h2>
-      <p class="text-base-content/40 mb-6">
-        {m.cecotec_no_account_desc()}
-      </p>
+      <p class="text-base-content/40 mb-6">{m.cecotec_no_account_desc()}</p>
       <a href={resolve("/profile")} class="btn btn-primary"
         >{m.cecotec_link_account_cta()}</a
       >
@@ -202,7 +200,10 @@
                   {formatCookingTime(recipe.cookingTime)}
                 </span>
                 {#if recipe.starAvg}
-                  <span class="inline-flex items-center gap-1" title={m.cecotec_rating_title()}>
+                  <span
+                    class="inline-flex items-center gap-1"
+                    title={m.cecotec_rating_title()}
+                  >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
@@ -222,7 +223,10 @@
                   </span>
                 {/if}
                 {#if recipe.views != null}
-                  <span class="inline-flex items-center gap-1" title={m.cecotec_views_title()}>
+                  <span
+                    class="inline-flex items-center gap-1"
+                    title={m.cecotec_views_title()}
+                  >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
