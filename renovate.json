@@ -7,6 +7,11 @@
   "semanticCommitType": "chore",
   "packageRules": [
     {
+      "matchDatasources": ["docker"],
+      "matchPackagePatterns": ["^postgres"],
+      "enabled": false
+    },
+    {
       "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
       "matchCurrentVersion": "!/^0/",
       "matchDepTypes": ["devDependencies"],
