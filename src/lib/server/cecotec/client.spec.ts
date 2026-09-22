@@ -6,6 +6,8 @@ import {
   deleteRecipe,
   encryptPassword,
   getDevices,
+  listCatalogCategories,
+  listPublicCatalog,
   listRecipes,
   updateRecipe,
   uploadImage,
@@ -444,5 +446,143 @@ describe("getDevices", () => {
   it("throws CecotecError on API-level error", async () => {
     vi.stubGlobal("fetch", mockFetch(errorEnvelope("Unauthorized")));
     await expect(getDevices("token")).rejects.toBeInstanceOf(CecotecError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// listCatalogCategories
+// ---------------------------------------------------------------------------
+
+describe("listCatalogCategories", () => {
+  it("returns parsed categories", async () => {
+    vi.stubGlobal(
+      "fetch",
+      mockFetch(
+        successEnvelope([
+          { id: "1", recipeCategoryName: "Soups", imageUrl: "https://x/1" },
+        ]),
+      ),
+    );
+
+    const categories = await listCatalogCategories("token", "en");
+    expect(categories).toHaveLength(1);
+    expect(categories[0].recipeCategoryName).toBe("Soups");
+  });
+
+  it("calls the top/categorys endpoint with sourceType and code", async () => {
+    const spy = mockFetch(successEnvelope([]));
+    vi.stubGlobal("fetch", spy);
+
+    await listCatalogCategories("token", "es");
+
+    const [url] = spy.mock.calls[0] as [string, RequestInit];
+    expect(url).toContain(
+      "/api/blade-cook/kitCloud/category/app/top/categorys",
+    );
+    expect(url).toContain("sourceType=1");
+    expect(url).toContain("code=es");
+  });
+
+  it("throws CecotecError on HTTP error", async () => {
+    vi.stubGlobal("fetch", mockFetch({}, 500));
+    await expect(listCatalogCategories("token", "en")).rejects.toBeInstanceOf(
+      CecotecError,
+    );
+  });
+
+  it("throws CecotecError on API-level error", async () => {
+    vi.stubGlobal("fetch", mockFetch(errorEnvelope("Not found")));
+    await expect(listCatalogCategories("token", "en")).rejects.toBeInstanceOf(
+      CecotecError,
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// listPublicCatalog
+// ---------------------------------------------------------------------------
+
+describe("listPublicCatalog", () => {
+  function mockTextFetch(body: unknown, status = 200) {
+    return vi.fn().mockResolvedValue({
+      ok: status >= 200 && status < 300,
+      status,
+      text: () => Promise.resolve(JSON.stringify(body)),
+    });
+  }
+
+  it("returns parsed catalog page, preserving large IDs", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        // A raw JSON string with an 18-digit id that JSON.parse would round
+        // if not for the client's "wrap large numbers in quotes" workaround.
+        text: () =>
+          Promise.resolve(
+            '{"code":"200","data":{"records":[{"id":2065088550414004226,"number":42,"defaultName":"Tomato Soup","landscapeImageUrl":"https://x/soup.jpg","cookingTime":900,"views":120,"starAvg":4.5}],"total":1,"pages":1,"size":20,"current":1}}',
+          ),
+      }),
+    );
+
+    const result = await listPublicCatalog("token", { code: "en" });
+    expect(result.records).toHaveLength(1);
+    expect(result.records[0].id).toBe("2065088550414004226");
+    expect(result.records[0].defaultName).toBe("Tomato Soup");
+    expect(result.total).toBe(1);
+  });
+
+  it("builds query params from options", async () => {
+    const spy = mockTextFetch({
+      code: "200",
+      data: { records: [], total: 0, pages: 0, size: 20, current: 1 },
+    });
+    vi.stubGlobal("fetch", spy);
+
+    await listPublicCatalog("token", {
+      code: "es",
+      categoryId: "cat-1",
+      currentPageNo: 2,
+      pageSize: 10,
+    });
+
+    const [url] = spy.mock.calls[0] as [string, RequestInit];
+    expect(url).toContain(
+      "/api/blade-cook/kitCloud/front/recipe/app/page/compatible/list",
+    );
+    expect(url).toContain("code=es");
+    expect(url).toContain("categoryIds=cat-1");
+    expect(url).toContain("currentPageNo=2");
+    expect(url).toContain("pageSize=10");
+  });
+
+  it("defaults categoryIds to empty and page/size to 1/20", async () => {
+    const spy = mockTextFetch({
+      code: "200",
+      data: { records: [], total: 0, pages: 0, size: 20, current: 1 },
+    });
+    vi.stubGlobal("fetch", spy);
+
+    await listPublicCatalog("token", { code: "en" });
+
+    const [url] = spy.mock.calls[0] as [string, RequestInit];
+    expect(url).toContain("categoryIds=");
+    expect(url).toContain("currentPageNo=1");
+    expect(url).toContain("pageSize=20");
+  });
+
+  it("throws CecotecError on HTTP error", async () => {
+    vi.stubGlobal("fetch", mockTextFetch({}, 500));
+    await expect(
+      listPublicCatalog("token", { code: "en" }),
+    ).rejects.toBeInstanceOf(CecotecError);
+  });
+
+  it("throws CecotecError on API-level error", async () => {
+    vi.stubGlobal("fetch", mockTextFetch(errorEnvelope("Not found")));
+    await expect(
+      listPublicCatalog("token", { code: "en" }),
+    ).rejects.toBeInstanceOf(CecotecError);
   });
 });

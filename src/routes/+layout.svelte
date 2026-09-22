@@ -26,6 +26,7 @@
       <div class="flex flex-none items-center gap-2">
         <ul class="menu menu-horizontal hidden gap-1 px-1 font-medium sm:flex">
           <li><a href={resolve("/recipes")}>My Recipes</a></li>
+          <li><a href={resolve("/recipes/cecotec")}>Cecotec Recipes</a></li>
         </ul>
         <div class="dropdown dropdown-end">
           <button
@@ -46,6 +47,9 @@
             <li class="menu-title sm:hidden">{data.user.name}</li>
             <li class="sm:hidden">
               <a href={resolve("/recipes")}>My Recipes</a>
+            </li>
+            <li class="sm:hidden">
+              <a href={resolve("/recipes/cecotec")}>Cecotec Recipes</a>
             </li>
             <li><a href={resolve("/profile")}>Profile</a></li>
             <ThemeToggle variant="menu-item" />
