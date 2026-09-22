@@ -121,6 +121,40 @@ describe("mapCatalogDetailToImportedRecipe", () => {
     ]);
   });
 
+  it('normalizes ingredient unit casing to match the local unit catalog (e.g. Cecotec\'s "L" -> our "l")', () => {
+    const detail = buildDetail();
+    detail.multiLanguageRelations[0].ingredientsRelationVosList = [
+      {
+        ingredientId: "1473607852819722242",
+        foodIngredient: "Water",
+        unitId: "1468065253094465540",
+        unit: "L",
+        amount: "1",
+      },
+    ];
+
+    const result = mapCatalogDetailToImportedRecipe(detail, "en");
+
+    expect(result.ingredients[0].unit).toBe("l");
+  });
+
+  it("leaves a unit unchanged when it isn't recognized in the local catalog", () => {
+    const detail = buildDetail();
+    detail.multiLanguageRelations[0].ingredientsRelationVosList = [
+      {
+        ingredientId: "1",
+        foodIngredient: "Mystery item",
+        unitId: "1",
+        unit: "not-a-real-unit",
+        amount: "1",
+      },
+    ];
+
+    const result = mapCatalogDetailToImportedRecipe(detail, "en");
+
+    expect(result.ingredients[0].unit).toBe("not-a-real-unit");
+  });
+
   it("returns an empty ingredients array when ingredientsRelationVosList is absent", () => {
     const detail = buildDetail();
     detail.multiLanguageRelations[0].ingredientsRelationVosList = undefined;

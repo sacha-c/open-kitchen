@@ -64,12 +64,12 @@
           method="POST"
           action="?/import"
           use:enhance={() => {
-            importing = true;
-            return async ({ update }) => {
-              await update();
-              importing = false;
-            };
-          }}
+          importing = true;
+          return async ({ update }) => {
+            await update();
+            importing = false;
+          };
+        }}
         >
           <input type="hidden" name="number" value={data.number}>
           <button

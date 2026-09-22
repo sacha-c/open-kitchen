@@ -143,6 +143,12 @@ export const recipe = pgTable("recipe", {
   imageUrl: text("image_url"),
   cecotecRecipeId: text("cecotec_recipe_id"),
   cecotecNumber: text("cecotec_number"),
+  // Set once, at import time, when this recipe was copied in from Cecotec's
+  // public catalog. Purely informational (drives the "already imported" UI
+  // on /recipes/cecotec) — never read or written by the sync engine, unlike
+  // cecotecRecipeId/cecotecNumber above which identify *this* recipe's own
+  // copy on the user's Cecotec account once synced.
+  importedFromCecotecNumber: text("imported_from_cecotec_number"),
   syncStatus: text("sync_status").notNull().default("pending"),
   syncError: text("sync_error"),
   syncedAt: timestamp("synced_at", {

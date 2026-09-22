@@ -548,6 +548,9 @@
                   }}
                     aria-invalid={fieldError(`ingredients.${i}.unit`) ? "true" : undefined}
                   >
+                    {#if ingredient.unit && !(catalogs.units || []).some((u) => u.name === ingredient.unit)}
+                      <option value={ingredient.unit}>{ingredient.unit}</option>
+                    {/if}
                     {#each (catalogs.units || []) as unit (unit.id)}
                       <option value={unit.name}>{unit.name}</option>
                     {/each}
@@ -557,6 +560,11 @@
                     name={`ingredients[${i}].cecotecUnitId`}
                     value={ingredient.cecotecUnitId}
                   >
+                  {#if fieldError(`ingredients.${i}.unit`)}
+                    <span class="label-text-alt text-error mt-1"
+                      >{fieldError(`ingredients.${i}.unit`)}</span
+                    >
+                  {/if}
                 </div>
 
                 <div class="flex gap-1 ml-auto sm:ml-0">

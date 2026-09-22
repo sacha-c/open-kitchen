@@ -1,0 +1,1 @@
+ALTER TABLE "recipe" ADD COLUMN "imported_from_cecotec_number" text;

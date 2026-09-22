@@ -1,3 +1,4 @@
+import { getUnitCatalog } from "$lib/server/cecotec/catalog";
 import { CecotecError } from "$lib/server/cecotec/client";
 import type { CecotecRecipeDetail } from "$lib/server/cecotec/types";
 import { speedEnum } from "$lib/server/db/schema";
@@ -10,6 +11,19 @@ function toValidSpeed(speed: string): Speed {
   return (speedEnum.enumValues as readonly string[]).includes(speed)
     ? (speed as Speed)
     : "0";
+}
+
+// The ingredient edit form's unit dropdown only offers options from our
+// bundled unit catalog, matched by exact string. Cecotec's own display text
+// doesn't always match our catalog's casing (e.g. "L" vs our "l") even when
+// the underlying unitId is the same — normalize to the catalog's spelling
+// when we recognize it case-insensitively, so the edit form's <select>
+// actually shows the ingredient as selected instead of leaving it blank.
+function normalizeUnit(unit: string): string {
+  const canonical = getUnitCatalog().find(
+    (u) => u.name.toLowerCase() === unit.toLowerCase(),
+  );
+  return canonical?.name ?? unit;
 }
 
 export interface ImportedRecipeStep {
@@ -78,7 +92,7 @@ export function mapCatalogDetailToImportedRecipe(
         sortOrder: index,
         name: ing.foodIngredient,
         amount: ing.amount,
-        unit: ing.unit,
+        unit: normalizeUnit(ing.unit),
         cecotecIngredientId: ing.ingredientId,
         cecotecUnitId: ing.unitId,
       }),
