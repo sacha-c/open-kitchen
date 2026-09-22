@@ -51,7 +51,9 @@
 
       <div class="mt-4 flex flex-col gap-3">
         <div class="form-control">
-          <label class="label" for="profile-name">{m.common_name_label()}</label>
+          <label class="label" for="profile-name"
+            >{m.common_name_label()}</label
+          >
           <input
             id="profile-name"
             class="input w-full"
@@ -61,7 +63,9 @@
           >
         </div>
         <div class="form-control">
-          <label class="label" for="profile-email">{m.common_email_label()}</label>
+          <label class="label" for="profile-email"
+            >{m.common_email_label()}</label
+          >
           <input
             id="profile-email"
             class="input w-full"
@@ -80,9 +84,13 @@
       <div class="flex items-center justify-between">
         <h2 class="card-title text-xl">{m.profile_cecotec_heading()}</h2>
         {#if linked}
-          <span class="badge badge-success gap-1">{m.profile_linked_badge()}</span>
+          <span class="badge badge-success gap-1"
+            >{m.profile_linked_badge()}</span
+          >
         {:else}
-          <span class="badge badge-neutral">{m.profile_not_linked_badge()}</span>
+          <span class="badge badge-neutral"
+            >{m.profile_not_linked_badge()}</span
+          >
         {/if}
       </div>
 
@@ -116,7 +124,9 @@
         class="mt-2 flex flex-col gap-5"
       >
         <div class="form-control">
-          <label class="label" for="cecotec-email">{m.profile_cecotec_email_label()}</label>
+          <label class="label" for="cecotec-email"
+            >{m.profile_cecotec_email_label()}</label
+          >
           <input
             id="cecotec-email"
             name="email"
@@ -140,7 +150,9 @@
         </div>
 
         <div class="form-control">
-          <label class="label" for="cecotec-password">{m.profile_cecotec_password_label()}</label>
+          <label class="label" for="cecotec-password"
+            >{m.profile_cecotec_password_label()}</label
+          >
           <input
             id="cecotec-password"
             name="password"

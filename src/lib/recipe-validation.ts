@@ -67,7 +67,9 @@ export function createRecipeFormSchema() {
 }
 
 export type RecipeFormData = z.infer<ReturnType<typeof createRecipeFormSchema>>;
-export type IngredientFormData = z.infer<ReturnType<typeof createIngredientSchema>>;
+export type IngredientFormData = z.infer<
+  ReturnType<typeof createIngredientSchema>
+>;
 export type StepFormData = z.infer<ReturnType<typeof createStepSchema>>;
 
 export function calculateCookingTime(

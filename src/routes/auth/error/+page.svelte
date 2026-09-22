@@ -25,10 +25,10 @@
         />
       </svg>
       <h1 class="card-title">{m.auth_error_heading()}</h1>
-      <p class="text-base-content/60 text-sm">
-        {m.auth_error_message()}
-      </p>
-      <a href="/" class="btn btn-primary mt-4 w-full">{m.auth_error_back_to_signin()}</a>
+      <p class="text-base-content/60 text-sm">{m.auth_error_message()}</p>
+      <a href="/" class="btn btn-primary mt-4 w-full"
+        >{m.auth_error_back_to_signin()}</a
+      >
     </div>
   </div>
 </div>

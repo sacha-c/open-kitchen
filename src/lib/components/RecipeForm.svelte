@@ -400,7 +400,9 @@
         </div>
 
         <div class="form-control">
-          <label class="label" for="recipe-image">{m.recipe_form_image_label()}</label>
+          <label class="label" for="recipe-image"
+            >{m.recipe_form_image_label()}</label
+          >
           <input type="hidden" name="imageUrl" value={imageUrl}>
           <div
             class="bg-base-200 border-base-300 rounded-box relative flex h-28 items-center justify-center overflow-hidden border-2 border-dashed"

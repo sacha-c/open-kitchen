@@ -51,7 +51,8 @@
               <a href={resolve("/recipes")}>{m.nav_my_recipes()}</a>
             </li>
             <li class="sm:hidden">
-              <a href={resolve("/recipes/cecotec")}>{m.nav_cecotec_recipes()}</a
+              <a href={resolve("/recipes/cecotec")}
+                >{m.nav_cecotec_recipes()}</a
               >
             </li>
             <li><a href={resolve("/profile")}>{m.nav_profile()}</a></li>

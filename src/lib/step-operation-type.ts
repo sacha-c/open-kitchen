@@ -17,7 +17,8 @@ const BADGE_CLASSES: Record<number, string> = {
 };
 
 export function getStepTypeLabel(operationType: number): string {
-  if (operationType === OPERATION_TYPES.PREPARATION) return m.step_type_preparation();
+  if (operationType === OPERATION_TYPES.PREPARATION)
+    return m.step_type_preparation();
   if (operationType === OPERATION_TYPES.COOKING) return m.step_type_cooking();
   return m.step_type_manual();
 }

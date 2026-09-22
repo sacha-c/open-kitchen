@@ -1,6 +1,6 @@
 <script lang="ts">
   import * as m from "$lib/paraglide/messages";
-  import { getLocale, setLocale, type Locale } from "$lib/paraglide/runtime";
+  import { getLocale, type Locale, setLocale } from "$lib/paraglide/runtime";
 
   const SUPPORTED_LOCALES = ["en", "es"] as const satisfies readonly Locale[];
 
