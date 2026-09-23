@@ -204,6 +204,35 @@ describe("createRecipe", () => {
     expect(result.number).toBe("42");
   });
 
+  it("does not corrupt free-text fields that contain a colon followed by 15+ digits", async () => {
+    // A step description or ingredient name can legitimately contain something
+    // shaped like ":123456789012345" (a ratio, code, etc.) — this must not be
+    // mistaken for an unquoted large numeric property value.
+    const spy = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        text: () =>
+          Promise.resolve(
+            '{"code":"200","data":{"recipeId":2065088550414004226,"number":42,' +
+              '"note":"ratio is 1:123456789012345 approx"}}',
+          ),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve(successEnvelope({})),
+      });
+
+    vi.stubGlobal("fetch", spy);
+
+    const result = await createRecipe("token", minimalRecipe, "MamboTouch");
+
+    expect(result.recipeId).toBe("2065088550414004226");
+    expect(result.number).toBe("42");
+  });
+
   it("throws CecotecError when add returns API error", async () => {
     const mockErrorPayload = errorEnvelope("Recipe not allowed");
 
