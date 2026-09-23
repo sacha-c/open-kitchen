@@ -133,14 +133,34 @@ export async function authenticate(
   };
 }
 
+const JSON_STRING_LITERAL = /"(?:\\.|[^"\\])*"/g;
+const UNQUOTED_BIG_NUMBER = /:(\s*)(\d{15,})/g;
+
+// Cecotec's API returns some numeric IDs unquoted (e.g. {"recipeId": 2065088550414004226}),
+// which JSON.parse silently rounds via float precision loss. Quote any 15+ digit number
+// found as a property value so it parses as a string instead. This only touches text
+// outside JSON string literals — free-text fields (step descriptions, ingredient names,
+// etc.) can legitimately contain a colon followed by 15+ digits, and quoting a match
+// inside one of those would corrupt the string boundary and break parsing entirely.
+function quoteUnquotedBigNumbers(rawText: string): string {
+  let result = "";
+  let lastIndex = 0;
+
+  for (const match of rawText.matchAll(JSON_STRING_LITERAL)) {
+    result += rawText
+      .slice(lastIndex, match.index)
+      .replace(UNQUOTED_BIG_NUMBER, ':$1"$2"');
+    result += match[0];
+    lastIndex = match.index + match[0].length;
+  }
+  result += rawText.slice(lastIndex).replace(UNQUOTED_BIG_NUMBER, ':$1"$2"');
+
+  return result;
+}
+
 async function parseCecotecResponse(response: Response): Promise<unknown> {
   const rawText = await response.text();
-
-  // 🚨 THE HOLY GRAIL: Find any unquoted 15+ digit number and wrap it in quotes
-  // This turns {"recipeId": 2065088550414004226} into {"recipeId": "2065088550414004226"}
-  const safeJsonText = rawText.replace(/:(\s*)(\d{15,})/g, ':$1"$2"');
-
-  return JSON.parse(safeJsonText);
+  return JSON.parse(quoteUnquotedBigNumbers(rawText));
 }
 
 export async function createRecipe(
