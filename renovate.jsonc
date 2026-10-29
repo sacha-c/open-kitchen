@@ -64,7 +64,12 @@
     // ORM, migration tooling, seeding and zod bindings need compatible versions
     {
       "groupName": "drizzle",
-      "matchPackageNames": ["drizzle-orm", "drizzle-kit", "drizzle-seed", "drizzle-zod"]
+      "matchPackageNames": [
+        "drizzle-orm",
+        "drizzle-kit",
+        "drizzle-seed",
+        "drizzle-zod"
+      ]
     },
     {
       "groupName": "patch updates",
