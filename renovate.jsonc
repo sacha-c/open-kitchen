@@ -1,0 +1,92 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:best-practices",
+    ":pinAllExceptPeerDependencies",
+    "security:openssf-scorecard",
+    ":enableVulnerabilityAlerts",
+    ":automergeStableNonMajor",
+    ":automergeDigest",
+    "group:allDigest",
+    "group:vite",
+    "mergeConfidence:all-badges",
+    "customManagers:biomeVersions"
+  ],
+  "prConcurrentLimit": 10,
+  "labels": ["dependencies"],
+  "minimumReleaseAge": "3 days",
+  "internalChecksFilter": "strict",
+  "osvVulnerabilityAlerts": true,
+  "dependencyDashboardOSVVulnerabilitySummary": "unresolved",
+  "vulnerabilityAlerts": {
+    "addLabels": ["security"],
+    "minimumReleaseAge": null
+  },
+  "postUpdateOptions": ["pnpmDedupe"],
+  "lockFileMaintenance": {
+    "enabled": true,
+    "automerge": true
+  },
+  "packageRules": [
+    // 0.x versions: semver promises nothing, so 0.45 -> 0.46 can break.
+    // :automergeStableNonMajor skips them. Let patches through, keep minors manual.
+    // (drizzle-*, mdsvex, @tailwindcss/forms, @tailwindcss/typography, ...)
+    {
+      "matchCurrentVersion": "/^0\\./",
+      "matchUpdateTypes": ["patch"],
+      "automerge": true
+    },
+    {
+      "matchCurrentVersion": "/^0\\./",
+      "matchUpdateTypes": ["minor"],
+      "automerge": false,
+      "addLabels": ["needs-review"]
+    },
+    // Majors: PR is opened but never automerged, and waits a bit longer
+    {
+      "matchUpdateTypes": ["major"],
+      "automerge": false,
+      "minimumReleaseAge": "7 days",
+      "addLabels": ["major"]
+    },
+    // Svelte, SvelteKit, adapters and svelte-check have tight peer ranges.
+    {
+      "groupName": "svelte",
+      "matchPackageNames": ["svelte", "svelte-check", "@sveltejs/**"]
+    },
+    // group:vite's patterns don't match scoped names, so add vite-plugin-svelte
+    // to the same "Vite packages" group by hand (it tracks vite's major version).
+    // Must stay below the svelte rule, which would otherwise claim it via @sveltejs/**.
+    {
+      "groupName": "Vite packages",
+      "matchPackageNames": ["@sveltejs/vite-plugin-svelte"]
+    },
+    // ORM, migration tooling, seeding and zod bindings need compatible versions
+    {
+      "groupName": "drizzle",
+      "matchPackageNames": ["drizzle-orm", "drizzle-kit", "drizzle-seed", "drizzle-zod"]
+    },
+    {
+      "groupName": "patch updates",
+      "matchUpdateTypes": ["patch"]
+    },
+
+    // Vercel CLI ships almost daily: batch it into a weekly PR.
+    // Below the patch rule so its schedule doesn't delay the shared patch PR.
+    {
+      "groupName": "vercel",
+      "matchPackageNames": ["vercel"],
+      "schedule": ["before 6am on monday"]
+    },
+
+    // Postgres majors need a data migration and should match production,
+    // so they wait for explicit approval on the dependency dashboard.
+    // Digest refreshes and minor/patch updates still flow normally.
+    {
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["/(^|/)postgres$/"],
+      "matchUpdateTypes": ["major"],
+      "dependencyDashboardApproval": true
+    }
+  ]
+}
