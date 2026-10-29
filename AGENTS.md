@@ -63,10 +63,13 @@ In general you should follow these guidelines, however it is also important to k
 
 ## Current State
 
-- Auth flow complete: sign in, sign up, sign out pages.
-- DB schema has only better-auth tables: `user`, `session`, `account`, `verification`.
-- No recipe tables, no recipe UI, no Cecotec integration yet.
-- `.mambo/` folder contains **reference Python scripts** (not commited with repository) showing Cecotec API interaction.
+- Auth: sign in, sign up and sign out (better-auth, email + password).
+- DB schema (`src/lib/server/db/schema.ts`): better-auth tables (`user`, `session`, `account`, `verification`), plus `cecotec_credentials`, `recipe`, `recipe_step` and `recipe_ingredient`.
+- Recipes: create, view, edit and delete recipes with steps, ingredients and an image (`/recipes`).
+- Cecotec integration: link an account on `/profile` (password stored AES-256-GCM encrypted, see `src/lib/server/crypto.ts`), sync recipes to it (`src/lib/server/sync/engine.ts`), and browse/import the public catalog (`/recipes/cecotec`).
+- Supported devices: Mambo Touch and Mambo 11090. The model code is read from the user's linked device, not hardcoded.
+- There is no self-service "delete my account" yet. Disconnecting Cecotec and deleting recipes are available in the UI; see `SECURITY.md`.
+- `.mambo/` folder contains **reference Python scripts** (not committed to the repository) showing Cecotec API interaction.
 
 ## Cecotec API Reference
 

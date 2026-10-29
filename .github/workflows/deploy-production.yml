@@ -8,7 +8,13 @@ on:
 
 jobs:
   deploy:
-    if: github.event.workflow_run.conclusion == 'success'
+    # `branches: [main]` also matches a fork's own `main` branch, and
+    # workflow_run runs with this repo's secrets. Only deploy this repo's main,
+    # triggered by a push (not a pull request).
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_repository.full_name == github.repository
     runs-on: ubuntu-latest
     environment:
       name: Production

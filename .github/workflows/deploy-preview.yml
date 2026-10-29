@@ -8,7 +8,12 @@ on:
 
 jobs:
   deploy:
-    if: github.event.workflow_run.conclusion == 'success'
+    # workflow_run executes with this repo's secrets even when CI was triggered
+    # by a fork PR. Only deploy branches from this repo, otherwise a fork could
+    # run arbitrary build code here and exfiltrate VERCEL_TOKEN.
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_repository.full_name == github.repository
     runs-on: ubuntu-latest
     environment:
       name: Preview
