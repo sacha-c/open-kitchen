@@ -28,6 +28,7 @@
     "automerge": true
   },
   "packageRules": [
+    { "matchDepNames": ["pnpm"], "allowedVersions": "<11" },
     // 0.x versions: semver promises nothing, so 0.45 -> 0.46 can break.
     // :automergeStableNonMajor skips them. Let patches through, keep minors manual.
     // (drizzle-*, mdsvex, @tailwindcss/forms, @tailwindcss/typography, ...)
