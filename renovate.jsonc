@@ -12,7 +12,7 @@
     "mergeConfidence:all-badges",
     "customManagers:biomeVersions"
   ],
-  "prConcurrentLimit": 2,
+  "prConcurrentLimit": 5,
   "prHourlyLimit": 2,
   "labels": ["dependencies"],
   "minimumReleaseAge": "3 days",
