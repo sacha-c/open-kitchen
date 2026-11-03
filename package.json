@@ -43,8 +43,8 @@
     "@tailwindcss/vite": "4.3.3",
     "@types/node": "25.9.9",
     "daisyui": "5.7.50",
-    "drizzle-kit": "^0.31.11",
-    "drizzle-seed": "^0.3.1",
+    "drizzle-kit": "0.31.11",
+    "drizzle-seed": "0.3.1",
     "mdsvex": "0.12.8",
     "playwright": "1.64.1",
     "prettier-plugin-tailwindcss": "0.8.1",
@@ -62,8 +62,8 @@
     "@fontsource/inter": "5.3.0",
     "@fontsource/playfair-display": "5.3.0",
     "better-auth": "1.7.15",
-    "drizzle-orm": "^0.45.4",
-    "drizzle-zod": "^0.8.3",
+    "drizzle-orm": "0.45.4",
+    "drizzle-zod": "0.8.3",
     "postgres": "4.0.0",
     "zod": "4.6.7"
   }
