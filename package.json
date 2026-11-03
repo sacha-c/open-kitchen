@@ -30,7 +30,7 @@
     "services:stop": "docker compose down"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.4.9",
+    "@biomejs/biome": "2.6.4",
     "@fontsource/fira-mono": "5.3.0",
     "@inlang/paraglide-js": "2.29.3",
     "@neoconfetti/svelte": "2.2.2",
